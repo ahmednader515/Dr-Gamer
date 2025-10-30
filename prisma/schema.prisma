@@ -1,0 +1,250 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(cuid())
+  phone         String       @unique
+  name          String
+  role          String       @default("User")
+  password      String?
+  image         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  orders        Order[]
+  reviews       Review[]
+  address       UserAddress?
+
+  @@map("users")
+}
+
+model UserAddress {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  fullName   String
+  street     String
+  city       String
+  province   String
+  postalCode String
+  country    String
+  phone      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_addresses")
+}
+
+model Product {
+  id                 String      @id @default(cuid())
+  name               String
+  slug               String      @unique
+  categoryId         String?
+  category           String      // Keep for backward compatibility
+  images             String[]
+  brand              String
+  description        String
+  productType        String      @default("game_code") // game_account, subscription, game_code
+  price              Decimal     @db.Decimal(10, 2)
+  listPrice          Decimal     @db.Decimal(10, 2)
+  countInStock       Int
+  tags               String[]    @default([])
+  colors             String[]    @default(["White", "Red", "Black"])
+  sizes              String[]    @default(["S", "M", "L"])
+  avgRating          Float       @default(0)
+  numReviews         Int         @default(0)
+  ratingDistribution Json?
+  numSales           Int         @default(0)
+  isPublished        Boolean     @default(false)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  orderItems         OrderItem[]
+  reviews            Review[]
+  categoryRelation   Category?   @relation(fields: [categoryId], references: [id])
+
+  @@map("products")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  image       String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Review {
+  id                 String   @id @default(cuid())
+  userId             String
+  productId          String
+  isVerifiedPurchase Boolean  @default(false)
+  rating             Int
+  title              String
+  comment            String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Order {
+  id                   String                @id @default(cuid())
+  userId               String
+  customerEmail        String                @default("")
+  customerPhone        String                @default("")
+  expectedDeliveryDate DateTime
+  paymentMethod        String
+  paymentResult        Json?
+  paymentNumber        String?
+  transactionImage     String?
+  itemsPrice           Decimal               @db.Decimal(10, 2)
+  shippingPrice        Decimal               @db.Decimal(10, 2)
+  taxPrice             Decimal               @db.Decimal(10, 2)
+  totalPrice           Decimal               @db.Decimal(10, 2)
+  promoCode            String?
+  discountPercent      Int?
+  discountAmount       Decimal?              @db.Decimal(10, 2)
+  isPaid               Boolean               @default(false)
+  paidAt               DateTime?
+  isDelivered          Boolean               @default(false)
+  deliveredAt          DateTime?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  orderItems           OrderItem[]
+  shippingAddress      OrderShippingAddress?
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id                String   @id @default(cuid())
+  orderId           String
+  productId         String
+  clientId          String
+  name              String
+  slug              String
+  category          String
+  quantity          Int
+  countInStock      Int
+  image             String
+  price             Decimal  @db.Decimal(10, 2)
+  size              String?
+  color             String?
+  productType       String?  // game_account, subscription, game_code
+  isAddToOwnAccount Boolean  @default(false)
+  accountUsername   String?
+  accountPassword   String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product           Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+model OrderShippingAddress {
+  id         String   @id @default(cuid())
+  orderId    String   @unique
+  street     String   // العنوان (الشارع, الشقة, الجناح, الوحدة, الخ)
+  province   String   // المحافظة
+  area       String   // المنطقة
+  apartment  String?  // شقة
+  building   String?  // المبني
+  floor      String?  // طابق
+  landmark   String?  // علامة
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_shipping_addresses")
+}
+
+model Setting {
+  id                      String   @id @default(cuid())
+  common                  Json
+  site                    Json
+  carousels               Json
+  availableLanguages      Json
+  defaultLanguage         String
+  availableCurrencies     Json
+  defaultCurrency         String
+  availablePaymentMethods Json
+  defaultPaymentMethod    String
+  availableDeliveryDates  Json
+  defaultDeliveryDate     String
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model WebPage {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("web_pages")
+}
+
+model PromoCode {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  discountPercent Int
+  isActive        Boolean  @default(true)
+  expiresAt       DateTime?
+  usageLimit      Int?
+  usageCount      Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("promo_codes")
+}
+
+model FAQCategory {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  questions FAQQuestion[]
+
+  @@map("faq_categories")
+}
+
+model FAQQuestion {
+  id          String       @id @default(cuid())
+  categoryId  String
+  question    String
+  answer      String
+  sortOrder   Int          @default(0)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  category    FAQCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("faq_questions")
+}
