@@ -9,11 +9,7 @@ const platforms = [
   { name: 'Steam', image: '/images/steam.avif', href: '/search?tag=steam' },
   { name: 'Xbox', image: '/images/xbox.png', href: '/search?tag=xbox' },
   { name: 'PlayStation', image: '/images/playstation.jpg', href: '/search?tag=playstation' },
-  { name: 'Nintendo', image: '/images/nintendo.png', href: '/search?tag=nintendo' },
   { name: 'Epic Games', image: '/images/epic.jpg', href: '/search?tag=epic-games' },
-  { name: 'Ubisoft', image: '/images/ubisoft.png', href: '/search?tag=ubisoft' },
-  { name: 'EA Games', image: '/images/ea.avif', href: '/search?tag=ea-games' },
-  { name: 'Rockstar', image: '/images/Rockstar-Games.jpg', href: '/search?tag=rockstar' },
 ]
 
 export default function PlatformsSection() {
@@ -30,16 +26,16 @@ export default function PlatformsSection() {
           display: none !important;
         }
       `}</style>
-      <div className='py-12' style={{ backgroundColor: '#171717' }}>
-        <div className='w-full px-8' dir="rtl">
+      <div className='py-12' style={{ backgroundColor: '#1f0a4d' }}>
+        <div className='w-full px-8' dir="ltr">
           <h2 className='text-2xl sm:text-3xl font-bold text-white mb-8 text-center'>
-            اكتشف حسب المنصات
+            Discover by Platforms
           </h2>
           
-          <div className='relative overflow-hidden mb-4'>
-            {/* Gradient overlays */}
-            <div className='absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#171717] to-transparent z-10 pointer-events-none' />
-            <div className='absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#171717] to-transparent z-10 pointer-events-none' />
+          <div className='relative overflow-hidden mb-4 lg:w-[50%] mx-auto'>
+            {/* Gradient overlays - 25% on each side for 50% visible area */}
+            <div className='absolute left-0 top-0 bottom-0 w-[10%] bg-gradient-to-r from-[#1f0a4d] to-transparent z-10 pointer-events-none' />
+            <div className='absolute right-0 top-0 bottom-0 w-[10%] bg-gradient-to-l from-[#1f0a4d] to-transparent z-10 pointer-events-none' />
             
             {/* Scrolling container */}
             <div style={{ direction: 'ltr' }} className='overflow-hidden'>
@@ -56,13 +52,13 @@ export default function PlatformsSection() {
                       href={platform.href}
                       className='flex-shrink-0 group block'
                     >
-                      <div className='w-48 h-32 rounded-xl overflow-hidden transition-transform duration-300 group-hover:scale-105 relative'>
+                      <div className='w-40 sm:w-48 md:w-56 lg:w-64 h-28 sm:h-36 md:h-40 lg:h-44 rounded-xl overflow-hidden transition-transform duration-300 group-hover:scale-105 relative'>
                         <Image
                           src={platform.image}
                           alt={platform.name}
                           fill
                           className='object-cover'
-                          sizes='(max-width: 768px) 192px, 192px'
+                          sizes='(max-width: 640px) 160px, (max-width: 768px) 192px, (max-width: 1024px) 224px, 256px'
                         />
                       </div>
                     </Link>

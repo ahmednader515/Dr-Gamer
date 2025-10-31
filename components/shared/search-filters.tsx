@@ -13,7 +13,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 
 interface SearchFiltersProps {
   categories: string[]
-  tags: string[]
+  tags?: string[]
   maxPrice: number
 }
 
@@ -25,29 +25,28 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
   
   // Get current filter values
   const currentCategory = searchParams.get('category') || ''
-  const currentTags = searchParams.getAll('tag')
   const currentMinPrice = searchParams.get('minPrice') || '0'
   const currentMaxPrice = searchParams.get('maxPrice') || maxPrice.toString()
 
-  // Arabic translations
+  // English translations
   const translations = {
-    filters: 'البحث',
-    category: 'الفئة',
-    tags: 'العلامات',
-    priceRange: 'نطاق السعر',
-    clearAll: 'مسح الكل',
-    apply: 'تطبيق',
-    showFilters: 'إظهار البحث',
-    hideFilters: 'إخفاء البحث',
-    allCategories: 'جميع الفئات',
-    allTags: 'جميع العلامات',
-    price: 'السعر',
-    egp: 'ج.م',
-    from: 'من',
-    to: 'إلى',
-    noResults: 'لا توجد نتائج',
-    results: 'نتيجة',
-    resultsPlural: 'نتائج'
+    filters: 'Filters',
+    category: 'Category',
+    tags: 'Tags',
+    priceRange: 'Price Range',
+    clearAll: 'Clear All',
+    apply: 'Apply',
+    showFilters: 'Show Filters',
+    hideFilters: 'Hide Filters',
+    allCategories: 'All Categories',
+    allTags: 'All Tags',
+    price: 'Price',
+    egp: '$',
+    from: 'From',
+    to: 'To',
+    noResults: 'No Results',
+    results: 'result',
+    resultsPlural: 'results'
   }
 
   const updateFilters = (newParams: Record<string, string | string[]>) => {
@@ -80,13 +79,6 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
     }
   }
 
-  const handleTagChange = (tag: string) => {
-    const newTags = currentTags.includes(tag)
-      ? currentTags.filter(t => t !== tag)
-      : [...currentTags, tag]
-    updateFilters({ tag: newTags })
-  }
-
   const handlePriceChange = (values: number[]) => {
     setPriceRange(values)
   }
@@ -101,9 +93,6 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
   const removeFilter = (key: string, value?: string) => {
     if (key === 'category') {
       updateFilters({ category: '' })
-    } else if (key === 'tag') {
-      const newTags = currentTags.filter(t => t !== value)
-      updateFilters({ tag: newTags })
     } else if (key === 'price') {
       updateFilters({ minPrice: '', maxPrice: '' })
       setPriceRange([0, maxPrice])
@@ -112,12 +101,11 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
 
   const activeFilters = [
     ...(currentCategory ? [{ key: 'category', value: currentCategory, label: currentCategory }] : []),
-    ...currentTags.map(tag => ({ key: 'tag', value: tag, label: tag })),
     ...(currentMinPrice !== '0' || currentMaxPrice !== maxPrice.toString() ? [{ key: 'price', value: '', label: `${currentMinPrice} - ${currentMaxPrice} ${translations.egp}` }] : [])
   ]
 
   return (
-    <div className="bg-gray-900 rounded-xl shadow-sm border-0 p-4 sm:p-6 lg:sticky lg:top-6" dir="rtl">
+    <div className="bg-gray-900 rounded-xl shadow-sm border-0 p-4 sm:p-6 lg:sticky lg:top-6" dir="ltr">
       {/* Header */}
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div className="flex items-center gap-2 sm:gap-3">
@@ -205,28 +193,6 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
           </div>
 
           <Separator className="my-4 sm:my-6" />
-
-          {/* Tags Filter */}
-          <div className="mb-4 sm:mb-6">
-            <Label className="text-sm font-semibold mb-3 sm:mb-4 block text-white">{translations.tags}</Label>
-            <div className="space-y-2 sm:space-y-3">
-              {tags.map((tag) => (
-                <div key={tag} className="flex items-center space-x-2 space-x-reverse">
-                  <Checkbox
-                    id={tag}
-                    checked={currentTags.includes(tag)}
-                    onCheckedChange={() => handleTagChange(tag)}
-                    className="text-purple-500"
-                  />
-                  <Label htmlFor={tag} className="text-xs sm:text-sm text-gray-300 cursor-pointer">
-                    {tag}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <Separator className="my-3 sm:my-4" />
 
           {/* Price Range Filter */}
           <div className="mb-4 sm:mb-6">

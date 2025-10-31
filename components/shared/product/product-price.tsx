@@ -22,16 +22,16 @@ export default function ProductPrice({
     // Ensure price is a valid number
     const numericPrice = Number(price)
     if (isNaN(numericPrice) || numericPrice <= 0) {
-      return '0.00 ج.م'
+      return '0.00 EGP'
     }
     
-    // Custom formatting for Egyptian Pound to show ج.م
+    // Custom formatting for Egyptian Pound to show EGP
     if (currency === 'EGP') {
-      return `${numericPrice.toFixed(2)} ج.م`
+      return `${numericPrice.toFixed(2)} EGP`
     }
     
     // Fallback to standard currency formatting for other currencies
-    return new Intl.NumberFormat('en-EG', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency,
     }).format(numericPrice)
@@ -59,7 +59,7 @@ export default function ProductPrice({
             {formatPrice(originalPrice)}
           </span>
           <Badge variant='destructive' className='text-xs w-fit text-left'>
-            {Math.round(((Number(originalPrice) - Number(price)) / Number(originalPrice)) * 100)}% خصم
+            {Math.round(((Number(originalPrice) - Number(price)) / Number(originalPrice)) * 100)}% OFF
           </Badge>
         </>
       )}

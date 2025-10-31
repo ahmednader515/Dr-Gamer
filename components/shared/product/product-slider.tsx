@@ -60,9 +60,9 @@ export default function ProductSlider({
   }, [swiperInstance])
 
   return (
-    <div className='w-full font-cairo rounded-xl p-4 sm:p-6 overflow-visible' dir="rtl">
+    <div className='w-full font-cairo rounded-xl p-4 sm:p-6 overflow-visible' dir="ltr">
       {title && (
-        <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-right text-white'>{title}</h2>
+        <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-left text-white'>{title}</h2>
       )}
       
       <div className="relative px-2 py-4">
@@ -109,14 +109,14 @@ export default function ProductSlider({
             disableOnInteraction: true,
             pauseOnMouseEnter: true,
           }}
-          dir="rtl"
+          dir="ltr"
           className="product-swiper"
         >
           {products.map((product) => (
             <SwiperSlide key={product.slug}>
               <ProductCard
                 hideDetails={hideDetails}
-                hideAddToCart
+                hideAddToCart={false}
                 hideBorder
                 product={product}
               />
@@ -126,27 +126,27 @@ export default function ProductSlider({
 
         {/* Custom Navigation Buttons */}
         <button
-          ref={navigationNextRef}
-          className={`absolute -left-10 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 sm:p-3 shadow-lg transition-all duration-200 border-2 ${
-            isEnd 
-              ? 'bg-gray-800/50 text-gray-400 border-gray-700 cursor-not-allowed' 
-              : 'bg-gray-800/90 hover:bg-purple-600 text-white hover:scale-110 border-gray-700 hover:border-purple-500 cursor-pointer'
-          }`}
-          aria-label="Next slide"
-          disabled={isEnd}
-        >
-          <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-        </button>
-        
-        <button
           ref={navigationPrevRef}
-          className={`absolute -right-10 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 sm:p-3 shadow-lg transition-all duration-200 border-2 ${
+          className={`absolute -left-10 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 sm:p-3 shadow-lg transition-all duration-200 border-2 ${
             isBeginning 
               ? 'bg-gray-800/50 text-gray-400 border-gray-700 cursor-not-allowed' 
               : 'bg-gray-800/90 hover:bg-purple-600 text-white hover:scale-110 border-gray-700 hover:border-purple-500 cursor-pointer'
           }`}
           aria-label="Previous slide"
           disabled={isBeginning}
+        >
+          <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+        </button>
+        
+        <button
+          ref={navigationNextRef}
+          className={`absolute -right-10 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 sm:p-3 shadow-lg transition-all duration-200 border-2 ${
+            isEnd 
+              ? 'bg-gray-800/50 text-gray-400 border-gray-700 cursor-not-allowed' 
+              : 'bg-gray-800/90 hover:bg-purple-600 text-white hover:scale-110 border-gray-700 hover:border-purple-500 cursor-pointer'
+          }`}
+          aria-label="Next slide"
+          disabled={isEnd}
         >
           <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>

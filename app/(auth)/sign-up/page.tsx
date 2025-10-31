@@ -4,14 +4,14 @@ import SignupForm from './signup-form'
 import data from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'إنشاء حساب جديد',
+  title: 'Create New Account',
 }
 
 export default function SignUpPage() {
   const { site } = data.settings[0];
   
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-gray-900 signin-page-rtl" dir="rtl">
+    <div className="w-full min-h-screen flex items-center justify-center bg-gray-900 signin-page-rtl" dir="ltr">
       <div className="w-full max-w-[1800px] mx-auto p-4 sm:p-6 md:p-8">
         <div className="grid lg:grid-cols-2 gap-8 md:gap-16 lg:gap-32 items-center">
           {/* Logo Section - Right Side */}
@@ -19,15 +19,15 @@ export default function SignUpPage() {
             <div className="w-32 h-32 md:w-48 md:h-48 lg:w-64 lg:h-64 relative">
               <Image
                 src="/icons/logo.png"
-                alt="شعار المتجر"
+                alt="Store logo"
                 fill
                 className="object-contain"
                 priority
               />
             </div>
             <div className="space-y-4 md:space-y-6 lg:space-y-8">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-white font-cairo">انضم إلى {site.name}</h1>
-              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 font-cairo">أنشئ حسابك واستمتع بالتسوق</p>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-white font-cairo">Join {site.name}</h1>
+              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 font-cairo">Create your account and start shopping</p>
             </div>
           </div>
 
@@ -35,8 +35,8 @@ export default function SignUpPage() {
           <div className="flex justify-center form-section order-1 lg:order-2">
             <div className="w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-2xl">
               <div className="text-center mb-6 md:mb-8">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-right font-cairo mb-2 md:mb-3 text-white">إنشاء حساب جديد</h2>
-                <p className="text-sm sm:text-base md:text-lg text-gray-300 text-right font-cairo">أدخل بياناتك لإنشاء حساب جديد</p>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center font-cairo mb-2 md:mb-3 text-white">Create New Account</h2>
+                <p className="text-sm sm:text-base md:text-lg text-gray-300 text-center font-cairo">Enter your details to create a new account</p>
               </div>
               <SignupForm />
             </div>
@@ -46,11 +46,11 @@ export default function SignUpPage() {
         {/* Bottom Section */}
         <div className="mt-8 md:mt-12 lg:mt-16 text-center">
           <div className="text-gray-300 mb-4 md:mb-6 font-cairo text-base md:text-lg">
-            لديك حساب بالفعل؟
+            Already have an account?
           </div>
           <a href="/sign-in" className="inline-block">
             <button className="w-full max-w-sm md:max-w-lg font-cairo text-base md:text-lg h-10 md:h-12 bg-purple-600 border-2 border-purple-600 text-white hover:bg-purple-700 rounded-lg transition-colors">
-              تسجيل الدخول
+              Sign In
             </button>
           </a>
         </div>

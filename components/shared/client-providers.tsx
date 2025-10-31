@@ -21,12 +21,12 @@ export default function ClientProviders({
       <ThemeProvider>
         <AppInitializer setting={setting}>
           {visible ? (
-            <div className='flex min-h-screen bg-gray-800'>
-              <div className='flex-1 overflow-hidden bg-gray-900'>{children}</div>
+            <div className='flex min-h-screen' style={{ backgroundColor: '#4618ac' }}>
+              <div className='flex-1 overflow-hidden' style={{ backgroundColor: '#4618ac' }}>{children}</div>
               <CartSidebar />
             </div>
           ) : (
-            <div className='min-h-screen bg-gray-900'>{children}</div>
+            <div className='min-h-screen' style={{ backgroundColor: '#4618ac' }}>{children}</div>
           )}
           <Toaster />
         </AppInitializer>

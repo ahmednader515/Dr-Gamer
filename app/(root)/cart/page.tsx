@@ -31,8 +31,8 @@ export default function CartPage() {
       async () => {
         removeItem(item)
         toast({
-          title: 'تم حذف المنتج',
-          description: 'تم حذف المنتج من عربة التسوق',
+          title: 'Product Removed',
+          description: 'Product has been removed from cart',
           variant: 'default',
         })
       }
@@ -44,8 +44,8 @@ export default function CartPage() {
       async () => {
         clearCart()
         toast({
-          title: 'تم إفراغ العربة',
-          description: 'تم حذف جميع المنتجات من عربة التسوق',
+          title: 'Cart Cleared',
+          description: 'All products have been removed from cart',
           variant: 'default',
         })
       }
@@ -56,15 +56,15 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className='container mx-auto px-4 py-6 sm:py-8' dir='rtl'>
+      <div className='container mx-auto px-4 py-6 sm:py-8' dir='ltr'>
         <div className='text-center py-8 sm:py-12'>
           <ShoppingCart className='h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto mb-3 sm:mb-4' />
-          <h1 className='text-xl sm:text-2xl font-bold mb-2'>عربة التسوق فارغة</h1>
+          <h1 className='text-xl sm:text-2xl font-bold mb-2'>Your Cart is Empty</h1>
           <p className='text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 px-4'>
-            يبدو أنك لم تضيف أي منتجات إلى عربة التسوق بعد.
+            Looks like you haven't added any products to your cart yet.
           </p>
           <Button asChild size='lg' className='btn-mobile-lg'>
-            <Link href='/'>ابدأ التسوق</Link>
+            <Link href='/'>Start Shopping</Link>
           </Button>
         </div>
       </div>
@@ -72,15 +72,15 @@ export default function CartPage() {
   }
 
   return (
-    <div className='container mx-auto px-4 py-6 sm:py-8' dir='rtl'>
+    <div className='container mx-auto px-4 py-6 sm:py-8' dir='ltr'>
       <div className='flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8'>
         <Button variant='ghost' size='sm' asChild>
           <Link href='/'>
-            <ArrowLeft className='h-4 w-4 ml-2' />
-            متابعة التسوق
+            <ArrowLeft className='h-4 w-4 mr-2' />
+            Continue Shopping
           </Link>
         </Button>
-        <h1 className='text-2xl sm:text-3xl font-bold'>عربة التسوق</h1>
+        <h1 className='text-2xl sm:text-3xl font-bold'>Shopping Cart</h1>
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6'>
@@ -100,9 +100,9 @@ export default function CartPage() {
                   <div className='flex-1 min-w-0'>
                     <h3 className='font-semibold text-sm sm:text-base mb-1'>{item.name}</h3>
                     <p className='text-xs sm:text-sm text-muted-foreground mb-2'>
-                      {item.color && `اللون: ${item.color}`}
+                      {item.color && `Color: ${item.color}`}
                       {item.color && item.size && ` | `}
-                      {item.size && `الحجم: ${item.size}`}
+                      {item.size && `Size: ${item.size}`}
                     </p>
                     <p className='font-medium text-sm sm:text-base mb-3 sm:mb-0'>
                       {formatPrice(item.price)} × {item.quantity}
@@ -151,16 +151,16 @@ export default function CartPage() {
         <div className='space-y-3 sm:space-y-4'>
           <Card>
             <CardHeader className='p-3 sm:p-4 pb-2 sm:pb-3'>
-              <CardTitle className='text-base sm:text-lg'>ملخص الطلب</CardTitle>
+              <CardTitle className='text-base sm:text-lg'>Order Summary</CardTitle>
             </CardHeader>
             <CardContent className='p-3 sm:p-4 pt-0 space-y-2'>
               <div className='flex justify-between text-sm sm:text-base'>
-                <span>المنتجات ({items.length})</span>
+                <span>Products ({items.length})</span>
                 <span>{formatPrice(itemsPrice)}</span>
               </div>
               <Separator />
               <div className='flex justify-between font-semibold text-base sm:text-lg'>
-                <span>المجموع</span>
+                <span>Total</span>
                 <span>{formatPrice(itemsPrice)}</span>
               </div>
             </CardContent>
@@ -168,7 +168,7 @@ export default function CartPage() {
           
           <div className='space-y-2'>
             <Button asChild className='w-full' size='lg' className='btn-mobile-lg'>
-              <Link href='/checkout'>إتمام الطلب</Link>
+              <Link href='/checkout'>Complete Order</Link>
             </Button>
             <Button
               variant='outline'
@@ -177,9 +177,9 @@ export default function CartPage() {
               className='w-full btn-mobile'
             >
               {isUpdating ? (
-                <LoadingSpinner size="sm" text="جاري الإفراغ..." />
+                <LoadingSpinner size="sm" text="Clearing..." />
               ) : (
-                'إفراغ العربة'
+                'Clear Cart'
               )}
             </Button>
           </div>

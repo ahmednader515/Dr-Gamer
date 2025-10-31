@@ -30,11 +30,11 @@ const ProductCard = ({
   // Helper function to get product type label
   const getProductTypeLabel = (productType: string = 'game_code') => {
     const typeMap: { [key: string]: string } = {
-      'game_code': 'كود اللعبة',
-      'game_account': 'حساب اللعبة',
-      'subscription': 'اشتراك',
+      'game_code': 'Game Code',
+      'game_account': 'Game Account',
+      'subscription': 'Subscription',
     };
-    return typeMap[productType] || 'كود اللعبة';
+    return typeMap[productType] || 'Game Code';
   };
 
   const getProductTypeColor = (productType: string = 'game_code') => {
@@ -49,7 +49,7 @@ const ProductCard = ({
   const ProductImage = () => (
     <div className="relative group">
       <Link href={`/product/${product.slug}`}>
-        <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden bg-gray-800">
+        <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden" style={{ backgroundColor: '#351564' }}>
           {/* Product Type Banner */}
           <div className={`absolute top-2 right-2 ${getProductTypeColor(product.productType || 'game_code')} text-white text-center py-0.5 px-2 z-10 text-[10px] sm:text-xs font-semibold rounded`}>
             {getProductTypeLabel(product.productType || 'game_code')}
@@ -72,14 +72,14 @@ const ProductCard = ({
               />
             )
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-200">
-              <span className="text-gray-500 text-sm">لا توجد صورة</span>
+            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#351564' }}>
+              <span className="text-gray-400 text-sm">No Image</span>
             </div>
           )}
           
           {/* Quick action buttons overlay */}
           <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <button className="p-1.5 sm:p-2 bg-gray-800/90 hover:bg-gray-800 rounded-full shadow-md transition-all duration-200 hover:scale-110">
+            <button className="p-1.5 sm:p-2 rounded-full shadow-md transition-all duration-200 hover:scale-110" style={{ backgroundColor: 'rgba(53, 21, 100, 0.9)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 1)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 0.9)'}>
               <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-purple-400" />
             </button>
           </div>
@@ -87,12 +87,12 @@ const ProductCard = ({
           {/* Stock status badge */}
           {product.countInStock <= 10 && product.countInStock > 0 && (
             <Badge variant="destructive" className="absolute top-2 sm:top-3 right-2 sm:right-3 text-xs">
-              آخر {product.countInStock} قطع
+              Only {product.countInStock} left
             </Badge>
           )}
           {product.countInStock === 0 && (
-             <Badge variant="secondary" className="absolute top-2 sm:top-3 right-2 sm:right-3 text-xs bg-gray-800">
-              نفذت الكمية
+             <Badge variant="secondary" className="absolute top-2 sm:top-3 right-2 sm:right-3 text-xs" style={{ backgroundColor: '#351564' }}>
+              Out of Stock
             </Badge>
           )}
         </div>
@@ -101,14 +101,14 @@ const ProductCard = ({
   );
 
   const ProductDetails = () => (
-    <div className="flex-1 space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-800/50" dir="rtl">
+    <div className="flex-1 space-y-3 sm:space-y-4 p-3 sm:p-4" style={{ backgroundColor: 'rgba(45, 26, 95, 0.5)' }} dir="ltr">
       {/* Product Name */}
       <Link
         href={`/product/${product.slug}`}
         className="block group"
       >
         <h3 
-           className="font-semibold text-gray-100 text-right leading-tight line-clamp-2 group-hover:text-purple-400 transition-colors duration-200 text-sm sm:text-base"
+           className="font-semibold text-gray-100 text-left leading-tight line-clamp-2 group-hover:text-purple-400 transition-colors duration-200 text-sm sm:text-base"
           style={{
             display: "-webkit-box",
             WebkitLineClamp: 2,
@@ -122,13 +122,13 @@ const ProductCard = ({
       {/* Rating and Reviews - Clean Number Design */}
       <div className="flex flex-col items-start gap-1 sm:gap-2">
         <div className="flex items-center gap-1 sm:gap-2">
-          <span className="text-xs text-gray-500">التقييم:</span>
+          <span className="text-xs text-gray-500">Rating:</span>
           <div className="bg-yellow-100 text-yellow-800 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-semibold">
             {product.avgRating && !isNaN(product.avgRating) ? product.avgRating.toFixed(1) : '0.0'}
           </div>
         </div>
         <span className="text-xs text-gray-500 text-left">
-          ({product.numReviews && !isNaN(product.numReviews) ? formatNumber(product.numReviews) : '0'} تقييم)
+          ({product.numReviews && !isNaN(product.numReviews) ? formatNumber(product.numReviews) : '0'} reviews)
         </span>
       </div>
 
@@ -171,8 +171,8 @@ const ProductCard = ({
           }, 1);
 
           toast({
-            title: 'تمت الإضافة إلى السلة',
-            description: `تم إضافة ${product.name} إلى سلة التسوق الخاصة بك`,
+            title: 'Added to Cart',
+            description: `${product.name} has been added to your cart`,
             variant: 'default',
           });
         }
@@ -193,7 +193,7 @@ const ProductCard = ({
               <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
               </svg>
-              إضافة للسلة
+              Add to Cart
             </>
           )}
         </button>
@@ -203,7 +203,7 @@ const ProductCard = ({
 
   if (hideBorder) {
     return (
-      <div className="flex flex-col h-full bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden group border-2 border-gray-700 hover:border-purple-500 hover:scale-[1.03] m-1" dir="rtl">
+      <div className="flex flex-col h-full rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden group border-2 hover:border-purple-500 hover:scale-[1.03] m-1" style={{ backgroundColor: '#2d1a5f', borderColor: '#4618ac' }} dir="ltr">
         <ProductImage />
         {!hideDetails && (
           <>
@@ -216,7 +216,7 @@ const ProductCard = ({
   }
 
   return (
-    <Card className="flex flex-col h-full bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden group border-2 border-gray-700 hover:border-purple-500 hover:scale-[1.03] m-1" dir="rtl">
+    <Card className="flex flex-col h-full rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden group border-2 hover:border-purple-500 hover:scale-[1.03] m-1" style={{ backgroundColor: '#2d1a5f', borderColor: '#4618ac' }} dir="ltr">
       <ProductImage />
       {!hideDetails && (
         <>

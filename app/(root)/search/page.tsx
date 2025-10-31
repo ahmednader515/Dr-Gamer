@@ -226,12 +226,12 @@ async function ProductResults({ params, translations }: {
                   })}`}
                   className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                 >
-                  السابق
+                  Previous
                 </a>
               )}
               
               <span className="text-sm text-gray-600">
-                صفحة {currentPage} من {totalPages}
+                Page {currentPage} of {totalPages}
               </span>
               
               {currentPage < totalPages && (
@@ -242,7 +242,7 @@ async function ProductResults({ params, translations }: {
                   })}`}
                   className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                 >
-                  التالي
+                  Next
                 </a>
               )}
             </div>
@@ -261,13 +261,11 @@ async function SearchFiltersSection({ params }: { params: any }) {
   })
   
   const categoryList = categories.map((c: any) => c.name)
-  const tags = ['best-seller', 'featured', 'new-arrival', 'todays-deal', 'pain-relief', 'vitamins', 'allergy', 'digestive', 'cold-flu']
 
   return (
     <div className='w-full'>
       <SearchFilters 
         categories={categoryList}
-        tags={tags}
         maxPrice={1000}
       />
     </div>
@@ -285,30 +283,30 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     notFound()
   }
 
-  // Arabic translations
+  // English translations
   const translations = {
-    searchResults: 'نتائج البحث',
-    productsIn: 'المنتجات في',
-    found: 'تم العثور على',
-    product: 'منتج',
-    products: 'منتجات',
+    searchResults: 'Search Results',
+    productsIn: 'Products in',
+    found: 'Found',
+    product: 'product',
+    products: 'products',
     loading: '...',
-    filters: 'المرشحات',
-    filterOptionsComingSoon: 'خيارات التصفية قريباً...',
-    showing: 'عرض',
-    of: 'من',
-    noProductsFound: 'لم يتم العثور على منتجات',
-    tryAdjustingSearch: 'حاول تعديل معايير البحث أو تصفح جميع المنتجات',
-    sortBy: 'ترتيب حسب',
-    newest: 'الأحدث',
-    priceLowToHigh: 'السعر: من الأقل إلى الأعلى',
-    priceHighToLow: 'السعر: من الأعلى إلى الأعلى',
-    bestSelling: 'الأكثر مبيعاً',
-    avgCustomerReview: 'متوسط تقييم العملاء'
+    filters: 'Filters',
+    filterOptionsComingSoon: 'Filter options coming soon...',
+    showing: 'Showing',
+    of: 'of',
+    noProductsFound: 'No products found',
+    tryAdjustingSearch: 'Try adjusting your search criteria or browse all products',
+    sortBy: 'Sort by',
+    newest: 'Newest',
+    priceLowToHigh: 'Price: Low to High',
+    priceHighToLow: 'Price: High to Low',
+    bestSelling: 'Best Selling',
+    avgCustomerReview: 'Average Customer Review'
   }
 
   return (
-    <div className='container mx-auto px-4 py-6 sm:py-8' dir="rtl">
+    <div className='container mx-auto px-4 py-6 sm:py-8' dir="ltr">
       {/* Search Header - Load first */}
       <Suspense fallback={<SearchHeaderSkeleton />}>
         <SearchHeader params={params} translations={translations} />

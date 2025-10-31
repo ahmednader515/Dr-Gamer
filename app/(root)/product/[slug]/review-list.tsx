@@ -93,8 +93,8 @@ export default function ReviewList({ productId }: ReviewListProps) {
     } catch (error) {
       console.error('Error fetching reviews:', error)
       toast({
-        title: 'خطأ في تحميل التقييمات',
-        description: 'فشل في تحميل التقييمات. يرجى المحاولة مرة أخرى.',
+        title: 'Error Loading Reviews',
+        description: 'Failed to load reviews. Please try again.',
         variant: 'destructive',
       })
     } finally {
@@ -111,8 +111,8 @@ export default function ReviewList({ productId }: ReviewListProps) {
   const handleSubmitReview = async () => {
     if (!session) {
       toast({
-        title: 'تسجيل الدخول مطلوب',
-        description: 'يجب تسجيل الدخول لكتابة تقييم',
+        title: 'Sign In Required',
+        description: 'You must sign in to write a review',
         variant: 'destructive',
       })
       router.push('/sign-in')
@@ -121,8 +121,8 @@ export default function ReviewList({ productId }: ReviewListProps) {
 
     if (newReview.rating === 0) {
       toast({
-        title: 'التقييم مطلوب',
-        description: 'يرجى اختيار تقييم قبل الإرسال',
+        title: 'Rating Required',
+        description: 'Please select a rating before submitting',
         variant: 'destructive',
       })
       return
@@ -130,8 +130,8 @@ export default function ReviewList({ productId }: ReviewListProps) {
 
     if (!newReview.comment.trim()) {
       toast({
-        title: 'التعليق مطلوب',
-        description: 'يرجى كتابة تعليق قبل الإرسال',
+        title: 'Comment Required',
+        description: 'Please write a comment before submitting',
         variant: 'destructive',
       })
       return
@@ -153,8 +153,8 @@ export default function ReviewList({ productId }: ReviewListProps) {
         if (response.ok) {
           const result = await response.json()
           toast({
-            title: 'تم إرسال التقييم',
-            description: result.message || 'شكراً لك على تقييمك!',
+            title: 'Review Submitted',
+            description: result.message || 'Thank you for your review!',
             variant: 'default',
           })
 
@@ -165,8 +165,8 @@ export default function ReviewList({ productId }: ReviewListProps) {
         } else {
           const error = await response.json()
           toast({
-            title: 'خطأ',
-            description: error.error || 'فشل في إرسال التقييم. يرجى المحاولة مرة أخرى.',
+            title: 'Error',
+            description: error.error || 'Failed to submit review. Please try again.',
             variant: 'destructive',
           })
         }
@@ -179,7 +179,7 @@ export default function ReviewList({ productId }: ReviewListProps) {
   // Update feature removed
 
   const handleDeleteReview = async (reviewId: string) => {
-    if (!confirm('هل أنت متأكد من حذف هذا التقييم؟')) return
+    if (!confirm('Are you sure you want to delete this review?')) return
 
     await withDeleting(
       async () => {
@@ -189,15 +189,15 @@ export default function ReviewList({ productId }: ReviewListProps) {
 
         if (response.ok) {
           toast({
-            title: 'تم حذف التقييم',
-            description: 'تم حذف تقييمك بنجاح',
+            title: 'Review Deleted',
+            description: 'Your review has been deleted successfully',
             variant: 'default',
           })
           await fetchReviews()
         } else {
           toast({
-            title: 'خطأ',
-            description: 'فشل في حذف التقييم. يرجى المحاولة مرة أخرى.',
+            title: 'Error',
+            description: 'Failed to delete review. Please try again.',
             variant: 'destructive',
           })
         }
@@ -214,42 +214,42 @@ export default function ReviewList({ productId }: ReviewListProps) {
 
   if (isLoading) {
     return (
-      <div className='space-y-6' dir="rtl">
+      <div className='space-y-6' dir="ltr">
         <div className='text-center py-8'>
           <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto'></div>
-          <p className='mt-2 text-muted-foreground'>جاري تحميل التقييمات...</p>
+          <p className='mt-2 text-muted-foreground'>Loading reviews...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className='space-y-6' dir="rtl">
+    <div className='space-y-6' dir="ltr">
       {/* Write Review Form */}
       <Card>
         <CardHeader>
-          <CardTitle>اكتب تقييماً</CardTitle>
+          <CardTitle>Write a Review</CardTitle>
         </CardHeader>
         <CardContent className='space-y-4'>
           {status === 'loading' ? (
             <div className='text-center py-6'>
               <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4'></div>
-              <p className='text-muted-foreground'>جاري التحقق من حالة تسجيل الدخول...</p>
+              <p className='text-muted-foreground'>Checking sign-in status...</p>
             </div>
           ) : status !== 'authenticated' ? (
             <div className='text-center py-6'>
               <Lock className='h-12 w-12 mx-auto mb-4 text-muted-foreground' />
               <p className='text-muted-foreground mb-4'>
-                يجب تسجيل الدخول لكتابة تقييم
+                You must sign in to write a review
               </p>
               <Button onClick={handleSignInClick} className='w-full'>
-                تسجيل الدخول
+                Sign In
               </Button>
             </div>
           ) : (
             <>
               <div>
-                <label className='text-sm font-medium mb-2 block'>التقييم</label>
+                <label className='text-sm font-medium mb-2 block'>Rating</label>
                 <div className='flex gap-1'>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -272,12 +272,12 @@ export default function ReviewList({ productId }: ReviewListProps) {
 
               <div>
                 <label htmlFor='title' className='text-sm font-medium mb-2 block'>
-                  العنوان (اختياري)
+                  Title (Optional)
                 </label>
                 <input
                   id='title'
                   type='text'
-                  placeholder='عنوان التقييم...'
+                  placeholder='Review title...'
                   value={newReview.title}
                   onChange={(e) => setNewReview(prev => ({ ...prev, title: e.target.value }))}
                   className='w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent'
@@ -286,11 +286,11 @@ export default function ReviewList({ productId }: ReviewListProps) {
 
               <div>
                 <label htmlFor='comment' className='text-sm font-medium mb-2 block'>
-                  التعليق
+                  Comment
                 </label>
                 <Textarea
                   id='comment'
-                  placeholder='شارك أفكارك حول هذا المنتج...'
+                  placeholder='Share your thoughts about this product...'
                   value={newReview.comment}
                   onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
                   rows={4}
@@ -303,9 +303,9 @@ export default function ReviewList({ productId }: ReviewListProps) {
                 className='w-full'
               >
                 {isSubmitting ? (
-                  <LoadingSpinner size="sm" text="جاري الإرسال..." />
+                  <LoadingSpinner size="sm" text="Submitting..." />
                 ) : (
-                  'إرسال التقييم'
+                  'Submit Review'
                 )}
               </Button>
             </>
@@ -318,13 +318,13 @@ export default function ReviewList({ productId }: ReviewListProps) {
       {/* Reviews List */}
       <div>
         <h3 className='text-lg font-semibold mb-4'>
-          تقييمات العملاء ({reviews.length})
+          Customer Reviews ({reviews.length})
         </h3>
         
         {reviews.length === 0 ? (
           <div className='text-center py-8 text-muted-foreground'>
             <User className='h-12 w-12 mx-auto mb-4 opacity-50' />
-            <p>لا توجد تقييمات بعد. كن أول من يقيم هذا المنتج!</p>
+            <p>No reviews yet. Be the first to review this product!</p>
           </div>
         ) : (
           <div className='space-y-4'>
@@ -371,7 +371,7 @@ export default function ReviewList({ productId }: ReviewListProps) {
                       )}
                       <p className='text-muted-foreground mb-2'>{review.comment}</p>
                       <p className='text-xs text-muted-foreground'>
-                        {new Date(review.createdAt).toLocaleDateString('ar-EG')}
+                        {new Date(review.createdAt).toLocaleDateString('en-US')}
                       </p>
                   </>
                 </CardContent>
@@ -383,25 +383,25 @@ export default function ReviewList({ productId }: ReviewListProps) {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className='flex justify-center gap-2 mt-6'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-            >
-              السابق
-            </Button>
-            <span className='px-3 py-2 text-sm'>
-              صفحة {currentPage} من {totalPages}
-            </span>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-            >
-              التالي
-            </Button>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className='px-3 py-2 text-sm'>
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
           </div>
         )}
       </div>

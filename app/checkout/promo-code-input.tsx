@@ -27,7 +27,7 @@ export default function PromoCodeInput({
     if (!promoCode.trim()) {
       toast({
         title: 'خطأ',
-        description: 'الرجاء إدخال كود الخصم',
+        description: 'Please enter a promo code',
         variant: 'destructive',
       })
       return
@@ -72,7 +72,7 @@ export default function PromoCodeInput({
     setPromoCode('')
     toast({
       title: 'تم الإزالة',
-      description: 'تم إزالة كود الخصم',
+      description: 'Promo code has been removed',
     })
   }
 
@@ -83,10 +83,10 @@ export default function PromoCodeInput({
           <div className='flex justify-between items-center'>
             <div>
               <p className='text-sm font-medium text-purple-400'>
-                كود الخصم: {appliedPromo.code}
+                Promo Code: {appliedPromo.code}
               </p>
               <p className='text-xs text-gray-300'>
-                خصم {appliedPromo.discountPercent}%
+                {appliedPromo.discountPercent}% OFF
               </p>
             </div>
             <Button
@@ -100,7 +100,7 @@ export default function PromoCodeInput({
           </div>
         </div>
         <div className='flex justify-between text-sm sm:text-base text-purple-400'>
-          <span>الخصم ({appliedPromo.discountPercent}%):</span>
+          <span>Discount ({appliedPromo.discountPercent}%):</span>
           <span>- <ProductPrice price={discountAmount} plain /></span>
         </div>
       </>
@@ -109,14 +109,14 @@ export default function PromoCodeInput({
 
   return (
     <div className='space-y-2'>
-      <Label htmlFor='promoCode' className='text-sm font-medium'>كود الخصم</Label>
+      <Label htmlFor='promoCode' className='text-sm font-medium'>Promo Code</Label>
       <div className='flex gap-2'>
         <Input
           id='promoCode'
           type='text'
           value={promoCode}
           onChange={(e) => setPromoCode(e.target.value)}
-          placeholder='أدخل كود الخصم'
+          placeholder='Enter promo code'
           className='flex-1'
         />
         <Button

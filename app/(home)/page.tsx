@@ -73,9 +73,6 @@ async function CategoriesBesideCarousel({ categories }: { categories: { id: stri
               <div className='w-full h-full bg-gray-800' />
             )}
             <div className='absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors' />
-            <p className='absolute bottom-3 right-4 text-white font-semibold text-base sm:text-lg'>
-              {category.name}
-            </p>
           </div>
         </Link>
       ))}
@@ -106,7 +103,7 @@ async function MostPurchasedSection() {
     return (
       <Card className='w-full rounded-xl bg-transparent border-0 shadow-none'>
         <CardContent className='card-mobile p-0'>
-          <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-right text-white'>المنتجات الأكثر مبيعاً</h2>
+          <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-right text-white'>Best Selling Products</h2>
           <ProductSlider 
             title={undefined}
             products={formattedProducts} 
@@ -278,7 +275,7 @@ async function RemainingCategoriesSection({ categories }: { categories: string[]
     )
   } catch (error) {
     console.error('Error loading remaining category products:', error)
-    return <ProductSliderSkeleton title="المنتجات" />
+    return <ProductSliderSkeleton title="Products" />
   }
 }
 
@@ -297,9 +294,9 @@ export default async function HomePage() {
   const categoriesBelow = categories.slice(3)
 
   return (
-    <div className='font-cairo text-white overflow-x-hidden' style={{ backgroundColor: '#0d0d0d' }} dir='rtl'>
+    <div className='font-cairo text-white overflow-x-hidden' style={{ backgroundColor: '#4618ac' }} dir='ltr'>
       {/* --- HERO SECTION --- */}
-      <div className='relative pt-6 pb-8'>
+      <div className='relative pt-4 md:pt-6 pb-8'>
         <div className='max-w-[80%] mx-auto'>
           <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 items-start'>
             {/* Left: Categories beside carousel */}
@@ -338,9 +335,6 @@ export default async function HomePage() {
                         <div className='w-full h-full bg-gray-800' />
                       )}
                       <div className='absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors' />
-                      <p className='absolute bottom-3 right-4 text-white font-semibold text-base sm:text-lg'>
-                        {category.name}
-                      </p>
                     </div>
                   </Link>
                 ))}
@@ -353,7 +347,7 @@ export default async function HomePage() {
       {/* --- MOST PURCHASED PRODUCTS --- */}
       <div id="offers" className='py-8'>
         <div className='max-w-[80%] mx-auto'>
-          <Suspense fallback={<ProductSliderSkeleton title='المنتجات الأكثر مبيعاً' />}>
+          <Suspense fallback={<ProductSliderSkeleton title='Best Selling Products' />}>
             <MostPurchasedSection />
           </Suspense>
         </div>
@@ -365,7 +359,7 @@ export default async function HomePage() {
       {/* --- PRODUCT SLIDERS --- */}
       <div className='p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8'>
         <div className='max-w-[80%] mx-auto'>
-          <Suspense fallback={<ProductSliderSkeleton title='المنتجات' />}>
+          <Suspense fallback={<ProductSliderSkeleton title='Products' />}>
             <FirstCategorySection categories={categoryList} />
           </Suspense>
         </div>
@@ -374,7 +368,7 @@ export default async function HomePage() {
       {/* --- REMAINING PRODUCT SLIDERS --- */}
       <div className='p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8'>
         <div className='max-w-[80%] mx-auto'>
-          <Suspense fallback={<ProductSliderSkeleton title='المنتجات' />}>
+          <Suspense fallback={<ProductSliderSkeleton title='Products' />}>
             <RemainingCategoriesSection categories={categoryList} />
           </Suspense>
         </div>

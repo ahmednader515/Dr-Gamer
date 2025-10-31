@@ -51,13 +51,13 @@ export default function CartSidebar() {
     <div className='w-32 h-full bg-gray-900 border-l border-gray-700 shadow-lg flex-shrink-0' style={{ direction: 'ltr' }}>
       <div className='p-3 h-full flex flex-col gap-3 justify-start items-center'>
         <div className='text-center space-y-2 w-full'>
-          <div className='text-sm font-medium text-gray-300'>المجموع الفرعي</div>
+          <div className='text-sm font-medium text-gray-300'>Subtotal</div>
           <div className='font-bold text-base text-white'>
             <ProductPrice price={itemsPrice} plain />
           </div>
           {itemsPrice > freeShippingMinPrice && (
             <div className='text-center text-xs text-purple-400 bg-purple-900/30 border border-purple-700 p-2 rounded-md'>
-              طلبك مؤهل للشحن المجاني
+              Your order qualifies for free shipping
             </div>
           )}
 
@@ -65,7 +65,7 @@ export default function CartSidebar() {
             className={`rounded-full hover:no-underline w-full text-sm btn-mobile bg-purple-600 hover:bg-purple-700 text-white py-2 px-3 block text-center transition-colors`}
             href='/cart'
           >
-            الذهاب إلى السلة
+            Go to Cart
           </Link>
           <Separator className='mt-3' />
         </div>

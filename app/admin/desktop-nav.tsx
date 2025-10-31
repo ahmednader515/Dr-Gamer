@@ -15,13 +15,13 @@ interface DesktopNavProps {
 
 // Default navigation if not provided
 const defaultNavigation = [
-  { name: 'نظرة عامة', href: '/admin/overview' },
-  { name: 'المنتجات', href: '/admin/products' },
-  { name: 'الطلبات', href: '/admin/orders' },
-  { name: 'المستخدمون', href: '/admin/users' },
-  { name: 'أكواد الخصم', href: '/admin/promo-codes' },
-  { name: 'صفحات الويب', href: '/admin/web-pages' },
-  { name: 'الإعدادات', href: '/admin/settings' },
+  { name: 'Overview', href: '/admin/overview' },
+  { name: 'Products', href: '/admin/products' },
+  { name: 'Orders', href: '/admin/orders' },
+  { name: 'Users', href: '/admin/users' },
+  { name: 'Promo Codes', href: '/admin/promo-codes' },
+  { name: 'Web Pages', href: '/admin/web-pages' },
+  { name: 'Settings', href: '/admin/settings' },
 ]
 
 export default function DesktopNav({ navigation = defaultNavigation }: DesktopNavProps) {
@@ -52,7 +52,7 @@ export default function DesktopNav({ navigation = defaultNavigation }: DesktopNa
         className='text-red-400 hover:text-red-200 hover:bg-red-900 transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2'
       >
         <LogOut className="h-4 w-4" />
-        تسجيل الخروج
+        Sign Out
       </button>
     </nav>
   )

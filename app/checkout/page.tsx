@@ -4,7 +4,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'إتمام الطلب',
+  title: 'Complete Order',
 }
 
 export default async function CheckoutPage() {

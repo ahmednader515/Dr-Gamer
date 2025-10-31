@@ -59,7 +59,7 @@ export default function OrderDetailsForm({
             {promoCode && discountAmount && (
               <div className='flex items-center justify-between text-purple-400'>
                 <div>
-                  <span className='text-sm'>كود الخصم: </span>
+                  <span className='text-sm'>Promo Code: </span>
                   <span className='font-semibold'>{promoCode}</span>
                   <span className='text-xs ml-1'>({discountPercent}%)</span>
                 </div>
@@ -79,7 +79,7 @@ export default function OrderDetailsForm({
             
             {promoCode && discountAmount && (
               <div className='text-xs text-gray-400 text-center'>
-                وفرت {discountPercent}% • <ProductPrice price={discountAmount} plain /> خصم
+                Saved {discountPercent}% • <ProductPrice price={discountAmount} plain /> discount
               </div>
             )}
 

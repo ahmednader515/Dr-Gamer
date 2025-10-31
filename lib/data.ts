@@ -859,14 +859,14 @@ const data: Data = {
     {
       title: 'About Us',
       slug: 'about-us',
-      content: `Welcome to الليثي صيدلية, your trusted partner in health and wellness. Since our founding, we have been committed to providing the highest quality medications, health products, and personalized care to our community.
+      content: `Welcome to DR.Gamer, your trusted partner in gaming. Since our founding, we have been committed to providing the highest quality games, gaming products, and personalized service to our community.
 
-At الليثي صيدلية, we understand that your health is your most valuable asset. That's why we've built our reputation on trust, expertise, and a deep commitment to your well-being. Our team of licensed pharmacists and healthcare professionals is here to ensure you receive the right medications, proper guidance, and the care you deserve.
+At DR.Gamer, we understand that your gaming experience is your most valuable asset. That's why we've built our reputation on trust, expertise, and a deep commitment to your satisfaction. Our team of gaming professionals is here to ensure you receive the right products, proper guidance, and the service you deserve.
 
 **Our Mission**
 To provide accessible, reliable, and professional pharmaceutical services that enhance the health and quality of life for our customers. We strive to be your first choice for all your medication and health product needs.
 
-**Why Choose الليثي صيدلية?**
+**Why Choose DR.Gamer?**
 - **Licensed Pharmacists**: Our team of experienced pharmacists is available to answer your questions and provide medication counseling
 - **Quality Products**: We carry only FDA-approved medications and high-quality health products from trusted manufacturers
 - **Convenient Service**: Easy online ordering, prescription refills, and fast delivery to your doorstep
@@ -881,7 +881,7 @@ To provide accessible, reliable, and professional pharmaceutical services that e
 - Health screenings and consultations
 - Immunization services
 
-Thank you for choosing الليثي صيدلية. Your health is our priority, and we're here to serve you with care, expertise, and dedication.`,
+Thank you for choosing DR.Gamer. Your gaming experience is our priority, and we're here to serve you with care, expertise, and dedication.`,
       isPublished: true,
     },
     {
@@ -907,7 +907,7 @@ We look forward to assisting you! Your satisfaction is our priority.
     {
       title: 'Help',
       slug: 'help',
-      content: `Welcome to الليثي صيدلية's Help Center! We're here to assist you with all your pharmaceutical needs and questions. Whether you need help with prescriptions, medication information, or general صيدلية services, our comprehensive help resources are designed to provide you with the information you need.
+      content: `Welcome to DR.Gamer's Help Center! We're here to assist you with all your gaming needs and questions. Whether you need help with orders, game information, or general services, our comprehensive help resources are designed to provide you with the information you need.
 
 **Prescription Services**
 Managing your prescriptions is easy with our online platform. You can:
@@ -969,11 +969,11 @@ We strive to ensure all product descriptions, pricing, and availability informat
     {
       title: 'Customer Service',
       slug: 'customer-service',
-      content: `At الليثي صيدلية, we're committed to providing exceptional customer service and support for all your pharmaceutical needs. Our dedicated team is here to help you with any questions, concerns, or assistance you may need.
+      content: `At DR.Gamer, we're committed to providing exceptional customer service and support for all your gaming needs. Our dedicated team is here to help you with any questions, concerns, or assistance you may need.
 
 **Contact Information**
 - **Phone**: +1 (555) 123-4567
-- **Email**: customer.service@الليثي-صيدلية.com
+- **Email**: customer.service@dr-gamer.com
 - **Address**: 456 Health Plaza, Medical District, CA 90210
 - **Hours**: Monday-Friday 8:00 AM - 8:00 PM, Saturday 9:00 AM - 6:00 PM, Sunday 10:00 AM - 4:00 PM
 

@@ -28,8 +28,7 @@ import PhoneInput from '@/components/shared/phone-input'
 const signInDefaultValues = { phone: '', password: '' };
 
 export default function CredentialsSignInForm() {
-  // const { site } = data.settings[0];
-  const site = { name: 'الليثي صيدلية' };
+  const { site } = data.settings[0];
   const searchParams = useSearchParams()
   const router = useRouter()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
@@ -62,8 +61,8 @@ export default function CredentialsSignInForm() {
       if (isSubmitting) {
         setIsSubmitting(false)
         toast({
-          title: 'انتهت مهلة الطلب',
-          description: 'استغرق تسجيل الدخول وقتاً طويلاً. يرجى المحاولة مرة أخرى.',
+          title: 'Request Timeout',
+          description: 'Sign in took too long. Please try again.',
           variant: 'destructive',
         })
       }
@@ -98,8 +97,8 @@ export default function CredentialsSignInForm() {
           if (sessionData?.user) {
             console.log('✅ Session found despite error, sign in actually succeeded')
             toast({
-              title: 'تم تسجيل الدخول بنجاح!',
-              description: 'أهلاً وسهلاً بك! جاري توجيهك...',
+              title: 'Sign In Successful!',
+              description: 'Welcome! Redirecting...',
               variant: 'default',
             })
             
@@ -112,8 +111,8 @@ export default function CredentialsSignInForm() {
         }
         
         toast({
-          title: 'فشل تسجيل الدخول',
-          description: result.message || 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.',
+        title: 'Sign In Failed',
+        description: result.message || 'Sign in failed. Please try again.',
           variant: 'destructive',
         })
         return
@@ -121,8 +120,8 @@ export default function CredentialsSignInForm() {
       
       // Successfully signed in
       toast({
-        title: 'تم تسجيل الدخول بنجاح!',
-        description: 'أهلاً وسهلاً بك! جاري توجيهك...',
+        title: 'Sign In Successful!',
+        description: 'Welcome! Redirecting...',
         variant: 'default',
       })
       
@@ -151,22 +150,22 @@ export default function CredentialsSignInForm() {
       form.setValue('password', '')
       
       // Handle different types of errors
-      let errorMessage = 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'
+      let errorMessage = 'An unexpected error occurred. Please try again.'
       
       if (error instanceof Error) {
         if (error.message.includes('network')) {
-          errorMessage = 'خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.'
+          errorMessage = 'Network error. Please check your connection and try again.'
         } else if (error.message.includes('timeout')) {
-          errorMessage = 'انتهت مهلة الطلب. يرجى المحاولة مرة أخرى.'
+          errorMessage = 'Request timeout. Please try again.'
         } else if (error.message.includes('validation')) {
-          errorMessage = 'يرجى التحقق من إدخالك والمحاولة مرة أخرى.'
+          errorMessage = 'Please check your input and try again.'
         } else if (error.message.includes('credentials')) {
-          errorMessage = 'بيانات غير صحيحة. يرجى التحقق من رقم الهاتف وكلمة المرور.'
+          errorMessage = 'Invalid credentials. Please check your phone number and password.'
         }
       }
       
       toast({
-        title: 'خطأ في تسجيل الدخول',
+        title: 'Sign In Error',
         description: errorMessage,
         variant: 'destructive',
       })
@@ -181,8 +180,8 @@ export default function CredentialsSignInForm() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-lg text-gray-600 font-cairo">جاري التحقق من الجلسة...</p>
-          <p className="text-sm text-gray-500 font-cairo mt-2">يرجى الانتظار...</p>
+          <p className="text-lg text-gray-600 font-cairo">Checking session...</p>
+          <p className="text-sm text-gray-500 font-cairo mt-2">Please wait...</p>
         </div>
       </div>
     )
@@ -194,7 +193,7 @@ export default function CredentialsSignInForm() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-lg text-gray-600 font-cairo">تم تسجيل الدخول بنجاح! جاري توجيهك...</p>
+          <p className="text-lg text-gray-600 font-cairo">Sign in successful! Redirecting...</p>
         </div>
       </div>
     )
@@ -202,14 +201,14 @@ export default function CredentialsSignInForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} dir="rtl" className="font-cairo">
+      <form onSubmit={handleSubmit(onSubmit)} dir="ltr" className="font-cairo">
         <input type='hidden' name='callbackUrl' value={callbackUrl} />
         
         {/* General form errors */}
         {Object.keys(errors).length > 0 && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-800 text-center font-cairo">
-              ⚠️ يرجى التحقق من الأخطاء أدناه وإعادة المحاولة
+              ⚠️ Please check the errors below and try again
             </p>
           </div>
         )}
@@ -220,27 +219,27 @@ export default function CredentialsSignInForm() {
             name='phone'
             render={({ field, fieldState }) => (
               <FormItem className='w-full'>
-                <FormLabel className="text-right block font-cairo text-white text-base md:text-lg lg:text-xl mb-2 md:mb-3 lg:mb-4">رقم الهاتف</FormLabel>
+                <FormLabel className="text-left block font-cairo text-white text-base md:text-lg lg:text-xl mb-2 md:mb-3 lg:mb-4">Phone Number</FormLabel>
                 <FormControl>
                   <PhoneInput 
-                    placeholder='أدخل رقم الهاتف' 
+                    placeholder='Enter phone number' 
                     value={field.value}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     name={field.name}
-                    className={`text-right font-cairo h-12 md:h-14 text-base md:text-lg px-4 md:px-6 ${
+                    className={`text-left font-cairo h-12 md:h-14 text-base md:text-lg px-4 md:px-6 ${
                       fieldState.error ? 'border-red-500 focus:border-red-500' : ''
                     }`}
                   />
                 </FormControl>
                 <FormMessage />
                 {fieldState.error && (
-                  <p className="text-sm text-red-600 mt-1 text-right font-cairo">
+                  <p className="text-sm text-red-600 mt-1 text-left font-cairo">
                     {fieldState.error.message}
                   </p>
                 )}
-                <p className="text-xs md:text-sm text-gray-300 mt-1 text-right font-cairo">
-                  مثال: +201234567890
+                <p className="text-xs md:text-sm text-gray-300 mt-1 text-left font-cairo">
+                  Example: +201234567890
                 </p>
               </FormItem>
             )}
@@ -251,20 +250,20 @@ export default function CredentialsSignInForm() {
             name='password'
             render={({ field, fieldState }) => (
               <FormItem className='w-full'>
-                <FormLabel className="text-right block font-cairo text-white text-base md:text-lg lg:text-xl mb-2 md:mb-3 lg:mb-4">كلمة المرور</FormLabel>
+                <FormLabel className="text-left block font-cairo text-white text-base md:text-lg lg:text-xl mb-2 md:mb-3 lg:mb-4">Password</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='أدخل كلمة المرور'
+                    placeholder='Enter password'
                     {...field}
-                    className={`text-right font-cairo h-12 md:h-14 text-base md:text-lg px-4 md:px-6 ${
+                    className={`text-left font-cairo h-12 md:h-14 text-base md:text-lg px-4 md:px-6 ${
                       fieldState.error ? 'border-red-500 focus:border-red-500' : ''
                     }`}
                   />
                 </FormControl>
                 <FormMessage />
                 {fieldState.error && (
-                  <p className="text-sm text-red-600 mt-1 text-right font-cairo">
+                  <p className="text-sm text-red-600 mt-1 text-left font-cairo">
                     {fieldState.error.message}
                   </p>
                 )}
@@ -281,26 +280,26 @@ export default function CredentialsSignInForm() {
               {isSubmitting ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 md:h-5 md:w-5 border-b-2 border-white mr-2"></div>
-                  جاري تسجيل الدخول...
+                  Signing in...
                 </>
               ) : (
-                'تسجيل الدخول'
+                'Sign In'
               )}
             </Button>
             
             {process.env.NODE_ENV === 'development' && (
               <div className="mt-4 p-3 bg-purple-50 border border-blue-200 rounded-lg">
                 <p className="text-xs md:text-sm text-blue-800 text-center font-cairo">
-                  💡 <strong>بيانات تجريبية:</strong> يمكنك استخدام رقم الهاتف +201234567890 وكلمة المرور 123456
+                  💡 <strong>Test Data:</strong> You can use phone number +201234567890 and password 123456
                 </p>
               </div>
             )}
           </div>
           
-          <div className='text-sm md:text-base lg:text-lg text-right text-gray-300 font-cairo leading-relaxed'>
-            عند تسجيل الدخول، فإنك توافق على{' '}
-            <Link href='/page/conditions-of-use' className="text-purple-400 hover:underline">شروط الاستخدام</Link> و{' '}
-            <Link href='/page/privacy-policy' className="text-purple-400 hover:underline">سياسة الخصوصية</Link> الخاصة بـ {site.name}.
+          <div className='text-sm md:text-base lg:text-lg text-left text-gray-300 font-cairo leading-relaxed'>
+            By signing in, you agree to the{' '}
+            <Link href='/page/conditions-of-use' className="text-purple-400 hover:underline">Terms of Use</Link> and{' '}
+            <Link href='/page/privacy-policy' className="text-purple-400 hover:underline">Privacy Policy</Link> of {site.name}.
           </div>
         </div>
       </form>

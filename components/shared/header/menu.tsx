@@ -11,15 +11,15 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
         <UserButton 
           session={session} 
           translations={{
-            hello: 'مرحباً',
-            signIn: 'تسجيل الدخول',
-            accountOrders: 'الحساب والطلبات',
-            yourAccount: 'حسابك',
-            yourOrders: 'طلباتك',
-            admin: 'المدير',
-            signOut: 'تسجيل الخروج',
-            newCustomer: 'عميل جديد',
-            signUp: 'إنشاء حساب'
+            hello: 'Hello',
+            signIn: 'Sign In',
+            accountOrders: 'Account & Orders',
+            yourAccount: 'Your Account',
+            yourOrders: 'Your Orders',
+            admin: 'Admin',
+            signOut: 'Sign Out',
+            newCustomer: 'New Customer',
+            signUp: 'Sign Up'
           }} 
         />
         {forAdmin ? null : <CartButton />}

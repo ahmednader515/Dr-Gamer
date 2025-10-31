@@ -48,13 +48,49 @@ export default async function Header() {
   const categoryList = categories.map(cat => cat.name);
   
   return (
-    <header className="bg-gray-900 text-gray-100 font-cairo" dir="rtl">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-gray-900 text-gray-100 font-cairo" dir="ltr">
       {/* Main Header - Clean Design */}
       <div className="bg-gray-900 border-b border-gray-700">
-        <div className="container mx-auto px-4 pt-2 pb-2">
+        <div className="container mx-auto px-4 pt-2 pb-3">
           {/* Header Row */}
           <div className="flex items-center justify-between gap-4">
-            {/* Left Side - Logo + DR.Gamer on desktop, Navigation Icons on mobile */}
+            {/* Left Side - Menu on desktop, Menu + Logo + DR.Gamer on mobile */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Mobile: Menu button + Logo + DR.Gamer */}
+              <div className="flex items-center gap-2 sm:gap-3 md:hidden">
+                <Sidebar />
+                <Link href="/" className="flex items-center">
+                  <Image
+                    src={site.logo}
+                    width={120}
+                    height={120}
+                    alt={`${site.name} logo`}
+                    className="w-20 h-20 sm:w-24 sm:h-24"
+                  />
+                </Link>
+                <div className="flex flex-col">
+                  <span className="text-white font-bold text-xl sm:text-2xl">
+                    <span className="text-white">DR.</span>
+                    <span className="text-purple-400">Gamer</span>
+                  </span>
+                  <span className="text-xs sm:text-sm">
+                    by <span className="text-blue-400">Mina</span> & <span className="text-green-400">Hamaki</span>
+                  </span>
+                </div>
+              </div>
+              
+              {/* Desktop: Menu */}
+              <div className="hidden md:block">
+                <Menu />
+              </div>
+            </div>
+            
+            {/* Center - Search on desktop */}
+            <div className="hidden md:flex items-center justify-center flex-1">
+              <Search />
+            </div>
+            
+            {/* Right Side - Logo + DR.Gamer on desktop, Navigation Icons on mobile */}
             <div className="flex items-center gap-3 sm:gap-4">
               {/* Desktop: Logo + DR.Gamer */}
               <div className="hidden md:flex items-center gap-3">
@@ -66,10 +102,15 @@ export default async function Header() {
                     alt={`${site.name} logo`}
                     className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20"
                   />
-                  <span className="text-white font-bold text-xl lg:text-2xl">
-                    <span className="text-white">DR.</span>
-                    <span className="text-purple-400">Gamer</span>
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-white font-bold text-xl lg:text-2xl">
+                      <span className="text-white">DR.</span>
+                      <span className="text-purple-400">Gamer</span>
+                    </span>
+                    <span className="text-xs sm:text-sm">
+                      by <span className="text-blue-400">Mina</span> & <span className="text-green-400">Hamaki</span>
+                    </span>
+                  </div>
                 </Link>
               </div>
               
@@ -120,44 +161,13 @@ export default async function Header() {
                 )}
               </div>
             </div>
-            
-            {/* Center - Search on desktop */}
-            <div className="hidden md:flex items-center justify-center flex-1">
-              <Search />
-            </div>
-            
-            {/* Right Side - Menu on desktop, Logo + DR.Gamer + Menu on mobile */}
-            <div className="flex items-center gap-3 sm:gap-4">
-              {/* Mobile: DR.Gamer + Logo + Menu (Menu appears on rightmost side) */}
-              <div className="flex items-center gap-2 sm:gap-3 md:hidden">
-                <span className="text-white font-bold text-lg sm:text-xl">
-                  <span className="text-white">DR.</span>
-                  <span className="text-purple-400">Gamer</span>
-                </span>
-                <Link href="/" className="flex items-center">
-                  <Image
-                    src={site.logo}
-                    width={100}
-                    height={100}
-                    alt={`${site.name} logo`}
-                    className="w-16 h-16 sm:w-20 sm:h-20"
-                  />
-                </Link>
-                <Sidebar />
-              </div>
-              
-              {/* Desktop: Menu */}
-              <div className="hidden md:block">
-                <Menu />
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
       {/* Categories Section - Hidden on mobile, shown on desktop */}
       <div className="hidden md:block bg-[#111827] text-white border-b border-gray-700">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-center">
             <div className="flex items-center justify-center flex-wrap gap-2 lg:gap-4">
               {/* Offers Button */}
@@ -165,7 +175,7 @@ export default async function Header() {
                 href="/#offers"
                 className="px-3 lg:px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-colors duration-200 whitespace-nowrap"
               >
-                العروض
+                Offers
               </Link>
               
               {/* Home Page Link */}
@@ -173,7 +183,7 @@ export default async function Header() {
                 href="/"
                 className="px-3 lg:px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition-colors duration-200 whitespace-nowrap"
               >
-                الصفحة الرئيسية
+                Homepage
               </Link>
               
               {/* Category Links */}

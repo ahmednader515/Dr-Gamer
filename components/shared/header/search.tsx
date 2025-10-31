@@ -34,7 +34,7 @@ export default function Search() {
         <div className="relative w-96 lg:w-[550px] xl:w-[600px]">
           <Input
             type="text"
-            placeholder="ابحث عن المنتجات..."
+            placeholder="Search for products..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full pl-12 pr-6 py-4 sm:py-5 text-lg sm:text-xl border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder:text-gray-500"
@@ -52,13 +52,13 @@ export default function Search() {
         </DialogTrigger>
         <DialogContent className="sm:max-w-md bg-gray-900 border-gray-700">
           <DialogHeader>
-            <DialogTitle className="text-right text-white">البحث عن المنتجات</DialogTitle>
+            <DialogTitle className="text-right text-white">Search for Products</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="mt-4">
             <div className="relative">
               <Input
                 type="text"
-                placeholder="ابحث عن المنتجات..."
+                placeholder="Search for products..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 text-base border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-800 text-white"
@@ -74,14 +74,14 @@ export default function Search() {
                 className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
                 disabled={!query.trim()}
               >
-                بحث
+                Search
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsOpen(false)}
               >
-                إلغاء
+                Cancel
               </Button>
             </div>
           </form>

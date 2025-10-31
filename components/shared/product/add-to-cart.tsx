@@ -32,8 +32,8 @@ export default function AddToCart({ product, className }: AddToCartProps) {
   const handleAddToCart = async () => {
     if ((product.colors.length > 1 || product.sizes.length > 1) && !selectedVariant) {
       toast({
-        title: 'يرجى اختيار الخيارات',
-        description: 'اختر اللون الحجم قبل الإضافة إلى السلة',
+        title: 'Please select options',
+        description: 'Please select color and size before adding to cart',
         variant: 'destructive',
       })
       return
@@ -61,8 +61,8 @@ export default function AddToCart({ product, className }: AddToCartProps) {
         }, quantity)
 
         toast({
-          title: 'تمت الإضافة إلى السلة',
-          description: `تم إضافة ${product.name} إلى سلة التسوق الخاصة بك`,
+          title: 'Added to Cart',
+          description: `${product.name} has been added to your cart`,
           variant: 'default',
         })
 
@@ -73,12 +73,12 @@ export default function AddToCart({ product, className }: AddToCartProps) {
   }
 
   return (
-    <div className={`space-y-4 ${className}`} dir="rtl">
+    <div className={`space-y-4 ${className}`} dir="ltr">
       {(product.colors.length > 1 || product.sizes.length > 1) && (
         <div className='space-y-3'>
           {product.colors.length > 1 && (
             <div>
-              <label className='font-medium mb-2 block'>اللون:</label>
+              <label className='font-medium mb-2 block'>Color:</label>
               <div className='flex gap-2'>
                 {product.colors.map((color) => (
                   <button
@@ -96,7 +96,7 @@ export default function AddToCart({ product, className }: AddToCartProps) {
           )}
           {product.sizes.length > 1 && (
             <div>
-              <label className='font-medium mb-2 block'>الحجم:</label>
+              <label className='font-medium mb-2 block'>Size:</label>
               <div className='flex gap-2'>
                 {product.sizes.map((size) => (
                   <button
@@ -148,11 +148,11 @@ export default function AddToCart({ product, className }: AddToCartProps) {
         disabled={isAddingToCart}
       >
         {isAddingToCart ? (
-          <LoadingSpinner size="sm" text="جاري الإضافة..." />
+          <LoadingSpinner size="sm" text="Adding..." />
         ) : (
           <>
             <ShoppingCart className="ml-2 h-4 w-4" />
-            أضف إلى السلة
+            Add to Cart
           </>
         )}
       </Button>

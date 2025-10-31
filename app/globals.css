@@ -218,6 +218,7 @@ input, textarea, select, button, label, span, div, p, h1, h2, h3, h4, h5, h6, a,
   body {
     @apply bg-background text-foreground;
     font-family: 'Cairo', sans-serif !important;
+    background-color: #4618ac !important;
   }
   
   /* Ensure all headings use Cairo */

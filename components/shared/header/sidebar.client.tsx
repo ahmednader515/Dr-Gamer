@@ -66,12 +66,12 @@ export default function SidebarClient({
            {/* Header with Title and Close Button */}
            <div className="flex items-center justify-between p-4 border-b border-gray-700">
              <DrawerTitle className="text-lg font-semibold text-right">
-               القائمة
+               Menu
              </DrawerTitle>
              <DrawerClose asChild>
                <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-gray-800">
                  <X className="h-4 w-4" />
-                 <span className="sr-only">إغلاق</span>
+                 <span className="sr-only">Close</span>
                </Button>
              </DrawerClose>
            </div>
@@ -80,7 +80,7 @@ export default function SidebarClient({
            <div className="flex-1 overflow-y-auto p-4">
              <div className="mb-6">
                <h2 className="text-lg font-semibold text-right mb-4">
-                 الأقسام
+                 Categories
                </h2>
              </div>
             <nav className="flex flex-col space-y-2">
@@ -109,7 +109,7 @@ export default function SidebarClient({
                     className="w-full block"
                   >
                     <Button className="w-full bg-blue-600 text-white hover:bg-blue-700 font-medium">
-                      {session.role === 'Admin' ? 'لوحة الإدارة' : 'لوحة المشرف'}
+                      {session.role === 'Admin' ? 'Admin Panel' : 'Moderator Panel'}
                     </Button>
                   </Link>
                 </DrawerClose>
@@ -120,7 +120,7 @@ export default function SidebarClient({
                 className="w-full bg-purple-600 text-white hover:bg-purple-700 font-medium"
                 onClick={handleSignOut}
               >
-                تسجيل الخروج
+                Sign Out
               </Button>
             </div>
           )}

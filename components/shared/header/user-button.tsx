@@ -93,7 +93,7 @@ export default function UserButton({
                   href={session.user.role === 'Admin' ? '/admin/overview' : '/admin/products'}
                 >
                   <DropdownMenuItem className='text-purple-400 hover:text-purple-300 hover:bg-gray-800 focus:bg-gray-800 focus:text-purple-300'>
-                    {session.user.role === 'Admin' ? translations.admin : 'لوحة المشرف'}
+                    {session.user.role === 'Admin' ? translations.admin : 'Moderator Panel'}
                   </DropdownMenuItem>
                 </Link>
               )}
@@ -105,7 +105,7 @@ export default function UserButton({
                 onClick={handleSignOut}
                 disabled={isSigningOut}
               >
-                {isSigningOut ? 'جاري تسجيل الخروج...' : translations.signOut}
+                {isSigningOut ? 'Signing out...' : translations.signOut}
               </Button>
             </DropdownMenuItem>
           </DropdownMenuContent>

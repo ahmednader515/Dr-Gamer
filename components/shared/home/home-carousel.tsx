@@ -35,7 +35,7 @@ export default function HomeCarousel({ carousels }: HomeCarouselProps) {
   return (
     <div 
       className="font-cairo relative overflow-hidden" 
-      dir="rtl"
+      dir="ltr"
     >
       <div className="relative w-full h-[250px] sm:h-[300px] md:h-[400px] lg:h-[500px]">
         <Swiper
@@ -72,7 +72,7 @@ export default function HomeCarousel({ carousels }: HomeCarouselProps) {
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-gray-500 text-lg">لا توجد صورة</span>
+                    <span className="text-gray-500 text-lg">No Image</span>
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
@@ -94,7 +94,7 @@ export default function HomeCarousel({ carousels }: HomeCarouselProps) {
         
         {/* Custom Navigation Arrows */}
         <button
-          onClick={() => swiperInstance?.slideNext()}
+          onClick={() => swiperInstance?.slidePrev()}
           className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-10 h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 rounded-full bg-gray-900/20 hover:bg-purple-600/80 text-white border-0 backdrop-blur-sm transition-all duration-200 hover:scale-110 shadow-lg flex items-center justify-center"
           aria-label="Previous slide"
         >
@@ -102,7 +102,7 @@ export default function HomeCarousel({ carousels }: HomeCarouselProps) {
         </button>
         
         <button
-          onClick={() => swiperInstance?.slidePrev()}
+          onClick={() => swiperInstance?.slideNext()}
           className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-10 h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 rounded-full bg-gray-900/20 hover:bg-purple-600/80 text-white border-0 backdrop-blur-sm transition-all duration-200 hover:scale-110 shadow-lg flex items-center justify-center"
           aria-label="Next slide"
         >

@@ -123,7 +123,7 @@ async function ProductHeader({ slug }: { slug: string }) {
             <div className='flex items-center gap-2 mb-3 sm:mb-4'>
               <Rating rating={productData.avgRating} />
               <span className='text-xs sm:text-sm text-muted-foreground'>
-                ({productData.numReviews} تقييم)
+                ({productData.numReviews} reviews)
               </span>
             </div>
             <ProductPrice 
@@ -145,15 +145,15 @@ async function ProductHeader({ slug }: { slug: string }) {
 
           <div className='space-y-3 sm:space-y-4'>
             <div>
-              <h3 className='font-semibold mb-2 text-sm sm:text-base'>تفاصيل المنتج</h3>
+              <h3 className='font-semibold mb-2 text-sm sm:text-base'>Product Details</h3>
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm'>
                 <div>
-                  <span className='text-muted-foreground'>الفئة:</span>
-                  <span className='mr-2'>{productData.category}</span>
+                  <span className='text-muted-foreground'>Category:</span>
+                  <span className='ml-2'>{productData.category}</span>
                 </div>
                 <div>
-                  <span className='text-muted-foreground'>العلامة التجارية:</span>
-                  <span className='mr-2'>{productData.brand}</span>
+                  <span className='text-muted-foreground'>Brand:</span>
+                  <span className='ml-2'>{productData.brand}</span>
                 </div>
               </div>
             </div>
@@ -177,7 +177,7 @@ async function ReviewsSection({ slug }: { slug: string }) {
   return (
     <div className='mb-8 sm:mb-12'>
       <Separator className='mb-6 sm:mb-8' />
-      <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6'>تقييمات العملاء</h2>
+      <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6'>Customer Reviews</h2>
       {/* Review List */}
       {product && <ReviewList productId={product.id} />}
     </div>
@@ -188,7 +188,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
 
   return (
-    <div className='container mx-auto px-4 py-6 sm:py-8' dir="rtl">
+    <div className='container mx-auto px-4 py-6 sm:py-8' dir="ltr">
       {/* Product Header - Load first */}
       <Suspense fallback={<ProductHeaderSkeleton />}>
         <ProductHeader slug={slug} />

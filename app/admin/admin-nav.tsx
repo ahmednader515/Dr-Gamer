@@ -20,14 +20,14 @@ import {
 import { SignOut } from '@/lib/actions/user.actions'
 
 const allNavigation = [
-  { name: 'نظرة عامة', href: '/admin/overview', icon: BarChart3, roles: ['Admin'] },
-  { name: 'المنتجات', href: '/admin/products', icon: Package, roles: ['Admin', 'Moderator'] },
-  { name: 'الطلبات', href: '/admin/orders', icon: ShoppingCart, roles: ['Admin'] },
-  { name: 'المستخدمون', href: '/admin/users', icon: Users, roles: ['Admin'] },
-  { name: 'أكواد الخصم', href: '/admin/promo-codes', icon: Ticket, roles: ['Admin'] },
-  { name: 'صفحات الويب', href: '/admin/web-pages', icon: FileText, roles: ['Admin', 'Moderator'] },
-  { name: 'الأسئلة الشائعة', href: '/admin/faq', icon: HelpCircle, roles: ['Admin', 'Moderator'] },
-  { name: 'الإعدادات', href: '/admin/settings', icon: Settings, roles: ['Admin', 'Moderator'] },
+  { name: 'Overview', href: '/admin/overview', icon: BarChart3, roles: ['Admin'] },
+  { name: 'Products', href: '/admin/products', icon: Package, roles: ['Admin', 'Moderator'] },
+  { name: 'Orders', href: '/admin/orders', icon: ShoppingCart, roles: ['Admin'] },
+  { name: 'Users', href: '/admin/users', icon: Users, roles: ['Admin'] },
+  { name: 'Promo Codes', href: '/admin/promo-codes', icon: Ticket, roles: ['Admin'] },
+  { name: 'Web Pages', href: '/admin/web-pages', icon: FileText, roles: ['Admin', 'Moderator'] },
+  { name: 'FAQ', href: '/admin/faq', icon: HelpCircle, roles: ['Admin', 'Moderator'] },
+  { name: 'Settings', href: '/admin/settings', icon: Settings, roles: ['Admin', 'Moderator'] },
 ]
 
 export default function AdminNav({ userRole }: { userRole: string }) {
@@ -105,7 +105,7 @@ export default function AdminNav({ userRole }: { userRole: string }) {
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-700">
-              <h2 className="text-lg font-semibold text-white">لوحة الإدارة</h2>
+              <h2 className="text-lg font-semibold text-white">Admin Panel</h2>
               <Button
                 variant="ghost"
                 size="sm"
@@ -147,7 +147,7 @@ export default function AdminNav({ userRole }: { userRole: string }) {
                 className="w-full justify-start text-red-400 hover:bg-red-900 hover:text-red-200 transition-colors"
               >
                 <LogOut className="h-5 w-5 ml-2" />
-                تسجيل الخروج
+                Sign Out
               </Button>
             </div>
           </div>

@@ -48,7 +48,7 @@ export default function PhoneInput({
   return (
     <div className="relative">
       {/* Country Code Selector */}
-      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-md border border-gray-700">
+      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-md border border-gray-700">
         <span className="text-2xl">🇪🇬</span>
         <span className="text-sm font-medium text-white">+20</span>
       </div>
@@ -61,7 +61,7 @@ export default function PhoneInput({
         onBlur={handleBlur}
         placeholder={placeholder}
         className={cn(
-          "pl-24 text-right font-cairo h-12 text-lg", // pl-24 to make room for country code
+          "pr-24 text-left font-cairo h-12 text-lg", // pr-24 to make room for country code on the right
           className
         )}
         disabled={disabled}
