@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,8 +20,26 @@ interface SearchFiltersProps {
 export default function SearchFilters({ categories, tags, maxPrice }: SearchFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [isOpen, setIsOpen] = useState(true)
+  // Default to collapsed on mobile (screen width < 1024px which is lg breakpoint)
+  const [isOpen, setIsOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1024 // lg breakpoint
+    }
+    return false // Default to collapsed for SSR
+  })
   const [priceRange, setPriceRange] = useState([0, maxPrice])
+  
+  // Update isOpen state on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsOpen(true) // Always open on desktop
+      }
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
   
   // Get current filter values
   const currentCategory = searchParams.get('category') || ''
