@@ -341,7 +341,7 @@ export default async function HomePage() {
       </div>
 
       {/* --- MOST PURCHASED PRODUCTS --- */}
-      <div className='py-8'>
+      <div id="offers" className='py-8'>
         <div className='max-w-[80%] mx-auto'>
           <Suspense fallback={<ProductSliderSkeleton title='المنتجات الأكثر مبيعاً' />}>
             <MostPurchasedSection />

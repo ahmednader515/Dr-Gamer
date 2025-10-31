@@ -7,7 +7,7 @@ import Search from "./search";
 import Menu from "./menu";
 import Sidebar from "./sidebar";
 import data from "@/lib/data";
-import { ShoppingCart, User, Package, Home, Shield } from "lucide-react";
+import { ShoppingCart, User, Package, Home, Shield, Tag } from "lucide-react";
 import MobileCartCount from './mobile-cart-count'
 
 // Arabic translations for categories
@@ -51,48 +51,60 @@ export default async function Header() {
     <header className="bg-gray-900 text-gray-100 font-cairo" dir="rtl">
       {/* Main Header - Clean Design */}
       <div className="bg-gray-900 border-b border-gray-700">
-        <div className="container mx-auto px-4 pt-2 pb-4">
+        <div className="container mx-auto px-4 pt-2 pb-2">
           {/* Header Row */}
-          <div className="flex items-center justify-between">
-            {/* Hamburger Menu */}
-            <div className="block md:hidden">
-              <Sidebar />
+          <div className="grid grid-cols-3 items-center gap-4">
+            {/* Left Side - Hamburger Menu on mobile, Logo on desktop */}
+            <div className="flex items-center justify-start">
+              <div className="block md:hidden">
+                <Sidebar />
+              </div>
+              <div className="hidden md:block">
+                <Link
+                  href="/"
+                  className="flex items-center"
+                >
+                  <Image
+                    src={site.logo}
+                    width={80}
+                    height={80}
+                    alt={`${site.name} logo`}
+                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20"
+                  />
+                </Link>
+              </div>
             </div>
             
-            {/* Logo - Centered on mobile */}
-            <div className="flex items-center justify-center flex-1 md:flex-none md:justify-start">
-              <Link
-                href="/"
-                className="flex items-center"
-              >
-                <Image
-                  src={site.logo}
-                  width={80}
-                  height={80}
-                  alt={`${site.name} logo`}
-                  className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14"
-                />
-              </Link>
-            </div>
-            
-            {/* Search Component - Right side on mobile, hidden on desktop */}
-            <div className="block md:hidden">
+            {/* Center - Search Component */}
+            <div className="flex items-center justify-center">
               <Search />
             </div>
             
-            {/* Search Component - Hidden on mobile, shown on desktop */}
-            <div className="hidden md:flex items-center justify-center">
-              <Search />
-            </div>
-            
-            {/* Desktop Right Side - Cart and Sign In */}
-            <div className="hidden md:flex items-center gap-4">
-              <Menu />
+            {/* Right Side - Mobile menu on mobile, Desktop menu on desktop */}
+            <div className="flex items-center justify-end">
+              <div className="block md:hidden">
+                {/* Mobile: Show hamburger menu on right side too */}
+                <div className="w-6"></div>
+              </div>
+              <div className="hidden md:flex items-center gap-4">
+                <Menu />
+              </div>
             </div>
           </div>
           
           {/* Mobile Navigation Icons Row - Simplified */}
           <div className="flex items-center justify-center gap-6 sm:gap-8 mt-4 md:hidden">
+            {/* Logo - Mobile */}
+            <Link href="/" className="flex items-center">
+              <Image
+                src={site.logo}
+                width={60}
+                height={60}
+                alt={`${site.name} logo`}
+                className="w-8 h-8"
+              />
+            </Link>
+            
             {/* Homepage Button */}
             <Link href="/" className="flex flex-col items-center gap-1">
               <Home className="w-6 h-6 text-gray-300" />
@@ -152,6 +164,14 @@ export default async function Header() {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-center">
             <div className="flex items-center justify-center flex-wrap gap-2 lg:gap-4">
+              {/* Offers Button */}
+              <Link
+                href="/#offers"
+                className="px-3 lg:px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-colors duration-200 whitespace-nowrap"
+              >
+                العروض
+              </Link>
+              
               {/* Home Page Link */}
               <Link
                 href="/"
