@@ -51,7 +51,7 @@ export default async function Header() {
     <header className="bg-gray-900 text-gray-100 font-cairo" dir="rtl">
       {/* Main Header - Clean Design */}
       <div className="bg-gray-900 border-b border-gray-700">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 pt-2 pb-4">
           {/* Header Row */}
           <div className="flex items-center justify-between">
             {/* Hamburger Menu */}

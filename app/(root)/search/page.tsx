@@ -209,7 +209,7 @@ async function ProductResults({ params, translations }: {
         </div>
       ) : (
         <>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10 mb-6 sm:mb-8'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10 mb-6 sm:mb-8 items-stretch'>
             {normalizedProducts.map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))}

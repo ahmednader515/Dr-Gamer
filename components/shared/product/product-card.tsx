@@ -203,7 +203,7 @@ const ProductCard = ({
 
   if (hideBorder) {
     return (
-      <div className="flex flex-col bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden group border-2 border-gray-700 hover:border-purple-500 hover:scale-[1.03] m-1" dir="rtl">
+      <div className="flex flex-col h-full bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden group border-2 border-gray-700 hover:border-purple-500 hover:scale-[1.03] m-1" dir="rtl">
         <ProductImage />
         {!hideDetails && (
           <>
@@ -216,7 +216,7 @@ const ProductCard = ({
   }
 
   return (
-    <Card className="flex flex-col bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden group border-2 border-gray-700 hover:border-purple-500 hover:scale-[1.03] m-1" dir="rtl">
+    <Card className="flex flex-col h-full bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden group border-2 border-gray-700 hover:border-purple-500 hover:scale-[1.03] m-1" dir="rtl">
       <ProductImage />
       {!hideDetails && (
         <>
