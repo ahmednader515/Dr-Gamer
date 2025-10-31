@@ -5,8 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import Search from "./search";
 import Menu from "./menu";
+import Sidebar from "./sidebar";
 import data from "@/lib/data";
-import { ShoppingCart, User, Package, Home, Shield, Tag } from "lucide-react";
+import { ShoppingCart, User, Package, Shield, Tag } from "lucide-react";
 import MobileCartCount from './mobile-cart-count'
 
 // Arabic translations for categories
@@ -52,14 +53,12 @@ export default async function Header() {
       <div className="bg-gray-900 border-b border-gray-700">
         <div className="container mx-auto px-4 pt-2 pb-2">
           {/* Header Row */}
-          <div className="grid grid-cols-3 items-center gap-4">
-            {/* Left Side - Empty on mobile, Logo on desktop */}
-            <div className="flex items-center justify-start">
-              <div className="hidden md:block">
-                <Link
-                  href="/"
-                  className="flex items-center"
-                >
+          <div className="flex items-center justify-between gap-4">
+            {/* Left Side - Logo + DR.Gamer on desktop, Navigation Icons on mobile */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Desktop: Logo + DR.Gamer */}
+              <div className="hidden md:flex items-center gap-3">
+                <Link href="/" className="flex items-center gap-3">
                   <Image
                     src={site.logo}
                     width={80}
@@ -67,18 +66,75 @@ export default async function Header() {
                     alt={`${site.name} logo`}
                     className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20"
                   />
+                  <span className="text-white font-bold text-xl lg:text-2xl">
+                    <span className="text-white">DR.</span>
+                    <span className="text-purple-400">Gamer</span>
+                  </span>
                 </Link>
+              </div>
+              
+              {/* Mobile Navigation Links - All on one line */}
+              <div className="flex items-center gap-4 sm:gap-5 md:hidden">
+                {/* Shopping Cart */}
+                <Link href="/cart" className="flex items-center">
+                  <div className="relative">
+                    <ShoppingCart className="w-6 h-6 text-gray-300" />
+                    <MobileCartCount />
+                  </div>
+                </Link>
+                
+                {/* User Actions */}
+                {session ? (
+                  <>
+                    {/* Orders Button */}
+                    <Link href="/account/orders" className="flex items-center">
+                      <Package className="w-6 h-6 text-gray-300" />
+                    </Link>
+                    
+                    {/* Search Icon */}
+                    <div className="flex items-center">
+                      <Search />
+                    </div>
+                    
+                    {/* Admin/Moderator Button - Show for Admin and Moderator users */}
+                    {(session.user.role === 'Admin' || session.user.role === 'Moderator') && (
+                      <Link 
+                        href={session.user.role === 'Admin' ? '/admin/overview' : '/admin/products'} 
+                        className="flex items-center"
+                      >
+                        <Shield className="w-6 h-6 text-purple-500" />
+                      </Link>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {/* Search Icon - For non-logged in users */}
+                    <div className="flex items-center">
+                      <Search />
+                    </div>
+                    {/* Sign In Button */}
+                    <Link href="/sign-in" className="flex items-center">
+                      <User className="w-6 h-6 text-gray-300" />
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
             
-            {/* Center - Logo on mobile, Search Component on desktop */}
-            <div className="flex items-center justify-center">
-              {/* Mobile: Logo */}
-              <div className="block md:hidden">
-                <Link
-                  href="/"
-                  className="flex items-center"
-                >
+            {/* Center - Search on desktop */}
+            <div className="hidden md:flex items-center justify-center flex-1">
+              <Search />
+            </div>
+            
+            {/* Right Side - Menu on desktop, Logo + DR.Gamer + Menu on mobile */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Mobile: DR.Gamer + Logo + Menu (Menu appears on rightmost side) */}
+              <div className="flex items-center gap-2 sm:gap-3 md:hidden">
+                <span className="text-white font-bold text-lg sm:text-xl">
+                  <span className="text-white">DR.</span>
+                  <span className="text-purple-400">Gamer</span>
+                </span>
+                <Link href="/" className="flex items-center">
                   <Image
                     src={site.logo}
                     width={100}
@@ -87,84 +143,14 @@ export default async function Header() {
                     className="w-16 h-16 sm:w-20 sm:h-20"
                   />
                 </Link>
+                <Sidebar />
               </div>
-              {/* Desktop: Search */}
+              
+              {/* Desktop: Menu */}
               <div className="hidden md:block">
-                <Search />
-              </div>
-            </div>
-            
-            {/* Right Side - Desktop menu on desktop */}
-            <div className="flex items-center justify-end">
-              <div className="hidden md:flex items-center gap-4">
                 <Menu />
               </div>
             </div>
-          </div>
-          
-          {/* Mobile Navigation Icons Row - Simplified */}
-          <div className="flex items-center justify-center gap-6 sm:gap-8 mt-4 md:hidden">
-            {/* Homepage Button */}
-            <Link href="/" className="flex flex-col items-center gap-1">
-              <Home className="w-6 h-6 text-gray-300" />
-              <span className="text-xs text-gray-300">الرئيسية</span>
-            </Link>
-            
-            {/* Shopping Cart */}
-            <Link href="/cart" className="flex flex-col items-center gap-1">
-              <div className="relative">
-                <ShoppingCart className="w-6 h-6 text-gray-300" />
-                <MobileCartCount />
-              </div>
-              <span className="text-xs text-gray-300">السلة</span>
-            </Link>
-            
-            {/* User Actions */}
-            {session ? (
-              <>
-                {/* Account Button */}
-                <Link href="/account" className="flex flex-col items-center gap-1">
-                  <User className="w-6 h-6 text-gray-300" />
-                  <span className="text-xs text-gray-300">حسابي</span>
-                </Link>
-                
-                {/* Orders Button */}
-                <Link href="/account/orders" className="flex flex-col items-center gap-1">
-                  <Package className="w-6 h-6 text-gray-300" />
-                  <span className="text-xs text-gray-300">طلباتي</span>
-                </Link>
-                
-                {/* Search Icon - Beside Orders */}
-                <div className="flex flex-col items-center gap-1">
-                  <Search />
-                </div>
-                
-                {/* Admin/Moderator Button - Show for Admin and Moderator users */}
-                {(session.user.role === 'Admin' || session.user.role === 'Moderator') && (
-                  <Link 
-                    href={session.user.role === 'Admin' ? '/admin/overview' : '/admin/products'} 
-                    className="flex flex-col items-center gap-1"
-                  >
-                    <Shield className="w-6 h-6 text-purple-500" />
-                    <span className="text-xs text-purple-500 font-medium">
-                      {session.user.role === 'Admin' ? 'الإدارة' : 'لوحة المشرف'}
-                    </span>
-                  </Link>
-                )}
-              </>
-            ) : (
-              <>
-                {/* Search Icon - For non-logged in users */}
-                <div className="flex flex-col items-center gap-1">
-                  <Search />
-                </div>
-                {/* Sign In Button */}
-                <Link href="/sign-in" className="flex flex-col items-center gap-1">
-                  <User className="w-6 h-6 text-gray-300" />
-                  <span className="text-xs text-gray-300">تسجيل الدخول</span>
-                </Link>
-              </>
-            )}
           </div>
         </div>
       </div>

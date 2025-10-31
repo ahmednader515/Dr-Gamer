@@ -56,7 +56,7 @@ export default function SidebarClient({
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-10 w-10 sm:h-12 sm:w-12 bg-gray-800 hover:bg-gray-700 text-purple-400 border border-gray-700 transition-all duration-200 hover:scale-105 shadow-sm">
+        <Button variant="ghost" size="icon" className="h-10 w-10 sm:h-12 sm:w-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 transition-all duration-200 hover:scale-105 shadow-sm">
           <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
           <span className="sr-only">Open menu</span>
         </Button>

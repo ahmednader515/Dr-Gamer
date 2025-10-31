@@ -252,16 +252,26 @@ async function RemainingCategoriesSection({ categories }: { categories: string[]
     
     return (
       <>
-        {remainingCategories.map((category: string) => {
+        {remainingCategories.map((category: string, index: number) => {
           const products = productsByCategory[category] || []
           if (products.length === 0) return null
           
           return (
-            <Card key={category} className='w-full rounded-xl bg-transparent border-0 shadow-none'>
-              <CardContent className='card-mobile p-0'>
-                <ProductSlider title={category} products={products} />
-              </CardContent>
-            </Card>
+            <React.Fragment key={category}>
+              <Card className='w-full rounded-xl bg-transparent border-0 shadow-none'>
+                <CardContent className='card-mobile p-0'>
+                  <ProductSlider title={category} products={products} />
+                </CardContent>
+              </Card>
+              {/* Insert DiscoverByPrice after the second category carousel - full width background */}
+              {index === 0 && (
+                <div className='-mx-4 sm:-mx-6 lg:-mx-8'>
+                  <div className='w-screen' style={{ marginLeft: 'calc((100% - 100vw) / 2)', marginRight: 'calc((100% - 100vw) / 2)' }}>
+                    <DiscoverByPrice />
+                  </div>
+                </div>
+              )}
+            </React.Fragment>
           )
         })}
       </>
@@ -287,7 +297,7 @@ export default async function HomePage() {
   const categoriesBelow = categories.slice(3)
 
   return (
-    <div className='font-cairo text-white' style={{ backgroundColor: '#0d0d0d' }} dir='rtl'>
+    <div className='font-cairo text-white overflow-x-hidden' style={{ backgroundColor: '#0d0d0d' }} dir='rtl'>
       {/* --- HERO SECTION --- */}
       <div className='relative pt-6 pb-8'>
         <div className='max-w-[80%] mx-auto'>
@@ -360,9 +370,6 @@ export default async function HomePage() {
           </Suspense>
         </div>
       </div>
-
-      {/* --- DISCOVER BY PRICE SECTION --- */}
-      <DiscoverByPrice />
 
       {/* --- REMAINING PRODUCT SLIDERS --- */}
       <div className='p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8'>

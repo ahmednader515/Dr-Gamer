@@ -46,9 +46,8 @@ export default function Search() {
       {/* Mobile Search Modal */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <button className="md:hidden flex flex-col items-center gap-1 p-0 bg-transparent border-0 text-gray-300 hover:text-gray-100 transition-colors duration-200">
+          <button className="md:hidden flex items-center p-0 bg-transparent border-0 text-gray-300 hover:text-gray-100 transition-colors duration-200">
             <SearchIcon className="w-6 h-6" />
-            <span className="text-xs text-gray-300">بحث</span>
           </button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md bg-gray-900 border-gray-700">
