@@ -36,7 +36,7 @@ export default async function PaymentSuccessPage({
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="text-center mb-8">
-        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <CheckCircle className="w-16 h-16 text-purple-500 mx-auto mb-4" />
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Payment Successful!
         </h1>
@@ -60,7 +60,7 @@ export default async function PaymentSuccessPage({
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Total Amount:</span>
-              <span className="font-semibold text-green-600">
+              <span className="font-semibold text-purple-600">
                 ${Number(order.totalPrice).toFixed(2)}
               </span>
             </div>
@@ -111,7 +111,7 @@ export default async function PaymentSuccessPage({
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild className="bg-green-600 hover:bg-green-700">
+          <Button asChild className="bg-purple-600 hover:bg-purple-700">
             <Link href={`/account/orders/${order.id}`}>
               View Order Details
             </Link>

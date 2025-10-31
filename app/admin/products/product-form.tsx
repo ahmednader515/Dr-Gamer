@@ -199,7 +199,7 @@ const ProductForm = ({
                   <FormControl>
                     <Input 
                       {...field} 
-                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-green-500 focus:ring-blue-500'
+                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500'
                       onChange={(e) => {
                         field.onChange(e)
                         if (type === 'Create') {
@@ -224,7 +224,7 @@ const ProductForm = ({
                   <FormControl>
                     <Input
                       {...field}
-                      className='border-gray-700 bg-gray-900 text-gray-300 focus:border-green-500 focus:ring-blue-500'
+                      className='border-gray-700 bg-gray-900 text-gray-300 focus:border-purple-500 focus:ring-blue-500'
                       readOnly
                       placeholder='سيتم توليد الرابط تلقائياً من اسم المنتج'
                     />
@@ -247,7 +247,7 @@ const ProductForm = ({
                   <FormLabel className='text-white font-semibold'>الفئة</FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange} value={field.value} disabled={isLoadingCategories}>
-                      <SelectTrigger className='border-gray-700 bg-gray-800 text-gray-200 focus:border-green-500 focus:ring-blue-500'>
+                      <SelectTrigger className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500'>
                         <SelectValue placeholder={isLoadingCategories ? "جاري التحميل..." : "اختر فئة"} />
                       </SelectTrigger>
                       <SelectContent>
@@ -279,7 +279,7 @@ const ProductForm = ({
                   <FormLabel className='text-white font-semibold'>نوع المنتج</FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className='border-gray-700 bg-gray-800 text-gray-200 focus:border-green-500 focus:ring-blue-500'>
+                      <SelectTrigger className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500'>
                         <SelectValue placeholder="اختر نوع المنتج" />
                       </SelectTrigger>
                       <SelectContent>
@@ -304,7 +304,7 @@ const ProductForm = ({
                   <FormControl>
                     <Input 
                       {...field} 
-                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-green-500 focus:ring-blue-500'
+                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500'
                     />
                   </FormControl>
 
@@ -322,7 +322,7 @@ const ProductForm = ({
                   <FormControl>
                     <Input 
                       {...field} 
-                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-green-500 focus:ring-blue-500'
+                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500'
                     />
                   </FormControl>
                   <FormMessage />
@@ -340,7 +340,7 @@ const ProductForm = ({
                   <FormControl>
                     <Input 
                       {...field} 
-                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-green-500 focus:ring-blue-500'
+                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500'
                     />
                   </FormControl>
                   <FormMessage />
@@ -357,7 +357,7 @@ const ProductForm = ({
                     <Input
                       type='number'
                       {...field}
-                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-green-500 focus:ring-blue-500'
+                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500'
                     />
                   </FormControl>
                   <FormMessage />
@@ -480,7 +480,7 @@ const ProductForm = ({
                   <FormLabel className='text-white font-semibold'>الوصف</FormLabel>
                   <FormControl>
                     <Textarea
-                      className='resize-none border-gray-700 bg-gray-800 text-gray-200 focus:border-green-500 focus:ring-blue-500'
+                      className='resize-none border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500'
                       {...field}
                     />
                   </FormControl>
@@ -515,7 +515,7 @@ const ProductForm = ({
             const values = form.getValues()
             onSubmit(values)
           }}
-          className='button col-span-2 w-full bg-green-600 hover:bg-green-700 text-white'
+          className='button col-span-2 w-full bg-purple-600 hover:bg-purple-700 text-white'
         >
           {isSubmitting ? 'جاري الإرسال...' : `${type === 'Create' ? 'إنشاء' : 'تحديث'} المنتج`}
         </Button>

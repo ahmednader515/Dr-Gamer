@@ -238,7 +238,7 @@ const WebPageForm = ({
               const values = form.getValues()
               onSubmit(values)
             }}
-            className='button col-span-2 w-full bg-green-600 hover:bg-green-700 text-white'
+            className='button col-span-2 w-full bg-purple-600 hover:bg-purple-700 text-white'
           >
             {form.formState.isSubmitting ? 'جاري الإرسال...' : `${type === 'Create' ? 'إنشاء' : 'تحديث'} الصفحة`}
           </Button>

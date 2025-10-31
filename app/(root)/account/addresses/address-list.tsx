@@ -155,7 +155,7 @@ export default function AddressList() {
                   <MapPin className='h-4 w-4 text-muted-foreground' />
                   <h3 className='font-semibold'>{address.fullName}</h3>
                   {address.isDefault && (
-                    <span className='inline-flex items-center gap-1 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full'>
+                    <span className='inline-flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full'>
                       <Star className='h-3 w-3' />
                       افتراضي
                     </span>

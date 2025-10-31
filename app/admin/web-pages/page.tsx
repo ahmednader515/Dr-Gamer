@@ -48,14 +48,14 @@ export default async function WebPageAdminPage() {
                 <TableCell className='text-right py-4 px-4 text-gray-700 font-mono text-sm'>{webPage.slug}</TableCell>
                 <TableCell className='text-right py-4 px-4'>
                   <span className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
-                    webPage.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    webPage.isPublished ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
                   }`}>
                     {webPage.isPublished ? 'نعم' : 'لا'}
                   </span>
                 </TableCell>
                 <TableCell className='py-4 px-4'>
                   <div className='flex flex-row gap-2 items-center'>
-                    <Button asChild variant='default' size='sm' className='bg-green-600 hover:bg-green-700 shadow-sm border border-gray-200'>
+                    <Button asChild variant='default' size='sm' className='bg-purple-600 hover:bg-purple-700 shadow-sm border border-gray-200'>
                       <Link href={`/admin/web-pages/${webPage.id}`}>تعديل</Link>
                     </Button>
                     <DeleteDialog id={webPage.id} action={deleteWebPage} />
@@ -75,7 +75,7 @@ export default async function WebPageAdminPage() {
             <div className="flex items-center justify-between">
               <div className="font-medium text-gray-900">{webPage.title}</div>
               <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                webPage.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                webPage.isPublished ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
               }`}>
                 {webPage.isPublished ? 'منشور' : 'غير منشور'}
               </span>
@@ -91,7 +91,7 @@ export default async function WebPageAdminPage() {
 
             {/* Actions */}
             <div className="border-t border-gray-100 pt-3 flex gap-2">
-              <Button asChild size='sm' className="flex-1 bg-green-600 hover:bg-green-700">
+              <Button asChild size='sm' className="flex-1 bg-purple-600 hover:bg-purple-700">
                 <Link href={`/admin/web-pages/${webPage.id}`}>
                   تعديل
                 </Link>

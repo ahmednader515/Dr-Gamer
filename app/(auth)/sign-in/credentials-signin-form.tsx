@@ -193,7 +193,7 @@ export default function CredentialsSignInForm() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <p className="text-lg text-gray-600 font-cairo">تم تسجيل الدخول بنجاح! جاري توجيهك...</p>
         </div>
       </div>
@@ -289,7 +289,7 @@ export default function CredentialsSignInForm() {
             </Button>
             
             {process.env.NODE_ENV === 'development' && (
-              <div className="mt-4 p-3 bg-green-50 border border-blue-200 rounded-lg">
+              <div className="mt-4 p-3 bg-purple-50 border border-blue-200 rounded-lg">
                 <p className="text-xs md:text-sm text-blue-800 text-center font-cairo">
                   💡 <strong>بيانات تجريبية:</strong> يمكنك استخدام رقم الهاتف +201234567890 وكلمة المرور 123456
                 </p>
@@ -299,8 +299,8 @@ export default function CredentialsSignInForm() {
           
           <div className='text-sm md:text-base lg:text-lg text-right text-gray-300 font-cairo leading-relaxed'>
             عند تسجيل الدخول، فإنك توافق على{' '}
-            <Link href='/page/conditions-of-use' className="text-green-400 hover:underline">شروط الاستخدام</Link> و{' '}
-            <Link href='/page/privacy-policy' className="text-green-400 hover:underline">سياسة الخصوصية</Link> الخاصة بـ {site.name}.
+            <Link href='/page/conditions-of-use' className="text-purple-400 hover:underline">شروط الاستخدام</Link> و{' '}
+            <Link href='/page/privacy-policy' className="text-purple-400 hover:underline">سياسة الخصوصية</Link> الخاصة بـ {site.name}.
           </div>
         </div>
       </form>

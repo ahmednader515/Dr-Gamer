@@ -84,23 +84,23 @@ export default function ProductSlider({
           breakpoints={{
             640: {
               slidesPerView: 2,
-              spaceBetween: 16,
+              spaceBetween: 32,
             },
             768: {
               slidesPerView: hideDetails ? 3 : 2,
-              spaceBetween: 20,
+              spaceBetween: 40,
             },
             1024: {
               slidesPerView: hideDetails ? 4 : 3,
-              spaceBetween: 24,
+              spaceBetween: 40,
             },
             1280: {
               slidesPerView: hideDetails ? 5 : 4,
-              spaceBetween: 24,
+              spaceBetween: 40,
             },
             1536: {
-              slidesPerView: hideDetails ? 6 : 5,
-              spaceBetween: 24,
+              slidesPerView: hideDetails ? 6 : 4,
+              spaceBetween: 40,
             },
           }}
           loop={products.length > slidesPerView}
@@ -130,7 +130,7 @@ export default function ProductSlider({
           className={`absolute -left-10 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 sm:p-3 shadow-lg transition-all duration-200 border-2 ${
             isEnd 
               ? 'bg-gray-800/50 text-gray-400 border-gray-700 cursor-not-allowed' 
-              : 'bg-gray-800/90 hover:bg-green-600 text-white hover:scale-110 border-gray-700 hover:border-green-500 cursor-pointer'
+              : 'bg-gray-800/90 hover:bg-purple-600 text-white hover:scale-110 border-gray-700 hover:border-purple-500 cursor-pointer'
           }`}
           aria-label="Next slide"
           disabled={isEnd}
@@ -143,7 +143,7 @@ export default function ProductSlider({
           className={`absolute -right-10 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 sm:p-3 shadow-lg transition-all duration-200 border-2 ${
             isBeginning 
               ? 'bg-gray-800/50 text-gray-400 border-gray-700 cursor-not-allowed' 
-              : 'bg-gray-800/90 hover:bg-green-600 text-white hover:scale-110 border-gray-700 hover:border-green-500 cursor-pointer'
+              : 'bg-gray-800/90 hover:bg-purple-600 text-white hover:scale-110 border-gray-700 hover:border-purple-500 cursor-pointer'
           }`}
           aria-label="Previous slide"
           disabled={isBeginning}

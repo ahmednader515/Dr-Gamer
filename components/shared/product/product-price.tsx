@@ -50,7 +50,7 @@ export default function ProductPrice({
 
   return (
     <div className={cn('flex flex-col gap-1 items-start text-left', className)} dir="rtl">
-      <span className='text-2xl font-bold text-primary text-left'>
+      <span className='text-2xl font-bold text-white text-left'>
         {formatPrice(price)}
       </span>
       {hasDiscount && (

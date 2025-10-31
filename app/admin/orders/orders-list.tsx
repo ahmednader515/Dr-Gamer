@@ -85,12 +85,12 @@ export default function OrdersList({ orders, totalPages, currentPage, userRole }
         <Table className="admin-table border border-gray-700 rounded-lg overflow-hidden shadow-lg">
           <TableHeader>
             <TableRow className="bg-gray-800 border-b-2 border-gray-700">
-              <TableHead className='text-right bg-gray-800 text-green-400 font-semibold py-4 px-4'>التاريخ</TableHead>
-              <TableHead className='text-right bg-gray-800 text-green-400 font-semibold py-4 px-4'>المشتري</TableHead>
-              <TableHead className='text-right bg-gray-800 text-green-400 font-semibold py-4 px-4'>المجموع</TableHead>
-              <TableHead className='text-right bg-gray-800 text-green-400 font-semibold py-4 px-4'>مدفوع</TableHead>
-              <TableHead className='text-right bg-gray-800 text-green-400 font-semibold py-4 px-4'>مُسلم</TableHead>
-              <TableHead className='text-right bg-gray-800 text-green-400 font-semibold py-4 px-4'>الإجراءات</TableHead>
+              <TableHead className='text-right bg-gray-800 text-purple-400 font-semibold py-4 px-4'>التاريخ</TableHead>
+              <TableHead className='text-right bg-gray-800 text-purple-400 font-semibold py-4 px-4'>المشتري</TableHead>
+              <TableHead className='text-right bg-gray-800 text-purple-400 font-semibold py-4 px-4'>المجموع</TableHead>
+              <TableHead className='text-right bg-gray-800 text-purple-400 font-semibold py-4 px-4'>مدفوع</TableHead>
+              <TableHead className='text-right bg-gray-800 text-purple-400 font-semibold py-4 px-4'>مُسلم</TableHead>
+              <TableHead className='text-right bg-gray-800 text-purple-400 font-semibold py-4 px-4'>الإجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -111,7 +111,7 @@ export default function OrdersList({ orders, totalPages, currentPage, userRole }
                 <TableCell className='py-4 px-4'>
                   <span className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
                     order.isPaid 
-                      ? 'bg-green-100 text-green-800' 
+                      ? 'bg-purple-100 text-purple-800' 
                       : 'bg-red-100 text-red-800'
                   }`}>
                     {order.isPaid ? 'مدفوع' : 'غير مدفوع'}
@@ -120,7 +120,7 @@ export default function OrdersList({ orders, totalPages, currentPage, userRole }
                 <TableCell className='py-4 px-4'>
                   <span className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
                     order.isDelivered 
-                      ? 'bg-green-100 text-green-800' 
+                      ? 'bg-purple-100 text-purple-800' 
                       : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     {order.isDelivered ? 'مُسلم' : 'قيد التوصيل'}
@@ -157,14 +157,14 @@ export default function OrdersList({ orders, totalPages, currentPage, userRole }
               <div className="flex gap-2">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                   order.isPaid 
-                    ? 'bg-green-100 text-green-800' 
+                    ? 'bg-purple-100 text-purple-800' 
                     : 'bg-red-100 text-red-800'
                 }`}>
                   {order.isPaid ? 'مدفوع' : 'غير مدفوع'}
                 </span>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                   order.isDelivered 
-                    ? 'bg-green-100 text-green-800' 
+                    ? 'bg-purple-100 text-purple-800' 
                     : 'bg-yellow-100 text-yellow-800'
                 }`}>
                   {order.isDelivered ? 'مُسلم' : 'قيد التوصيل'}
@@ -183,10 +183,10 @@ export default function OrdersList({ orders, totalPages, currentPage, userRole }
               <div className="border-t border-gray-700 pt-3">
                 <div className="text-sm text-gray-400 mb-1">كود الخصم:</div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-400 font-medium">{order.promoCode}</span>
+                  <span className="text-purple-400 font-medium">{order.promoCode}</span>
                   <span className="text-xs text-gray-500">({order.discountPercent}%)</span>
                 </div>
-                <div className="text-sm text-green-400 mt-1">
+                <div className="text-sm text-purple-400 mt-1">
                   - <ProductPrice price={order.discountAmount || 0} />
                 </div>
               </div>
@@ -194,7 +194,7 @@ export default function OrdersList({ orders, totalPages, currentPage, userRole }
 
             <div className="border-t border-gray-700 pt-3">
               <div className="text-sm text-gray-400 mb-1">المجموع:</div>
-              <div className="text-lg font-semibold text-green-400">
+              <div className="text-lg font-semibold text-purple-400">
                 <ProductPrice price={order.totalPrice} />
               </div>
             </div>

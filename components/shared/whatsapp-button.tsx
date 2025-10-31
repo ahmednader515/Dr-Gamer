@@ -34,7 +34,7 @@ export default function WhatsAppButton({
         onMouseLeave={() => setIsHovered(false)}
         className={`
           rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
-          bg-green-500 hover:bg-green-600 text-white p-3 sm:p-4
+          bg-purple-500 hover:bg-purple-600 text-white p-3 sm:p-4
           group relative overflow-hidden w-12 h-12 sm:w-14 sm:h-14
           ${className}
         `}

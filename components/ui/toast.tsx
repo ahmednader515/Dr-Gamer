@@ -32,7 +32,7 @@ const toastVariants = cva(
         default: "border-blue-300 bg-blue-50 text-blue-900 shadow-blue-200/50",
         destructive:
           "border-red-300 bg-red-50 text-red-900 shadow-red-200/50",
-        success: "border-green-300 bg-green-50 text-green-900 shadow-green-200/50",
+        success: "border-purple-300 bg-purple-50 text-purple-900 shadow-purple-200/50",
         warning: "border-yellow-300 bg-yellow-50 text-yellow-900 shadow-yellow-200/50",
         info: "border-blue-300 bg-blue-50 text-blue-900 shadow-blue-200/50",
       },
@@ -65,7 +65,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-9 shrink-0 items-center justify-center rounded-md border-2 bg-white px-4 text-sm font-medium transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-red-300 group-[.destructive]:text-red-700 group-[.destructive]:hover:bg-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-50 group-[.success]:border-green-300 group-[.success]:text-green-700 group-[.success]:hover:bg-green-50 group-[.success]:focus:ring-green-400 group-[.success]:focus:ring-offset-green-50 group-[.warning]:border-yellow-300 group-[.warning]:text-yellow-700 group-[.warning]:hover:bg-yellow-50 group-[.warning]:focus:ring-yellow-400 group-[.warning]:focus:ring-offset-yellow-50 group-[.info]:border-blue-300 group-[.info]:text-blue-700 group-[.info]:hover:bg-blue-50 group-[.info]:focus:ring-blue-400 group-[.info]:focus:ring-offset-blue-50",
+      "inline-flex h-9 shrink-0 items-center justify-center rounded-md border-2 bg-white px-4 text-sm font-medium transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-red-300 group-[.destructive]:text-red-700 group-[.destructive]:hover:bg-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-50 group-[.success]:border-purple-300 group-[.success]:text-purple-700 group-[.success]:hover:bg-purple-50 group-[.success]:focus:ring-purple-400 group-[.success]:focus:ring-offset-purple-50 group-[.warning]:border-yellow-300 group-[.warning]:text-yellow-700 group-[.warning]:hover:bg-yellow-50 group-[.warning]:focus:ring-yellow-400 group-[.warning]:focus:ring-offset-yellow-50 group-[.info]:border-blue-300 group-[.info]:text-blue-700 group-[.info]:hover:bg-blue-50 group-[.info]:focus:ring-blue-400 group-[.info]:focus:ring-offset-blue-50",
       className
     )}
     {...props}
@@ -80,7 +80,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "absolute right-2 top-2 rounded-md p-1.5 text-foreground/70 opacity-0 transition-all hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 group-hover:opacity-100 group-[.destructive]:text-red-700 group-[.destructive]:hover:text-red-900 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-50 group-[.success]:text-green-700 group-[.success]:hover:text-green-900 group-[.success]:focus:ring-green-400 group-[.success]:focus:ring-offset-green-50 group-[.warning]:text-yellow-700 group-[.warning]:hover:text-yellow-900 group-[.warning]:focus:ring-yellow-400 group-[.warning]:focus:ring-offset-yellow-50 group-[.info]:text-blue-700 group-[.info]:hover:text-blue-900 group-[.info]:focus:ring-blue-400 group-[.info]:focus:ring-offset-blue-50",
+      "absolute right-2 top-2 rounded-md p-1.5 text-foreground/70 opacity-0 transition-all hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 group-hover:opacity-100 group-[.destructive]:text-red-700 group-[.destructive]:hover:text-red-900 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-50 group-[.success]:text-purple-700 group-[.success]:hover:text-purple-900 group-[.success]:focus:ring-purple-400 group-[.success]:focus:ring-offset-purple-50 group-[.warning]:text-yellow-700 group-[.warning]:hover:text-yellow-900 group-[.warning]:focus:ring-yellow-400 group-[.warning]:focus:ring-offset-yellow-50 group-[.info]:text-blue-700 group-[.info]:hover:text-blue-900 group-[.info]:focus:ring-blue-400 group-[.info]:focus:ring-offset-blue-50",
       className
     )}
     toast-close=""

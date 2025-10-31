@@ -92,7 +92,7 @@ export default function UserButton({
                   className='w-full' 
                   href={session.user.role === 'Admin' ? '/admin/overview' : '/admin/products'}
                 >
-                  <DropdownMenuItem className='text-green-400 hover:text-green-300 hover:bg-gray-800 focus:bg-gray-800 focus:text-green-300'>
+                  <DropdownMenuItem className='text-purple-400 hover:text-purple-300 hover:bg-gray-800 focus:bg-gray-800 focus:text-purple-300'>
                     {session.user.role === 'Admin' ? translations.admin : 'لوحة المشرف'}
                   </DropdownMenuItem>
                 </Link>
@@ -114,7 +114,7 @@ export default function UserButton({
             <DropdownMenuGroup>
               <DropdownMenuItem className='text-white hover:text-white hover:bg-gray-800 focus:bg-gray-800 focus:text-white'>
                 <Link
-                  className={cn(buttonVariants(), 'w-full bg-green-600 hover:bg-green-700 text-white')}
+                  className={cn(buttonVariants(), 'w-full bg-purple-600 hover:bg-purple-700 text-white')}
                   href='/sign-in'
                 >
                   {translations.signIn}
@@ -124,7 +124,7 @@ export default function UserButton({
             <DropdownMenuLabel className='text-white'>
               <div className='font-normal'>
                 {translations.newCustomer}?{' '}
-                <Link href='/sign-up' className='text-green-400 hover:text-green-300 underline'>{translations.signUp}</Link>
+                <Link href='/sign-up' className='text-purple-400 hover:text-purple-300 underline'>{translations.signUp}</Link>
               </div>
             </DropdownMenuLabel>
           </DropdownMenuContent>

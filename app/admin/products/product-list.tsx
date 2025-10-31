@@ -234,11 +234,11 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                       </div>
                     </TableCell>
                     <TableCell className='text-right py-4 px-4'>
-                      <Link href={`/admin/products/${product.id}`} className="text-green-600 hover:text-green-800 hover:underline font-medium">
+                      <Link href={`/admin/products/${product.id}`} className="text-purple-600 hover:text-purple-800 hover:underline font-medium">
                         {product.name}
                       </Link>
                     </TableCell>
-                    <TableCell className='text-right py-4 px-4 font-semibold text-green-700'>
+                    <TableCell className='text-right py-4 px-4 font-semibold text-purple-700'>
                       {product.price.toFixed(2)} ج.م
                     </TableCell>
                     <TableCell className='text-right py-4 px-4'>
@@ -246,7 +246,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                     </TableCell>
                     <TableCell className='text-right py-4 px-4'>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        product.countInStock > 10 ? 'bg-green-100 text-green-800' : 
+                        product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
                         product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
                         'bg-red-100 text-red-800'
                       }`}>
@@ -261,7 +261,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                     </TableCell>
                     <TableCell className='text-right py-4 px-4'>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        product.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        product.isPublished ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
                       }`}>
                         {product.isPublished ? 'نعم' : 'لا'}
                       </span>
@@ -315,7 +315,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <Link href={`/admin/products/${product.id}`} className="text-green-600 hover:text-green-800 hover:underline font-medium text-lg block">
+                    <Link href={`/admin/products/${product.id}`} className="text-purple-600 hover:text-purple-800 hover:underline font-medium text-lg block">
                       {product.name}
                     </Link>
                     <div className="text-sm text-gray-500">{product.category}</div>
@@ -326,12 +326,12 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600">السعر:</span>
-                    <span className="font-semibold text-green-700">{product.price.toFixed(2)} ج.م</span>
+                    <span className="font-semibold text-purple-700">{product.price.toFixed(2)} ج.م</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600">المخزون:</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      product.countInStock > 10 ? 'bg-green-100 text-green-800' : 
+                      product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
                       product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
                       'bg-red-100 text-red-800'
                     }`}>
@@ -348,7 +348,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600">منشور:</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      product.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      product.isPublished ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
                     }`}>
                       {product.isPublished ? 'نعم' : 'لا'}
                     </span>

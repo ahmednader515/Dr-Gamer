@@ -128,7 +128,7 @@ export default function AdminNav({ userRole }: { userRole: string }) {
                     className={cn(
                       'flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-200',
                       isActive
-                        ? 'bg-green-600 text-white shadow-md'
+                        ? 'bg-purple-600 text-white shadow-md'
                         : 'text-gray-300 hover:bg-gray-800 hover:text-white hover:shadow-sm'
                     )}
                   >

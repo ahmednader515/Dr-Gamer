@@ -22,9 +22,9 @@ interface SearchPageProps {
 // Loading skeleton components
 function SearchHeaderSkeleton() {
   return (
-    <div className='mb-6 sm:mb-8 bg-white rounded-xl p-4 sm:p-6 shadow-sm'>
-      <div className='h-6 sm:h-8 bg-gray-200 rounded w-3/4 mb-2 sm:mb-3 animate-pulse'></div>
-      <div className='h-4 sm:h-6 bg-gray-200 rounded w-1/2 animate-pulse'></div>
+    <div className='mb-6 sm:mb-8 bg-gray-900 rounded-xl p-4 sm:p-6 shadow-sm'>
+      <div className='h-6 sm:h-8 bg-gray-700 rounded w-3/4 mb-2 sm:mb-3 animate-pulse'></div>
+      <div className='h-4 sm:h-6 bg-gray-700 rounded w-1/2 animate-pulse'></div>
     </div>
   )
 }
@@ -74,11 +74,11 @@ async function SearchHeader({ params, translations }: {
   } = params
 
   return (
-    <div className='mb-6 sm:mb-8 bg-white rounded-xl p-4 sm:p-6 shadow-sm'>
-      <h1 className='text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-right text-gray-800'>
+    <div className='mb-6 sm:mb-8 bg-gray-900 rounded-xl p-4 sm:p-6 shadow-sm'>
+      <h1 className='text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-right text-white'>
         {q ? `${translations.searchResults} "${q}"` : `${translations.productsIn} ${category}`}
       </h1>
-      <p className='text-sm sm:text-base text-gray-600 text-right'>
+      <p className='text-sm sm:text-base text-gray-300 text-right'>
         {translations.found} {translations.loading} {translations.products}
       </p>
     </div>
@@ -183,7 +183,7 @@ async function ProductResults({ params, translations }: {
 
   return (
     <>
-      <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 bg-white rounded-xl p-3 sm:p-4 shadow-sm'>
+      <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 bg-gray-900 rounded-xl p-3 sm:p-4 shadow-sm'>
         <ProductSortSelector 
           sortOrders={[
             { value: 'newest', name: translations.newest },
@@ -195,7 +195,7 @@ async function ProductResults({ params, translations }: {
           sort={sort}
           params={params}
         />
-        <p className='text-xs sm:text-sm text-gray-600 text-right'>
+        <p className='text-xs sm:text-sm text-gray-300 text-right'>
           {translations.showing} {from}-{to} {translations.of} {totalProducts} {translations.products}
         </p>
       </div>
@@ -209,7 +209,7 @@ async function ProductResults({ params, translations }: {
         </div>
       ) : (
         <>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10 mb-6 sm:mb-8'>
             {normalizedProducts.map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))}

@@ -19,7 +19,7 @@ export default function LoadingOverlay({
     <div className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center ${className}`}>
       <div className="bg-gray-900 rounded-lg shadow-xl p-8 text-center max-w-sm mx-4" dir="rtl">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-12 h-12 border-4 border-green-300 border-t-green-600 rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-gray-100">
               {text}
@@ -52,7 +52,7 @@ export function LoadingSpinner({
 
   return (
     <div className={`flex items-center gap-2 ${className}`} dir="rtl">
-      <div className={`${sizeClasses[size]} border-green-300 border-t-green-600 rounded-full animate-spin`}></div>
+      <div className={`${sizeClasses[size]} border-purple-300 border-t-purple-600 rounded-full animate-spin`}></div>
       {text && (
         <span className="text-sm text-gray-300">
           {text}
@@ -73,7 +73,7 @@ export function FullPageLoading({
   return (
     <div className={`min-h-screen flex items-center justify-center bg-black ${className}`} dir="rtl">
       <div className="text-center space-y-6">
-        <div className="w-16 h-16 border-4 border-green-300 border-t-green-600 rounded-full animate-spin mx-auto"></div>
+        <div className="w-16 h-16 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin mx-auto"></div>
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-gray-100">
             {text}

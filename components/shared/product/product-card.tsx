@@ -41,7 +41,7 @@ const ProductCard = ({
     const colorMap: { [key: string]: string } = {
       'game_code': 'bg-blue-600',
       'game_account': 'bg-purple-600',
-      'subscription': 'bg-green-600',
+      'subscription': 'bg-purple-600',
     };
     return colorMap[productType] || 'bg-blue-600';
   };
@@ -49,7 +49,7 @@ const ProductCard = ({
   const ProductImage = () => (
     <div className="relative group">
       <Link href={`/product/${product.slug}`}>
-        <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden rounded-lg bg-gray-800">
+        <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden bg-gray-800">
           {/* Product Type Banner */}
           <div className={`absolute top-2 right-2 ${getProductTypeColor(product.productType || 'game_code')} text-white text-center py-0.5 px-2 z-10 text-[10px] sm:text-xs font-semibold rounded`}>
             {getProductTypeLabel(product.productType || 'game_code')}
@@ -68,7 +68,7 @@ const ProductCard = ({
                 alt={product.name}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-contain transition-transform duration-300 group-hover:scale-105"
+                className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
               />
             )
           ) : (
@@ -80,7 +80,7 @@ const ProductCard = ({
           {/* Quick action buttons overlay */}
           <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <button className="p-1.5 sm:p-2 bg-gray-800/90 hover:bg-gray-800 rounded-full shadow-md transition-all duration-200 hover:scale-110">
-              <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
+              <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-purple-400" />
             </button>
           </div>
           
@@ -108,7 +108,7 @@ const ProductCard = ({
         className="block group"
       >
         <h3 
-           className="font-semibold text-gray-100 text-right leading-tight line-clamp-2 group-hover:text-green-400 transition-colors duration-200 text-sm sm:text-base"
+           className="font-semibold text-gray-100 text-right leading-tight line-clamp-2 group-hover:text-purple-400 transition-colors duration-200 text-sm sm:text-base"
           style={{
             display: "-webkit-box",
             WebkitLineClamp: 2,
@@ -184,7 +184,7 @@ const ProductCard = ({
          <button 
            onClick={handleAddToCart}
            disabled={isAddingToCart}
-           className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
+           className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
          >
           {isAddingToCart ? (
             <LoadingSpinner size="sm" />
@@ -203,7 +203,7 @@ const ProductCard = ({
 
   if (hideBorder) {
     return (
-      <div className="flex flex-col bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-300 overflow-hidden group border-2 border-gray-700 hover:border-green-500 hover:scale-[1.03] m-1" dir="rtl">
+      <div className="flex flex-col bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden group border-2 border-gray-700 hover:border-purple-500 hover:scale-[1.03] m-1" dir="rtl">
         <ProductImage />
         {!hideDetails && (
           <>
@@ -216,7 +216,7 @@ const ProductCard = ({
   }
 
   return (
-    <Card className="flex flex-col bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-300 overflow-hidden group border-2 border-gray-700 hover:border-green-500 hover:scale-[1.03] m-1" dir="rtl">
+    <Card className="flex flex-col bg-gray-900 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden group border-2 border-gray-700 hover:border-purple-500 hover:scale-[1.03] m-1" dir="rtl">
       <ProductImage />
       {!hideDetails && (
         <>

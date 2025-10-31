@@ -56,13 +56,13 @@ export default function CartSidebar() {
             <ProductPrice price={itemsPrice} plain />
           </div>
           {itemsPrice > freeShippingMinPrice && (
-            <div className='text-center text-xs text-green-400 bg-green-900/30 border border-green-700 p-2 rounded-md'>
+            <div className='text-center text-xs text-purple-400 bg-purple-900/30 border border-purple-700 p-2 rounded-md'>
               طلبك مؤهل للشحن المجاني
             </div>
           )}
 
           <Link
-            className={`rounded-full hover:no-underline w-full text-sm btn-mobile bg-green-600 hover:bg-green-700 text-white py-2 px-3 block text-center transition-colors`}
+            className={`rounded-full hover:no-underline w-full text-sm btn-mobile bg-purple-600 hover:bg-purple-700 text-white py-2 px-3 block text-center transition-colors`}
             href='/cart'
           >
             الذهاب إلى السلة

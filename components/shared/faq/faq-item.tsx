@@ -23,9 +23,9 @@ export default function FAQItem({ question, answer, isLast }: FAQItemProps) {
       >
         <span className="text-lg font-semibold text-white">{question}</span>
         {isOpen ? (
-          <ChevronUp className="h-5 w-5 text-green-400 flex-shrink-0" />
+          <ChevronUp className="h-5 w-5 text-purple-400 flex-shrink-0" />
         ) : (
-          <ChevronDown className="h-5 w-5 text-green-400 flex-shrink-0" />
+          <ChevronDown className="h-5 w-5 text-purple-400 flex-shrink-0" />
         )}
       </button>
       

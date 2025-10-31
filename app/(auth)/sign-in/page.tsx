@@ -52,7 +52,7 @@ export default async function SignInPage(props: {
 
           {/* Form Section - Left Side */}
           <div className="flex justify-center form-section order-1 lg:order-2">
-            <Card className="w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-2xl bg-gray-900 border-2 border-green-600">
+            <Card className="w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-2xl bg-gray-900 border-2 border-purple-600">
               <CardHeader className="text-center pb-4 md:pb-6">
                 <CardTitle className="text-xl sm:text-2xl md:text-3xl text-right font-cairo mb-2 md:mb-3 text-white">تسجيل الدخول</CardTitle>
                 <p className="text-sm sm:text-base md:text-lg text-gray-300 text-right font-cairo">أدخل بياناتك للوصول إلى حسابك</p>
@@ -70,7 +70,7 @@ export default async function SignInPage(props: {
             جديد في {site.name}؟
           </div>
           <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-            <Button className="w-full max-w-sm md:max-w-lg font-cairo text-base md:text-lg h-10 md:h-12 bg-green-600 hover:bg-green-700 text-white border-0" variant="outline">
+            <Button className="w-full max-w-sm md:max-w-lg font-cairo text-base md:text-lg h-10 md:h-12 bg-purple-600 hover:bg-purple-700 text-white border-0" variant="outline">
               إنشاء حساب جديد
             </Button>
           </Link>

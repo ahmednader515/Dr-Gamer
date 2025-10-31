@@ -332,7 +332,7 @@ export default function CheckoutForm() {
 
             <div className='flex justify-between pt-3 sm:pt-4 font-bold text-base sm:text-lg'>
               <span>المجموع الكلي:</span>
-              <span className={appliedPromo ? 'text-green-400' : ''}>
+              <span className={appliedPromo ? 'text-purple-400' : ''}>
                 <ProductPrice price={finalTotal} plain />
               </span>
             </div>
@@ -596,7 +596,7 @@ export default function CheckoutForm() {
                 </div>
                 <div className='col-span-12 lg:col-span-5 text-sm sm:text-base'>
                   <p>رقم الدفع: {paymentNumber}</p>
-                  <p className='text-green-400'>✓ تم رفع صورة المعاملة</p>
+                  <p className='text-purple-400'>✓ تم رفع صورة المعاملة</p>
                 </div>
                 <div className='col-span-12 lg:col-span-2'>
                   <Button
@@ -637,7 +637,7 @@ export default function CheckoutForm() {
                                   <p className='mb-1 text-gray-300'>
                                     اسم المستخدم:
                                   </p>
-                                  <p className='text-green-400 font-bold text-lg'>
+                                  <p className='text-purple-400 font-bold text-lg'>
                                     {currentPaymentInfo.userName}
                                   </p>
                                 </div>
@@ -646,7 +646,7 @@ export default function CheckoutForm() {
                                 <p className='mb-1 text-gray-300'>
                                   {currentPaymentInfo.label}:
                                 </p>
-                                <p className='text-green-400 font-bold text-lg'>
+                                <p className='text-purple-400 font-bold text-lg'>
                                   {currentPaymentInfo.number}
                                 </p>
                               </div>
@@ -780,7 +780,7 @@ export default function CheckoutForm() {
                                         })
                                       }}
                                       appearance={{
-                                        button: 'ut-ready:bg-green-500 ut-ready:bg-opacity-20 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-500 ut-uploading:bg-opacity-20 bg-gray-800 text-white border border-gray-700 cursor-pointer rounded-lg px-4 py-2 text-sm',
+                                        button: 'ut-ready:bg-purple-500 ut-ready:bg-opacity-20 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-500 ut-uploading:bg-opacity-20 bg-gray-800 text-white border border-gray-700 cursor-pointer rounded-lg px-4 py-2 text-sm',
                                         container: 'w-full',
                                         allowedContent: 'text-gray-400 text-xs mt-2',
                                       }}
@@ -843,7 +843,7 @@ export default function CheckoutForm() {
                       className='text-sm cursor-pointer'
                     >
                       أوافق على{' '}
-                      <Link href="/terms" className='text-green-400 hover:underline'>
+                      <Link href="/terms" className='text-purple-400 hover:underline'>
                         الشروط والأحكام
                       </Link>
                     </label>
@@ -880,7 +880,7 @@ export default function CheckoutForm() {
                     <p className='font-bold text-base sm:text-lg'>
                       المجموع الكلي: <ProductPrice price={finalTotal} plain />
                       {appliedPromo && (
-                        <span className='text-xs text-green-400 mr-2'>
+                        <span className='text-xs text-purple-400 mr-2'>
                           (وفرت {appliedPromo.discountPercent}%)
                         </span>
                       )}

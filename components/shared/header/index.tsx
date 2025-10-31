@@ -70,7 +70,7 @@ export default async function Header() {
                   width={80}
                   height={80}
                   alt={`${site.name} logo`}
-                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
+                  className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14"
                 />
               </Link>
             </div>
@@ -129,8 +129,8 @@ export default async function Header() {
                     href={session.user.role === 'Admin' ? '/admin/overview' : '/admin/products'} 
                     className="flex flex-col items-center gap-1"
                   >
-                    <Shield className="w-6 h-6 text-green-500" />
-                    <span className="text-xs text-green-500 font-medium">
+                    <Shield className="w-6 h-6 text-purple-500" />
+                    <span className="text-xs text-purple-500 font-medium">
                       {session.user.role === 'Admin' ? 'الإدارة' : 'لوحة المشرف'}
                     </span>
                   </Link>
@@ -148,14 +148,14 @@ export default async function Header() {
       </div>
 
       {/* Categories Section - Hidden on mobile, shown on desktop */}
-      <div className="hidden md:block bg-green-700 text-white">
+      <div className="hidden md:block bg-[#111827] text-white border-b border-gray-700">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-center">
             <div className="flex items-center justify-center flex-wrap gap-2 lg:gap-4">
               {/* Home Page Link */}
               <Link
                 href="/"
-                className="px-3 lg:px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-green-400 text-sm font-medium transition-colors duration-200 whitespace-nowrap"
+                className="px-3 lg:px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition-colors duration-200 whitespace-nowrap"
               >
                 الصفحة الرئيسية
               </Link>
@@ -165,7 +165,7 @@ export default async function Header() {
                 <Link
                   href={`/search?category=${category}`}
                   key={category}
-                  className="px-3 lg:px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-green-400 text-sm font-medium transition-colors duration-200 whitespace-nowrap"
+                  className="px-3 lg:px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition-colors duration-200 whitespace-nowrap"
                 >
                   {categoryTranslations[category] || category}
                 </Link>

@@ -273,7 +273,7 @@ const FAQCategoryForm = ({
                   <CardTitle>الأسئلة</CardTitle>
                   <CardDescription>إدارة الأسئلة لهذه الفئة</CardDescription>
                 </div>
-                <Button type='button' onClick={addQuestion} size='sm' className='bg-green-600 hover:bg-green-700'>
+                <Button type='button' onClick={addQuestion} size='sm' className='bg-purple-600 hover:bg-purple-700'>
                   <Plus className="h-4 w-4 ml-2" />
                   إضافة سؤال
                 </Button>
@@ -284,7 +284,7 @@ const FAQCategoryForm = ({
                 {questions.map((question, index) => (
                   <div key={question.id} className='border border-gray-700 rounded-lg p-4 bg-gray-900'>
                     <div className='flex items-center justify-between mb-4'>
-                      <div className='flex items-center gap-2 text-green-400 font-medium'>
+                      <div className='flex items-center gap-2 text-purple-400 font-medium'>
                         السؤال #{index + 1}
                       </div>
                       <div className='flex gap-2'>
@@ -384,7 +384,7 @@ const FAQCategoryForm = ({
             type='submit'
             size='lg'
             disabled={form.formState.isSubmitting}
-            className='bg-green-600 hover:bg-green-700 text-white'
+            className='bg-purple-600 hover:bg-purple-700 text-white'
           >
             {form.formState.isSubmitting ? 'جاري الإرسال...' : `${type === 'Create' ? 'إنشاء' : 'تحديث'} الفئة`}
           </Button>

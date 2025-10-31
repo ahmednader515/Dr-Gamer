@@ -187,25 +187,25 @@ input, textarea, select, button, label, span, div, p, h1, h2, h3, h4, h5, h6, a,
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 12%;
     --popover-foreground: 0 0% 95%;
-    --primary: 107 76% 45%;
+    --primary: 268 77% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 107 60% 35%;
+    --secondary: 268 60% 55%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 70%;
-    --accent: 107 76% 45%;
+    --accent: 268 77% 65%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 25%;
     --input: 0 0% 20%;
-    --ring: 107 76% 45%;
+    --ring: 268 77% 65%;
     --radius: 0.5rem;
-    --chart-1: 107 76% 45%;
-    --chart-2: 107 60% 55%;
-    --chart-3: 107 50% 35%;
-    --chart-4: 95 60% 40%;
-    --chart-5: 120 70% 45%;
+    --chart-1: 268 77% 65%;
+    --chart-2: 268 60% 65%;
+    --chart-3: 268 60% 55%;
+    --chart-4: 260 70% 60%;
+    --chart-5: 275 70% 65%;
   }
 }
 
@@ -241,7 +241,7 @@ input, textarea, select, button, label, span, div, p, h1, h2, h3, h4, h5, h6, a,
   }
   .highlight-link a,
   a.highlight-link {
-    @apply text-green-500 hover:text-green-400 hover:underline;
+    @apply text-purple-500 hover:text-purple-400 hover:underline;
   }
   .header-button {
     @apply cursor-pointer p-1 border border-transparent hover:border-gray-300 hover:bg-gray-700 hover:text-white rounded transition-all duration-200;
@@ -266,13 +266,13 @@ input, textarea, select, button, label, span, div, p, h1, h2, h3, h4, h5, h6, a,
     @apply transition-colors duration-300;
   }
   .footer-link:hover {
-    @apply text-green-500;
+    @apply text-purple-500;
   }
   .sidebar-link {
     @apply transition-colors duration-300;
   }
   .sidebar-link:hover {
-    @apply text-green-500;
+    @apply text-purple-500;
   }
   .item-button {
     @apply p-3 hover:bg-muted hover:no-underline;
@@ -535,7 +535,7 @@ input, textarea, select, button, label, span, div, p, h1, h2, h3, h4, h5, h6, a,
 
 .admin-table th {
   background-color: #1f2937;
-  color: #10b981;
+  color: #9d60e9;
   font-weight: 600;
   padding: 16px;
   text-align: right;

@@ -69,7 +69,7 @@ export default async function AdminUser(props: {
                       ? 'bg-purple-100 text-purple-800' 
                       : user.role === 'Moderator'
                         ? 'bg-blue-100 text-blue-800'
-                        : 'bg-green-100 text-green-800'
+                        : 'bg-purple-100 text-purple-800'
                   }`}>
                     {user.role === 'Admin' ? 'مدير' : user.role === 'Moderator' ? 'مشرف' : 'مستخدم'}
                   </span>
@@ -107,7 +107,7 @@ export default async function AdminUser(props: {
                   ? 'bg-purple-100 text-purple-800' 
                   : user.role === 'Moderator'
                     ? 'bg-blue-100 text-blue-800'
-                    : 'bg-green-100 text-green-800'
+                    : 'bg-purple-100 text-purple-800'
               }`}>
                 {user.role === 'Admin' ? 'مدير' : user.role === 'Moderator' ? 'مشرف' : 'مستخدم'}
               </span>

@@ -39,7 +39,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
                       width={120}
                     />
                   </div>
-                  <p className='text-center text-sm whitespace-nowrap overflow-hidden text-ellipsis text-gray-700 group-hover:text-green-500 transition-colors duration-200'>
+                  <p className='text-center text-sm whitespace-nowrap overflow-hidden text-ellipsis text-gray-700 group-hover:text-purple-500 transition-colors duration-200'>
                     {item.name}
                   </p>
                 </Link>
@@ -50,7 +50,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
             <CardFooter className='px-6 pb-6'>
               <Link 
                 href={card.link.href} 
-                className='block text-center text-green-500 hover:text-blue-800 font-medium transition-colors duration-200 hover:underline'
+                className='block text-center text-purple-500 hover:text-blue-800 font-medium transition-colors duration-200 hover:underline'
               >
                 {card.link.text}
               </Link>

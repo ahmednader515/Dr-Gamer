@@ -214,8 +214,8 @@ export default function SignUpForm() {
           
           <div className='text-sm md:text-base text-right text-gray-300 font-cairo leading-relaxed'>
             عند إنشاء الحساب، فإنك توافق على{' '}
-            <Link href='/page/conditions-of-use' className="text-green-400 hover:underline">شروط الاستخدام</Link> و{' '}
-            <Link href='/page/privacy-policy' className="text-green-400 hover:underline">سياسة الخصوصية</Link> الخاصة بـ {site.name}.
+            <Link href='/page/conditions-of-use' className="text-purple-400 hover:underline">شروط الاستخدام</Link> و{' '}
+            <Link href='/page/privacy-policy' className="text-purple-400 hover:underline">سياسة الخصوصية</Link> الخاصة بـ {site.name}.
           </div>
         </div>
       </form>

@@ -49,7 +49,7 @@ export default function SignUpPage() {
             لديك حساب بالفعل؟
           </div>
           <a href="/sign-in" className="inline-block">
-            <button className="w-full max-w-sm md:max-w-lg font-cairo text-base md:text-lg h-10 md:h-12 bg-green-600 border-2 border-green-600 text-white hover:bg-green-700 rounded-lg transition-colors">
+            <button className="w-full max-w-sm md:max-w-lg font-cairo text-base md:text-lg h-10 md:h-12 bg-purple-600 border-2 border-purple-600 text-white hover:bg-purple-700 rounded-lg transition-colors">
               تسجيل الدخول
             </button>
           </a>

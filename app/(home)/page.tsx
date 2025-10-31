@@ -14,7 +14,7 @@ export const runtime = 'nodejs'
 // Loading skeleton for categories
 function CategoriesSkeleton() {
   return (
-    <Card className='w-full rounded-xl shadow-sm border-2 border-green-600 bg-gray-900'>
+    <Card className='w-full rounded-xl shadow-sm border-2 border-purple-600 bg-gray-900'>
       <CardContent className='card-mobile'>
         <div className='h-6 sm:h-8 bg-gray-700 rounded w-32 sm:w-48 mb-4 sm:mb-6 animate-pulse'></div>
         <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4'>
@@ -32,7 +32,7 @@ function CategoriesSkeleton() {
 
 function ProductSliderSkeleton({ title }: { title: string }) {
   return (
-    <Card className='w-full rounded-xl shadow-sm border-2 border-green-600 bg-gray-900'>
+    <Card className='w-full rounded-xl shadow-sm border-2 border-purple-600 bg-gray-900'>
       <CardContent className='card-mobile'>
         <div className='h-6 sm:h-8 bg-gray-700 rounded w-24 sm:w-32 mb-4 sm:mb-6 animate-pulse'></div>
         <div className='flex space-x-3 sm:space-x-4 overflow-hidden'>

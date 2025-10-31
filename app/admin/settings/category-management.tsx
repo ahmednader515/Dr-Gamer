@@ -424,7 +424,7 @@ export default function CategoryManagement() {
                           </div>
                         )}
                         <div className={`border-2 border-dashed rounded-lg p-3 text-center ${
-                          isUploading ? 'border-green-300 bg-green-50' : 'border-gray-300'
+                          isUploading ? 'border-purple-300 bg-purple-50' : 'border-gray-300'
                         }`}>
                           <UploadButton
                             endpoint="imageUploader"
@@ -448,7 +448,7 @@ export default function CategoryManagement() {
                             }}
                           />
                           {isUploading && (
-                            <p className="text-xs text-green-600 mt-2">
+                            <p className="text-xs text-purple-600 mt-2">
                               جاري رفع الصورة، يرجى الانتظار...
                             </p>
                           )}

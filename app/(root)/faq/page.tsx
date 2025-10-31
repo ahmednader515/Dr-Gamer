@@ -33,7 +33,7 @@ export default async function FAQPage() {
       <div className="space-y-8">
         {faqData.map((category: any) => (
           <div key={category.id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
-            <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+            <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
               <h2 className="text-xl font-bold text-white">{category.title}</h2>
             </div>
             <div className="divide-y divide-gray-700">
@@ -51,7 +51,7 @@ export default async function FAQPage() {
       </div>
 
       {/* Contact Section */}
-      <div className="mt-12 p-8 bg-gradient-to-r from-green-600/20 to-green-700/20 border border-green-500/30 rounded-lg">
+      <div className="mt-12 p-8 bg-gradient-to-r from-purple-600/20 to-purple-700/20 border border-purple-500/30 rounded-lg">
         <h2 className="text-2xl font-bold text-white mb-4">لم تجد إجابتك؟</h2>
         <p className="text-gray-300 mb-6">
           إذا كان لديك أي سؤال آخر لم نغطيه هنا، لا تتردد في التواصل معنا. نحن هنا لمساعدتك!
@@ -59,7 +59,7 @@ export default async function FAQPage() {
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/page/contact-us"
-            className="inline-flex items-center justify-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
+            className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors"
           >
             اتصل بنا
           </Link>

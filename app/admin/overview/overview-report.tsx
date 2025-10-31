@@ -277,7 +277,7 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
                     {/* Order Details */}
                     <div className="flex items-center justify-between text-sm text-gray-600">
                       <span>{formatDateTime(order.createdAt).dateOnly}</span>
-                      <span className="font-semibold text-green-600">
+                      <span className="font-semibold text-purple-600">
                         <ProductPrice price={order.totalPrice} plain />
                       </span>
                     </div>
@@ -286,7 +286,7 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
                     <div className="border-t border-gray-200 pt-2">
                       <Link 
                         href={`/admin/orders/${order.id}`}
-                        className="text-green-600 hover:text-green-800 text-sm font-medium"
+                        className="text-purple-600 hover:text-purple-800 text-sm font-medium"
                       >
                         عرض التفاصيل
                       </Link>

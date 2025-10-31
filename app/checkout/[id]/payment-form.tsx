@@ -57,7 +57,7 @@ export default function OrderDetailsForm({
 
             {/* Promo Code Discount */}
             {promoCode && discountAmount && (
-              <div className='flex items-center justify-between text-green-400'>
+              <div className='flex items-center justify-between text-purple-400'>
                 <div>
                   <span className='text-sm'>كود الخصم: </span>
                   <span className='font-semibold'>{promoCode}</span>
@@ -71,7 +71,7 @@ export default function OrderDetailsForm({
 
             <div className='flex justify-between pt-3 font-bold text-lg border-t'>
               <span>المجموع الكلي:</span>
-              <span className='text-green-400'>
+              <span className='text-purple-400'>
                 {' '}
                 <ProductPrice price={totalPrice} plain />
               </span>
@@ -117,7 +117,7 @@ export default function OrderDetailsForm({
   return (
     <main className='max-w-6xl mx-auto px-4 py-6' dir='rtl'>
       <div className='mb-6'>
-        <h1 className='text-2xl sm:text-3xl font-bold text-green-400 mb-2'>
+        <h1 className='text-2xl sm:text-3xl font-bold text-purple-400 mb-2'>
           ✓ تم استلام طلبك بنجاح
         </h1>
         <p className='text-gray-400 text-sm sm:text-base'>

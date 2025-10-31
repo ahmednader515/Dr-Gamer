@@ -158,7 +158,7 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
       <h1 className='h1-bold text-white'>إدارة أكواد الخصم</h1>
 
       {/* Create Promo Code Form */}
-      <Card className='border-2 border-green-600 bg-gray-900'>
+      <Card className='border-2 border-purple-600 bg-gray-900'>
         <CardHeader>
           <CardTitle className='text-white'>إنشاء كود خصم جديد</CardTitle>
           <CardDescription className='text-gray-300'>أضف كود خصم جديد للعملاء</CardDescription>
@@ -218,7 +218,7 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
               </div>
             </div>
 
-            <Button type='submit' disabled={isCreating} className='bg-green-600 hover:bg-green-700'>
+            <Button type='submit' disabled={isCreating} className='bg-purple-600 hover:bg-purple-700'>
               {isCreating ? 'جاري الإنشاء...' : 'إنشاء كود الخصم'}
             </Button>
           </form>
@@ -226,7 +226,7 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
       </Card>
 
       {/* Promo Codes List */}
-      <Card className='border-2 border-green-600 bg-gray-900'>
+      <Card className='border-2 border-purple-600 bg-gray-900'>
         <CardHeader>
           <CardTitle className='text-white'>أكواد الخصم الحالية</CardTitle>
           <CardDescription className='text-gray-300'>
@@ -238,20 +238,20 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
             <Table className='admin-table border border-gray-700 rounded-lg'>
               <TableHeader>
                 <TableRow className='bg-gray-800 border-b-2 border-gray-700'>
-                  <TableHead className='text-right text-green-400'>الكود</TableHead>
-                  <TableHead className='text-right text-green-400'>الخصم</TableHead>
-                  <TableHead className='text-right text-green-400'>الحالة</TableHead>
-                  <TableHead className='text-right text-green-400'>الاستخدام</TableHead>
-                  <TableHead className='text-right text-green-400'>الانتهاء</TableHead>
-                  <TableHead className='text-right text-green-400'>تاريخ الإنشاء</TableHead>
-                  <TableHead className='text-right text-green-400'>الإجراءات</TableHead>
+                  <TableHead className='text-right text-purple-400'>الكود</TableHead>
+                  <TableHead className='text-right text-purple-400'>الخصم</TableHead>
+                  <TableHead className='text-right text-purple-400'>الحالة</TableHead>
+                  <TableHead className='text-right text-purple-400'>الاستخدام</TableHead>
+                  <TableHead className='text-right text-purple-400'>الانتهاء</TableHead>
+                  <TableHead className='text-right text-purple-400'>تاريخ الإنشاء</TableHead>
+                  <TableHead className='text-right text-purple-400'>الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {promoCodes.map((code) => (
                   <TableRow key={code.id} className='border-b border-gray-700'>
                     <TableCell className='font-bold text-white'>{code.code}</TableCell>
-                    <TableCell className='text-green-400'>{code.discountPercent}%</TableCell>
+                    <TableCell className='text-purple-400'>{code.discountPercent}%</TableCell>
                     <TableCell>
                       <Button
                         size='sm'
@@ -259,7 +259,7 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
                         onClick={() => handleToggleActive(code.id, !code.isActive)}
                         className={`min-w-[100px] ${
                           code.isActive
-                            ? 'bg-green-600 text-white border-green-600 hover:bg-green-700'
+                            ? 'bg-purple-600 text-white border-purple-600 hover:bg-purple-700'
                             : 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
                         }`}
                       >

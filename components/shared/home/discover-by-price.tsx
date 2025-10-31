@@ -28,7 +28,7 @@ export default function DiscoverByPrice() {
               className='group'
             >
               <div className='bg-gray-800 hover:bg-gray-700 rounded-xl p-6 text-center transition-colors duration-300 border border-gray-700 h-[140px] flex items-center justify-center'>
-                <p className='text-white font-bold text-base sm:text-lg group-hover:text-green-400 transition-colors'>
+                <p className='text-white font-bold text-base sm:text-lg group-hover:text-purple-400 transition-colors'>
                   {range.label}
                 </p>
               </div>

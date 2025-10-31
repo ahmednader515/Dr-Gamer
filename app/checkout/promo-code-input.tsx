@@ -79,10 +79,10 @@ export default function PromoCodeInput({
   if (appliedPromo) {
     return (
       <>
-        <div className='bg-green-900/30 border border-green-600 rounded-lg p-3'>
+        <div className='bg-purple-900/30 border border-purple-600 rounded-lg p-3'>
           <div className='flex justify-between items-center'>
             <div>
-              <p className='text-sm font-medium text-green-400'>
+              <p className='text-sm font-medium text-purple-400'>
                 كود الخصم: {appliedPromo.code}
               </p>
               <p className='text-xs text-gray-300'>
@@ -99,7 +99,7 @@ export default function PromoCodeInput({
             </Button>
           </div>
         </div>
-        <div className='flex justify-between text-sm sm:text-base text-green-400'>
+        <div className='flex justify-between text-sm sm:text-base text-purple-400'>
           <span>الخصم ({appliedPromo.discountPercent}%):</span>
           <span>- <ProductPrice price={discountAmount} plain /></span>
         </div>
@@ -122,7 +122,7 @@ export default function PromoCodeInput({
         <Button
           onClick={handleApplyPromoCode}
           disabled={isValidatingPromo}
-          className='bg-green-600 hover:bg-green-700'
+          className='bg-purple-600 hover:bg-purple-700'
         >
           {isValidatingPromo ? 'جاري التحقق...' : 'تطبيق'}
         </Button>

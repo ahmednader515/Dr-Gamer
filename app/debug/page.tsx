@@ -63,12 +63,12 @@ export default async function DebugPage() {
         </div>
         
         {/* Categories */}
-        <div className="bg-green-100 p-4 rounded">
+        <div className="bg-purple-100 p-4 rounded">
           <h2 className="text-xl font-semibold mb-2">Categories</h2>
           <p><strong>Count:</strong> {categories.length}</p>
           <div className="flex flex-wrap gap-2 mt-2">
             {categories.map(category => (
-              <span key={category} className="bg-green-200 px-2 py-1 rounded text-sm">
+              <span key={category} className="bg-purple-200 px-2 py-1 rounded text-sm">
                 {category}
               </span>
             ))}

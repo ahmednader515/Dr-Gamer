@@ -41,15 +41,15 @@ export default function ProductSortSelector({
       }}
       value={sort}
     >
-      <SelectTrigger className="text-right" dir="rtl">
+      <SelectTrigger className="text-right bg-gray-800 border-gray-700 text-white" dir="rtl">
         <SelectValue>
           {translations.sortBy}: {sortOrders.find((s) => s.value === sort)!.name}
         </SelectValue>
       </SelectTrigger>
 
-      <SelectContent className="text-right" dir="rtl">
+      <SelectContent className="text-right bg-gray-800 border-gray-700" dir="rtl">
         {sortOrders.map((s) => (
-          <SelectItem key={s.value} value={s.value}>
+          <SelectItem key={s.value} value={s.value} className="text-white focus:bg-gray-700">
             {s.name}
           </SelectItem>
         ))}
