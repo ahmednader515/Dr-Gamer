@@ -6,7 +6,7 @@ import Image from 'next/image'
 
 const Products = [
   { name: 'Games', image: '/images/games.jpg', href: '/search?tag=steam' },
-  { name: 'Subscriptions', image: '/images/sub.jfif', href: '/search?tag=xbox' },
+  { name: 'Subscriptions', image: '/images/sub.png', href: '/search?tag=xbox' },
   { name: 'Gift Cards', image: '/images/gift.png', href: '/search?tag=playstation' },
 ]
 
