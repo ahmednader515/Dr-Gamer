@@ -234,7 +234,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                       </div>
                     </TableCell>
                     <TableCell className='text-right py-4 px-4'>
-                      <Link href={`/admin/products/${product.id}`} className="text-purple-600 hover:text-purple-800 hover:underline font-medium">
+                      <Link href={`/admin/products/${product.id}`} className="text-white hover:text-gray-300 hover:underline font-medium">
                         {product.name}
                       </Link>
                     </TableCell>
@@ -315,7 +315,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <Link href={`/admin/products/${product.id}`} className="text-purple-600 hover:text-purple-800 hover:underline font-medium text-lg block">
+                    <Link href={`/admin/products/${product.id}`} className="text-white hover:text-gray-300 hover:underline font-medium text-lg block">
                       {product.name}
                     </Link>
                     <div className="text-sm text-gray-500">{product.category}</div>

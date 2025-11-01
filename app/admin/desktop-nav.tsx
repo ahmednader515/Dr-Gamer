@@ -13,6 +13,18 @@ interface DesktopNavProps {
   navigation: NavigationItem[]
 }
 
+// Navigation translations
+const navigationTranslations: { [key: string]: string } = {
+  'Overview': 'لوحة التحكم',
+  'Products': 'المنتجات',
+  'Orders': 'الطلبات',
+  'Users': 'المستخدمون',
+  'Promo Codes': 'أكواد الخصم',
+  'Web Pages': 'صفحات الويب',
+  'FAQ': 'الأسئلة الشائعة',
+  'Settings': 'الإعدادات',
+}
+
 // Default navigation if not provided
 const defaultNavigation = [
   { name: 'Overview', href: '/admin/overview' },
@@ -43,7 +55,7 @@ export default function DesktopNav({ navigation = defaultNavigation }: DesktopNa
           href={item.href}
           className='text-gray-300 hover:text-white transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800'
         >
-          {item.name}
+          {navigationTranslations[item.name] || item.name}
         </Link>
       ))}
       {/* Desktop Sign Out Button */}
@@ -52,7 +64,7 @@ export default function DesktopNav({ navigation = defaultNavigation }: DesktopNa
         className='text-red-400 hover:text-red-200 hover:bg-red-900 transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2'
       >
         <LogOut className="h-4 w-4" />
-        Sign Out
+        تسجيل الخروج
       </button>
     </nav>
   )

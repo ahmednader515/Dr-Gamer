@@ -19,6 +19,17 @@ import {
 } from 'lucide-react'
 import { SignOut } from '@/lib/actions/user.actions'
 
+const navigationTranslations: { [key: string]: string } = {
+  'Overview': 'لوحة التحكم',
+  'Products': 'المنتجات',
+  'Orders': 'الطلبات',
+  'Users': 'المستخدمون',
+  'Promo Codes': 'أكواد الخصم',
+  'Web Pages': 'صفحات الويب',
+  'FAQ': 'الأسئلة الشائعة',
+  'Settings': 'الإعدادات',
+}
+
 const allNavigation = [
   { name: 'Overview', href: '/admin/overview', icon: BarChart3, roles: ['Admin'] },
   { name: 'Products', href: '/admin/products', icon: Package, roles: ['Admin', 'Moderator'] },
@@ -105,7 +116,7 @@ export default function AdminNav({ userRole }: { userRole: string }) {
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-700">
-              <h2 className="text-lg font-semibold text-white">Admin Panel</h2>
+              <h2 className="text-lg font-semibold text-white">لوحة الإدارة</h2>
               <Button
                 variant="ghost"
                 size="sm"
@@ -133,7 +144,7 @@ export default function AdminNav({ userRole }: { userRole: string }) {
                     )}
                   >
                     <item.icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="font-medium">{item.name}</span>
+                    <span className="font-medium">{navigationTranslations[item.name] || item.name}</span>
                   </Link>
                 )
               })}
@@ -146,8 +157,8 @@ export default function AdminNav({ userRole }: { userRole: string }) {
                 variant="ghost"
                 className="w-full justify-start text-red-400 hover:bg-red-900 hover:text-red-200 transition-colors"
               >
-                <LogOut className="h-5 w-5 ml-2" />
-                Sign Out
+                <LogOut className="h-5 w-5 mr-2" />
+                تسجيل الخروج
               </Button>
             </div>
           </div>

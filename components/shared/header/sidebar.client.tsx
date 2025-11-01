@@ -54,15 +54,15 @@ export default function SidebarClient({
   }
 
   return (
-    <Drawer>
+    <Drawer direction="left">
       <DrawerTrigger asChild>
         <Button variant="ghost" size="icon" className="h-10 w-10 sm:h-12 sm:w-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 transition-all duration-200 hover:scale-105 shadow-sm">
           <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
           <span className="sr-only">Open menu</span>
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="w-full max-w-sm mt-0 top-0 left-0 bg-gray-900 border-0">
-        <div className="flex flex-col h-full bg-gray-900 text-white min-h-screen">
+      <DrawerContent className="!mt-0 !top-0 w-full max-w-sm !h-screen left-0 right-auto bg-gray-900 border-0 border-r rounded-none">
+        <div className="flex flex-col h-full bg-gray-900 text-white">
           {/* Header with Title and Close Button */}
           <div className="flex items-center justify-between p-4 border-b border-gray-700">
             <DrawerTitle className="text-lg font-semibold text-left">

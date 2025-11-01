@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { SessionProvider } from 'next-auth/react'
+import { usePathname } from 'next/navigation'
 import useCartSidebar from '@/hooks/use-cart-sidebar'
 import CartSidebar from './cart-sidebar'
 import { ThemeProvider } from './theme-provider'
@@ -14,7 +15,13 @@ export default function ClientProviders({
   children: React.ReactNode
 }) {
   const visible = useCartSidebar()
+  const pathname = usePathname()
   const setting = data.settings[0]
+  
+  // Check if we're on an admin route
+  const isAdminRoute = pathname?.startsWith('/admin') ?? false
+  // Use darker overlay for admin pages (0.6 instead of 0.3)
+  const overlayOpacity = isAdminRoute ? 0.6 : 0.3
 
   return (
     <SessionProvider refetchOnWindowFocus={false} refetchWhenOffline={false}>
@@ -24,7 +31,7 @@ export default function ClientProviders({
             <div 
               className='flex min-h-screen'
               style={{
-                backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(/icons/background.jpeg)',
+                backgroundImage: `linear-gradient(rgba(0, 0, 0, ${overlayOpacity}), rgba(0, 0, 0, ${overlayOpacity})), url(/icons/background.jpeg)`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -34,7 +41,7 @@ export default function ClientProviders({
               <div 
                 className='flex-1 overflow-hidden'
                 style={{
-                  backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(/icons/background.jpeg)',
+                  backgroundImage: `linear-gradient(rgba(0, 0, 0, ${overlayOpacity}), rgba(0, 0, 0, ${overlayOpacity})), url(/icons/background.jpeg)`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat',
@@ -49,7 +56,7 @@ export default function ClientProviders({
             <div 
               className='min-h-screen'
               style={{
-                backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(/icons/background.jpeg)',
+                backgroundImage: `linear-gradient(rgba(0, 0, 0, ${overlayOpacity}), rgba(0, 0, 0, ${overlayOpacity})), url(/icons/background.jpeg)`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',

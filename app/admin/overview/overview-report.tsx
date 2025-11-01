@@ -83,9 +83,9 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
 
   if (!header)
     return (
-      <div className='space-y-4' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <div className='space-y-4 rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
         <div>
-          <h1 className='h1-bold text-right'>لوحة التحكم</h1>
+          <h1 className='h1-bold'>لوحة التحكم</h1>
         </div>
         {/* First Row */}
         <div className='flex gap-4'>
@@ -116,9 +116,9 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
     )
 
   return (
-    <div style={{ fontFamily: 'Cairo, sans-serif' }}>
+    <div className='rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
       <div className='flex items-center justify-between mb-2'>
-        <h1 className='h1-bold text-right'>لوحة التحكم</h1>
+        <h1 className='h1-bold'>لوحة التحكم</h1>
         <CalendarDateRangePicker defaultDate={date} setDate={setDate} />
       </div>
       <div className='space-y-4'>

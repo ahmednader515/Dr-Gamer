@@ -34,7 +34,7 @@ export default async function OrdersPage(props: {
         user: {
           select: {
             name: true,
-            phone: true,
+            email: true,
           }
         }
       }
