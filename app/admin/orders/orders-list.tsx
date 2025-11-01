@@ -102,7 +102,7 @@ export default function OrdersList({ orders, totalPages, currentPage, userRole }
                 <TableCell className='py-4 px-4'>
                   <div>
                     <div className='font-medium'>{isModerator ? '***' : order.user.name}</div>
-                    <div className='text-sm text-gray-500'>{isModerator ? '***' : order.user.phone}</div>
+                    <div className='text-sm text-gray-500'>{isModerator ? '***' : order.user.email}</div>
                   </div>
                 </TableCell>
                 <TableCell className='py-4 px-4'>
@@ -175,7 +175,7 @@ export default function OrdersList({ orders, totalPages, currentPage, userRole }
             {/* Customer Info */}
             <div className="border-t border-gray-100 pt-3">
               <div className="font-medium text-gray-900">{isModerator ? 'Customer' : order.user.name}</div>
-              <div className="text-sm text-gray-500">{isModerator ? '***' : order.user.phone}</div>
+              <div className="text-sm text-gray-500">{isModerator ? '***' : order.user.email}</div>
             </div>
 
             {/* Order Total */}

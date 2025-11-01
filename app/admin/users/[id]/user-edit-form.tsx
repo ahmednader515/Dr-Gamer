@@ -39,7 +39,7 @@ const UserEditForm = ({ user }: { user: IUserInput & { id: string } }) => {
     defaultValues: {
       _id: user.id,
       name: user.name,
-      phone: user.phone,
+      email: user.email,
       role: user.role,
     },
   })

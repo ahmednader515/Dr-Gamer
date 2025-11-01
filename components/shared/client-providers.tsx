@@ -21,12 +21,43 @@ export default function ClientProviders({
       <ThemeProvider>
         <AppInitializer setting={setting}>
           {visible ? (
-            <div className='flex min-h-screen' style={{ backgroundColor: '#4618ac' }}>
-              <div className='flex-1 overflow-hidden' style={{ backgroundColor: '#4618ac' }}>{children}</div>
+            <div 
+              className='flex min-h-screen'
+              style={{
+                backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(/icons/background.jpeg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed'
+              }}
+            >
+              <div 
+                className='flex-1 overflow-hidden'
+                style={{
+                  backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(/icons/background.jpeg)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundAttachment: 'fixed'
+                }}
+              >
+                {children}
+              </div>
               <CartSidebar />
             </div>
           ) : (
-            <div className='min-h-screen' style={{ backgroundColor: '#4618ac' }}>{children}</div>
+            <div 
+              className='min-h-screen'
+              style={{
+                backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(/icons/background.jpeg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed'
+              }}
+            >
+              {children}
+            </div>
           )}
           <Toaster />
         </AppInitializer>

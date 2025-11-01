@@ -20,11 +20,9 @@ import { toast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignUpSchema } from '@/lib/validator'
 import { useState } from 'react'
-import PhoneInput from '@/components/shared/phone-input'
-
 const signUpDefaultValues = {
   name: '',
-  phone: '',
+  email: '',
   password: '',
   confirmPassword: '',
 }
@@ -55,8 +53,8 @@ export default function SignUpForm() {
         let errorMessage = 'Failed to create account'
         
         if (res.error) {
-          if (res.error.includes('already exists')) {
-            errorMessage = 'An account with this number already exists. Please sign in instead.'
+        if (res.error.includes('already exists')) {
+          errorMessage = 'An account with this email already exists. Please sign in instead.'
           } else if (res.error.includes('validation')) {
             errorMessage = 'Please check your input and try again.'
           } else {
@@ -81,7 +79,7 @@ export default function SignUpForm() {
       
       // If user creation is successful, sign them in
       const signInResult = await signInWithCredentials({
-        phone: data.phone,
+        email: data.email,
         password: data.password,
       })
       
@@ -149,17 +147,15 @@ export default function SignUpForm() {
 
           <FormField
             control={control}
-            name='phone'
+            name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className="text-left block font-cairo text-white text-base md:text-lg mb-2 md:mb-3">Phone Number</FormLabel>
+                <FormLabel className="text-left block font-cairo text-white text-base md:text-lg mb-2 md:mb-3">Email</FormLabel>
                 <FormControl>
-                  <PhoneInput 
-                    placeholder='Enter phone number' 
-                    value={field.value}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    name={field.name}
+                  <Input
+                    type='email'
+                    placeholder='Enter email address' 
+                    {...field}
                     className="text-left font-cairo h-10 md:h-12 text-base md:text-lg px-3 md:px-4"
                   />
                 </FormControl>

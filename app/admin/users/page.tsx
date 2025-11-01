@@ -55,13 +55,13 @@ export default async function AdminUser(props: {
                 <TableCell className='py-4 px-4'>
                   <div>
                     <div className='font-medium'>{user.name}</div>
-                    {user.phone && (
-                      <div className='text-sm text-gray-500'>{user.phone}</div>
+                    {user.email && (
+                      <div className='text-sm text-gray-500'>{user.email}</div>
                     )}
                   </div>
                 </TableCell>
                 <TableCell className='py-4 px-4'>
-                  {user.phone || 'Not Available'}
+                  {user.email || 'Not Available'}
                 </TableCell>
                 <TableCell className='py-4 px-4'>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -98,8 +98,8 @@ export default async function AdminUser(props: {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="font-medium text-lg text-gray-900">{user.name}</div>
-                {user.phone && (
-                  <div className="text-sm text-gray-500">{user.phone}</div>
+                {user.email && (
+                  <div className="text-sm text-gray-500">{user.email}</div>
                 )}
               </div>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${

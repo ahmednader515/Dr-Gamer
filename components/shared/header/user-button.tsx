@@ -75,7 +75,7 @@ export default function UserButton({
                   {session.user.name}
                 </p>
                 <p className='text-xs leading-none text-gray-300'>
-                  {session.user.phone}
+                  {session.user.email}
                 </p>
               </div>
             </DropdownMenuLabel>

@@ -41,13 +41,13 @@ export default function ProductsSection() {
                       href={platform.href}
                       className='flex-shrink-0 group block'
                     >
-                      <div className='w-40 sm:w-48 md:w-56 lg:w-64 h-28 sm:h-36 md:h-40 lg:h-44 rounded-xl overflow-hidden group-hover:scale-105 relative'>
+                      <div className='w-32 sm:w-48 md:w-56 lg:w-64 h-24 sm:h-36 md:h-40 lg:h-44 rounded-xl overflow-hidden group-hover:scale-105 relative'>
                         <Image
                           src={platform.image}
                           alt={platform.name}
                           fill
                           className='object-cover'
-                          sizes='(max-width: 640px) 160px, (max-width: 768px) 192px, (max-width: 1024px) 224px, 256px'
+                          sizes='(max-width: 640px) 128px, (max-width: 768px) 192px, (max-width: 1024px) 224px, 256px'
                         />
                         <div className='absolute inset-0 bg-black/40 rounded-xl'></div>
                         <div className='absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30 rounded-xl flex items-end'>

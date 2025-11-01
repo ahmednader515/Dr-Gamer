@@ -19,7 +19,7 @@ export default async function ProfilePage() {
   console.log('Session data:', {
     userId: session?.user?.id,
     userName: session?.user?.name,
-    userPhone: session?.user?.phone,
+    userEmail: session?.user?.email,
     userRole: session?.user?.role,
     fullSession: session
   })
@@ -50,11 +50,11 @@ export default async function ProfilePage() {
           <Separator />
           <CardContent className='p-4 flex justify-between flex-wrap'>
             <div>
-              <h3 className='font-bold'>رقم الهاتف</h3>
-              <p>{session?.user.phone || 'غير محدد'}</p>
+              <h3 className='font-bold'>البريد الإلكتروني</h3>
+              <p>{session?.user.email || 'غير محدد'}</p>
             </div>
             <div>
-              <Link href='/account/manage/phone'>
+              <Link href='/account/manage/email'>
                 <Button className='rounded-full w-32' variant='outline'>
                   تعديل
                 </Button>

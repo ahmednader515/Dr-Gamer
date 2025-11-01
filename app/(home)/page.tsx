@@ -295,7 +295,7 @@ export default async function HomePage() {
   const categoriesBelow = categories.slice(3)
 
   return (
-    <div className='font-cairo text-white overflow-x-hidden' style={{ backgroundColor: '#4618ac' }} dir='ltr'>
+    <div className='font-cairo text-white overflow-x-hidden' dir='ltr'>
       {/* --- HERO SECTION --- */}
       <div className='relative pt-4 md:pt-6 pb-8'>
         <div className='max-w-[80%] mx-auto'>

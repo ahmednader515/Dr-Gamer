@@ -11,13 +11,13 @@ declare module 'next-auth' {
   interface Session {
     user: {
       role: string
-      phone: string
+      email: string
       addresses?: ShippingAddress[]
     } & DefaultSession['user']
   }
   
   interface User {
-    phone: string
+    email: string
     role: string
     addresses?: ShippingAddress[]
   }
@@ -45,25 +45,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
     CredentialsProvider({
       credentials: {
-        phone: {
+        email: {
           type: 'text',
-          placeholder: 'رقم الهاتف',
+          placeholder: 'Email',
         },
         password: { type: 'password' },
       },
       async authorize(credentials) {
         try {
-          if (credentials == null || !credentials.phone || typeof credentials.phone !== 'string') {
+          if (credentials == null || !credentials.email || typeof credentials.email !== 'string') {
             console.log('Invalid credentials provided')
             return null
           }
 
           const user = await prisma.user.findUnique({
-            where: { phone: credentials.phone }
+            where: { email: credentials.email }
           })
 
           if (!user) {
-            console.log('User not found with phone:', credentials.phone)
+            console.log('User not found with email:', credentials.email)
             return null
           }
 
@@ -76,11 +76,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               return {
                 id: user.id,
                 name: user.name,
-                phone: user.phone,
+                email: user.email,
                 role: user.role,
               }
             } else {
-              console.log('Password mismatch for user:', credentials.phone)
+              console.log('Password mismatch for user:', credentials.email)
             }
           }
           return null
@@ -96,13 +96,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       try {
         if (user) {
           console.log('JWT callback - user data:', user)
-          console.log('JWT callback - user.phone:', (user as { phone: string }).phone)
+          console.log('JWT callback - user.email:', (user as { email: string }).email)
           if (!user.name) {
             try {
               await prisma.user.update({
                   where: { id: user.id },
                   data: {
-                    name: user.name || (user.phone ? user.phone : 'User'),
+                    name: user.name || (user.email ? user.email : 'User'),
                     role: 'user',
                   }
                 })
@@ -110,37 +110,37 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               console.error('Failed to update user:', updateError)
             }
           }
-          token.name = user.name || (user.phone ? user.phone : 'User')
+          token.name = user.name || (user.email ? user.email : 'User')
           token.role = (user as { role: string }).role || 'user'
-          token.phone = (user as { phone: string }).phone
+          token.email = (user as { email: string }).email
           console.log('JWT callback - token after update:', token)
-          console.log('JWT callback - token.phone set to:', token.phone)
+          console.log('JWT callback - token.email set to:', token.email)
         }
 
         if (session?.user?.name && trigger === 'update') {
           token.name = session.user.name
         }
-        if (session?.user?.phone && trigger === 'update') {
-          token.phone = session.user.phone
+        if (session?.user?.email && trigger === 'update') {
+          token.email = session.user.email
         }
         
-        // Ensure phone is always in token if it exists
-        if (!token.phone && user?.phone) {
-          token.phone = user.phone
+        // Ensure email is always in token if it exists
+        if (!token.email && user?.email) {
+          token.email = user.email
         }
         
-        // If we still don't have a phone number, try to get it from the database
-        if (!token.phone && token.sub) {
+        // If we still don't have an email, try to get it from the database
+        if (!token.email && token.sub) {
           try {
             const dbUser = await prisma.user.findUnique({
               where: { id: token.sub }
             })
             if (dbUser) {
-              token.phone = dbUser.phone
-              console.log('JWT callback - phone found from database:', dbUser.phone)
+              token.email = dbUser.email
+              console.log('JWT callback - email found from database:', dbUser.email)
             }
           } catch (error) {
-            console.error('Error fetching phone from database:', error)
+            console.error('Error fetching email from database:', error)
           }
         }
         
@@ -166,17 +166,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (token.name) {
           session.user.name = token.name as string
         }
-        if (token.phone) {
-          session.user.phone = token.phone as string
-          console.log('Session callback - phone set from token:', token.phone)
+        if (token.email) {
+          session.user.email = token.email as string
+          console.log('Session callback - email set from token:', token.email)
         } else {
-          console.log('Session callback - no phone in token')
+          console.log('Session callback - no email in token')
         }
         if (trigger === 'update' && user?.name) {
           session.user.name = user.name
         }
-        if (trigger === 'update' && user?.phone) {
-          session.user.phone = user.phone
+        if (trigger === 'update' && user?.email) {
+          session.user.email = user.email
         }
         console.log('Session callback - final session:', session)
         return session

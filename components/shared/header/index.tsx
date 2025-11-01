@@ -7,8 +7,9 @@ import Search from "./search";
 import Menu from "./menu";
 import Sidebar from "./sidebar";
 import data from "@/lib/data";
-import { ShoppingCart, User, Package, Shield, Tag, Heart } from "lucide-react";
+import { ShoppingCart, User, Package, Shield, Tag } from "lucide-react";
 import MobileCartCount from './mobile-cart-count'
+import MobileFavoritesButton from './mobile-favorites-button'
 
 // Arabic translations for categories
 const categoryTranslations: { [key: string]: string } = {
@@ -132,10 +133,8 @@ export default async function Header() {
                       <Package className="w-6 h-6 text-gray-300" />
                     </Link>
                     
-                    {/* Favorites Icon - Replaces search on mobile */}
-                    <Link href="/favorites" className="flex items-center">
-                      <Heart className="w-6 h-6 text-gray-300" />
-                    </Link>
+                    {/* Favorites Button - Dropdown with favorites list */}
+                    <MobileFavoritesButton />
                     
                     {/* Admin/Moderator Button - Show for Admin and Moderator users */}
                     {(session.user.role === 'Admin' || session.user.role === 'Moderator') && (
@@ -149,10 +148,8 @@ export default async function Header() {
                   </>
                 ) : (
                   <>
-                    {/* Favorites Icon - Replaces search on mobile for non-logged in users */}
-                    <Link href="/sign-in" className="flex items-center">
-                      <Heart className="w-6 h-6 text-gray-300" />
-                    </Link>
+                    {/* Favorites Button - Dropdown with favorites list (works without login) */}
+                    <MobileFavoritesButton />
                     {/* Sign In Button */}
                     <Link href="/sign-in" className="flex items-center">
                       <User className="w-6 h-6 text-gray-300" />

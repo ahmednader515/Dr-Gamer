@@ -23,9 +23,7 @@ import { toast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignInSchema } from '@/lib/validator'
 import { useState, useEffect } from 'react'
-import PhoneInput from '@/components/shared/phone-input'
-
-const signInDefaultValues = { phone: '', password: '' };
+const signInDefaultValues = { email: '', password: '' };
 
 export default function CredentialsSignInForm() {
   const { site } = data.settings[0];
@@ -69,10 +67,10 @@ export default function CredentialsSignInForm() {
     }, 30000) // 30 seconds timeout
     
     try {
-      console.log('Attempting sign in with phone:', formData.phone)
+      console.log('Attempting sign in with email:', formData.email)
       
       const result = await signInWithCredentials({
-        phone: formData.phone,
+        email: formData.email,
         password: formData.password,
       })
       
@@ -160,7 +158,7 @@ export default function CredentialsSignInForm() {
         } else if (error.message.includes('validation')) {
           errorMessage = 'Please check your input and try again.'
         } else if (error.message.includes('credentials')) {
-          errorMessage = 'Invalid credentials. Please check your phone number and password.'
+          errorMessage = 'Invalid credentials. Please check your email and password.'
         }
       }
       
@@ -216,17 +214,15 @@ export default function CredentialsSignInForm() {
         <div className='space-y-6 md:space-y-8 lg:space-y-10'>
           <FormField
             control={control}
-            name='phone'
+            name='email'
             render={({ field, fieldState }) => (
               <FormItem className='w-full'>
-                <FormLabel className="text-left block font-cairo text-white text-base md:text-lg lg:text-xl mb-2 md:mb-3 lg:mb-4">Phone Number</FormLabel>
+                <FormLabel className="text-left block font-cairo text-white text-base md:text-lg lg:text-xl mb-2 md:mb-3 lg:mb-4">Email</FormLabel>
                 <FormControl>
-                  <PhoneInput 
-                    placeholder='Enter phone number' 
-                    value={field.value}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    name={field.name}
+                  <Input
+                    type='email'
+                    placeholder='Enter email address' 
+                    {...field}
                     className={`text-left font-cairo h-12 md:h-14 text-base md:text-lg px-4 md:px-6 ${
                       fieldState.error ? 'border-red-500 focus:border-red-500' : ''
                     }`}
@@ -239,7 +235,7 @@ export default function CredentialsSignInForm() {
                   </p>
                 )}
                 <p className="text-xs md:text-sm text-gray-300 mt-1 text-left font-cairo">
-                  Example: +201234567890
+                  Example: user@example.com
                 </p>
               </FormItem>
             )}
@@ -290,7 +286,7 @@ export default function CredentialsSignInForm() {
             {process.env.NODE_ENV === 'development' && (
               <div className="mt-4 p-3 bg-purple-50 border border-blue-200 rounded-lg">
                 <p className="text-xs md:text-sm text-blue-800 text-center font-cairo">
-                  💡 <strong>Test Data:</strong> You can use phone number +201234567890 and password 123456
+                  💡 <strong>Test Data:</strong> You can use email test@example.com and password 123456
                 </p>
               </div>
             )}

@@ -16,7 +16,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
   try {
     const user = await UserSignUpSchema.parseAsync({
       name: userSignUp.name,
-      phone: userSignUp.phone,
+      email: userSignUp.email,
       password: userSignUp.password,
       confirmPassword: userSignUp.confirmPassword,
     })
@@ -25,17 +25,17 @@ export async function registerUser(userSignUp: IUserSignUp) {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { phone: user.phone }
+      where: { email: user.email }
     })
 
     if (existingUser) {
-      return { success: false, error: 'يوجد حساب بهذا الرقم بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.' }
+      return { success: false, error: 'يوجد حساب بهذا البريد الإلكتروني بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.' }
     }
 
     await prisma.user.create({
       data: {
         name: user.name,
-        phone: user.phone,
+        email: user.email,
         password: await bcrypt.hash(user.password, 5),
         role: 'User',
       }
@@ -48,7 +48,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
         return { success: false, error: 'يرجى التحقق من المدخلات والتأكد من ملء جميع الحقول بشكل صحيح.' }
       }
       if (error.message.includes('unique constraint')) {
-        return { success: false, error: 'يوجد حساب بهذا الرقم بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.' }
+        return { success: false, error: 'يوجد حساب بهذا البريد الإلكتروني بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.' }
       }
       if (error.message.includes('database')) {
         return { success: false, error: 'خطأ في الاتصال بقاعدة البيانات. يرجى المحاولة مرة أخرى لاحقاً.' }
@@ -84,7 +84,7 @@ export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
       where: { id: user._id },
       data: {
         name: user.name,
-        phone: user.phone,
+        email: user.email,
         role: user.role,
       }
     })
@@ -123,8 +123,8 @@ export async function updateUserName(user: IUserName) {
   }
 }
 
-// UPDATE USER PHONE
-export async function updateUserPhone(user: { phone: string }) {
+// UPDATE USER EMAIL
+export async function updateUserEmail(user: { email: string }) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
@@ -134,12 +134,12 @@ export async function updateUserPhone(user: { phone: string }) {
     const updatedUser = await prisma.user.update({
       where: { id: session?.user?.id },
       data: {
-        phone: user.phone,
+        email: user.email,
       }
     })
     return {
       success: true,
-      message: 'تم تحديث رقم الهاتف بنجاح',
+      message: 'تم تحديث البريد الإلكتروني بنجاح',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
   } catch (error) {
@@ -194,10 +194,10 @@ export async function updateUserPassword(user: {
 
 export async function signInWithCredentials(user: IUserSignIn) {
   try {
-    console.log('🔐 Attempting sign in with phone:', user.phone)
+    console.log('🔐 Attempting sign in with email:', user.email)
     
     const result = await signIn('credentials', { 
-      phone: user.phone,
+      email: user.email,
       password: user.password,
       redirect: false 
     })
@@ -214,10 +214,10 @@ export async function signInWithCredentials(user: IUserSignIn) {
       console.log('❌ Sign in failed with error:', result.error)
       
       // Provide more specific error messages based on the error type
-      let errorMessage = 'رقم الهاتف أو كلمة المرور غير صحيحة'
+      let errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
       
       if (result.error.includes('CredentialsSignin')) {
-        errorMessage = 'رقم الهاتف أو كلمة المرور غير صحيحة'
+        errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
       } else if (result.error.includes('Callback')) {
         errorMessage = 'خطأ في المصادقة. يرجى المحاولة مرة أخرى'
       } else if (result.error.includes('OAuth')) {
@@ -369,7 +369,7 @@ export async function signInWithCredentials(user: IUserSignIn) {
       } else if (error.message.includes('timeout')) {
         errorMessage = 'انتهت مهلة الطلب. يرجى المحاولة مرة أخرى'
       } else if (error.message.includes('credentials')) {
-        errorMessage = 'بيانات غير صحيحة. يرجى التحقق من رقم الهاتف وكلمة المرور'
+        errorMessage = 'بيانات غير صحيحة. يرجى التحقق من البريد الإلكتروني وكلمة المرور'
       } else if (error.message.includes('network')) {
         errorMessage = 'خطأ في الاتصال. يرجى التحقق من اتصالك بالإنترنت'
       } else {

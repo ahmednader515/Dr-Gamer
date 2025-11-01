@@ -218,7 +218,13 @@ input, textarea, select, button, label, span, div, p, h1, h2, h3, h4, h5, h6, a,
   body {
     @apply bg-background text-foreground;
     font-family: 'Cairo', sans-serif !important;
-    background-color: #4618ac !important;
+    background-image: 
+      linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+      url('/icons/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
   }
   
   /* Ensure all headings use Cairo */
