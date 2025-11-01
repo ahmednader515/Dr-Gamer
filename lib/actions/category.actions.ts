@@ -22,8 +22,17 @@ export async function createCategory(data: z.infer<typeof CategoryInputSchema>) 
   try {
     const validatedData = CategoryInputSchema.parse(data)
     
+    // Get the max sortOrder to add new category at the end
+    const maxOrder = await prisma.category.aggregate({
+      _max: { sortOrder: true },
+    })
+    const newSortOrder = (maxOrder._max.sortOrder ?? -1) + 1
+    
     const category = await prisma.category.create({
-      data: validatedData
+      data: {
+        ...validatedData,
+        sortOrder: newSortOrder,
+      }
     })
     
     revalidatePath('/admin/settings')
@@ -106,18 +115,56 @@ export async function deleteCategory(id: string) {
   }
 }
 
-// GET ALL
-export async function getAllCategories() {
+// GET ALL (for admin - returns all categories, for public - only active)
+export async function getAllCategories(includeInactive: boolean = false) {
   try {
     const categories = await prisma.category.findMany({
-      where: { isActive: true },
-      orderBy: { name: 'asc' }
+      where: includeInactive ? {} : { isActive: true },
+      orderBy: { sortOrder: 'asc' }
     })
     
     return categories
   } catch (error) {
     console.error('Error fetching categories:', error)
     return []
+  }
+}
+
+// REORDER CATEGORIES
+const ReorderCategoriesSchema = z.object({
+  orders: z.array(z.object({
+    id: z.string(),
+    sortOrder: z.number(),
+  })),
+})
+
+export async function reorderCategories(data: z.infer<typeof ReorderCategoriesSchema>) {
+  try {
+    const validatedData = ReorderCategoriesSchema.parse(data)
+    
+    // Update all categories in a transaction
+    await prisma.$transaction(
+      validatedData.orders.map(({ id, sortOrder }) =>
+        prisma.category.update({
+          where: { id },
+          data: { sortOrder },
+        })
+      )
+    )
+    
+    revalidatePath('/admin/settings')
+    revalidatePath('/')
+    
+    return {
+      success: true,
+      message: 'تم تحديث ترتيب الفئات بنجاح',
+    }
+  } catch (error) {
+    console.error('Error reordering categories:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'حدث خطأ أثناء تحديث ترتيب الفئات',
+    }
   }
 }
 
@@ -141,7 +188,7 @@ export async function getCategoryNames() {
     const categories = await prisma.category.findMany({
       where: { isActive: true },
       select: { name: true },
-      orderBy: { name: 'asc' }
+      orderBy: { sortOrder: 'asc' }
     })
     
     return categories.map(cat => cat.name)

@@ -14,13 +14,13 @@ const priceRanges = [
 
 export default function DiscoverByPrice() {
   return (
-    <div className='py-12' style={{ backgroundColor: '#1f0a4d' }}>
+    <div className='pt-12 pb-12 mb-0' style={{ backgroundColor: '#1f0a4d' }}>
       <div className='w-full px-8'>
         <h2 className='text-2xl sm:text-3xl font-bold text-white mb-8 text-center'>
           Discover by Price
         </h2>
         
-        <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-4'>
+        <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-0'>
           {priceRanges.map((range) => (
             <Link
               key={range.maxPrice}

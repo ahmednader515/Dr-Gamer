@@ -261,14 +261,6 @@ async function RemainingCategoriesSection({ categories }: { categories: string[]
                   <ProductSlider title={category} products={products} />
                 </CardContent>
               </Card>
-              {/* Insert DiscoverByPrice after the second category carousel - full width background */}
-              {index === 0 && (
-                <div className='-mx-4 sm:-mx-6 lg:-mx-8'>
-                  <div className='w-screen' style={{ marginLeft: 'calc((100% - 100vw) / 2)', marginRight: 'calc((100% - 100vw) / 2)' }}>
-                    <DiscoverByPrice />
-                  </div>
-                </div>
-              )}
             </React.Fragment>
           )
         })}
@@ -323,7 +315,7 @@ export default async function HomePage() {
                     href={`/search?category=${category.name}`}
                     className='group relative block rounded-xl overflow-hidden'
                   >
-                    <div className='relative w-full h-[180px] sm:h-[200px] md:h-[230px] lg:h-[240px]'>
+                    <div className='relative w-full h-[75px] sm:h-[92px] md:h-[125px] lg:h-[159px]'>
                       {category.image ? (
                         <Image
                           src={category.image}
@@ -377,6 +369,13 @@ export default async function HomePage() {
           <Suspense fallback={<ProductSliderSkeleton title='Products' />}>
             <RemainingCategoriesSection categories={categoryList} />
           </Suspense>
+        </div>
+      </div>
+
+      {/* --- DISCOVER BY PRICE SECTION --- */}
+      <div className='-mx-4 sm:-mx-6 lg:-mx-8 mb-0'>
+        <div className='w-screen' style={{ marginLeft: 'calc((100% - 100vw) / 2)', marginRight: 'calc((100% - 100vw) / 2)' }}>
+          <DiscoverByPrice />
         </div>
       </div>
     </div>

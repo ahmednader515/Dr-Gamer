@@ -40,10 +40,11 @@ import {
   createCategory, 
   updateCategory, 
   deleteCategory, 
-  getAllCategories
+  getAllCategories,
+  reorderCategories
 } from '@/lib/actions/category.actions'
 import { toSlug } from '@/lib/utils'
-import { Edit, Trash2, Plus } from 'lucide-react'
+import { Edit, Trash2, Plus, ChevronUp, ChevronDown } from 'lucide-react'
 import { UploadButton } from '@/lib/uploadthing'
 import Image from 'next/image'
 
@@ -64,6 +65,7 @@ interface Category {
   description?: string
   image?: string
   isActive: boolean
+  sortOrder: number
   createdAt: string
   updatedAt: string
 }
@@ -87,11 +89,11 @@ export default function CategoryManagement() {
     },
   })
 
-  // Load categories
+  // Load categories (include inactive for admin)
   const loadCategories = async () => {
     try {
       setIsLoading(true)
-      const data = await getAllCategories()
+      const data = await getAllCategories(true) // Include inactive categories
       setCategories(data)
     } catch (error) {
       console.error('Error loading categories:', error)
@@ -212,6 +214,50 @@ export default function CategoryManagement() {
     form.setValue('slug', slug)
   }
 
+  // Handle reorder
+  const handleReorder = async (categoryId: string, direction: 'up' | 'down') => {
+    const currentIndex = categories.findIndex(c => c.id === categoryId)
+    if (currentIndex === -1) return
+
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+    if (newIndex < 0 || newIndex >= categories.length) return
+
+    // Create new array with swapped items
+    const newCategories = [...categories]
+    const [removed] = newCategories.splice(currentIndex, 1)
+    newCategories.splice(newIndex, 0, removed)
+
+    // Update sortOrder for all affected categories
+    const orders = newCategories.map((cat, index) => ({
+      id: cat.id,
+      sortOrder: index,
+    }))
+
+    try {
+      const result = await reorderCategories({ orders })
+      if (result.success) {
+        toast({
+          title: 'نجح',
+          description: result.message,
+        })
+        setCategories(newCategories)
+      } else {
+        toast({
+          title: 'خطأ',
+          description: result.message,
+          variant: 'destructive',
+        })
+      }
+    } catch (error) {
+      console.error('Error reordering categories:', error)
+      toast({
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء تحديث ترتيب الفئات',
+        variant: 'destructive',
+      })
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -246,11 +292,36 @@ export default function CategoryManagement() {
             </div>
           ) : (
             <div className="space-y-4">
-              {categories.map((category) => (
+              {categories.map((category, index) => (
                 <div
                   key={category.id}
                   className="flex items-center justify-between p-4 border rounded-lg"
                 >
+                  <div className="flex items-center gap-3">
+                    {/* Reorder buttons */}
+                    <div className="flex flex-col gap-1">
+                      <Button
+                        onClick={() => handleReorder(category.id, 'up')}
+                        variant="outline"
+                        size="sm"
+                        disabled={index === 0}
+                        className="h-6 w-6 p-0"
+                        title="نقل لأعلى"
+                      >
+                        <ChevronUp className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        onClick={() => handleReorder(category.id, 'down')}
+                        variant="outline"
+                        size="sm"
+                        disabled={index === categories.length - 1}
+                        className="h-6 w-6 p-0"
+                        title="نقل لأسفل"
+                      >
+                        <ChevronDown className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
                       {category.image && (

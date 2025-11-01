@@ -28,11 +28,11 @@ export default function ProductsSection() {
             Discover by Products
           </h2>
           
-          <div className='relative mb-4 max-w-3xl mx-auto'>
-            {/* Vertical stack on mobile, horizontal scroll on desktop */}
+          <div className='relative mb-4 max-w-6xl mx-auto'>
+            {/* Vertical stack on mobile, centered horizontal on desktop */}
             <div 
               style={{ direction: 'ltr' }}
-              className='md:overflow-x-auto md:overflow-y-hidden md:scrollbar-hide'
+              className='md:flex md:justify-center'
             >
               <div className='flex flex-col md:flex-row gap-4 md:gap-6 px-2'>
                 {Products.map((platform, index) => (
