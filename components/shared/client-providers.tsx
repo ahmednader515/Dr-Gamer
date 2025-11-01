@@ -24,7 +24,7 @@ export default function ClientProviders({
             <div 
               className='flex min-h-screen'
               style={{
-                backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(/icons/background.jpeg)',
+                backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(/icons/background.jpeg)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -34,7 +34,7 @@ export default function ClientProviders({
               <div 
                 className='flex-1 overflow-hidden'
                 style={{
-                  backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(/icons/background.jpeg)',
+                  backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(/icons/background.jpeg)',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat',
@@ -49,7 +49,7 @@ export default function ClientProviders({
             <div 
               className='min-h-screen'
               style={{
-                backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(/icons/background.jpeg)',
+                backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(/icons/background.jpeg)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',

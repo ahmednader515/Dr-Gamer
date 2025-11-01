@@ -29,25 +29,25 @@ export default function ProductsSection() {
           </h2>
           
           <div className='relative mb-4 max-w-3xl mx-auto'>
-            {/* Scrolling container - swipeable on mobile */}
+            {/* Vertical stack on mobile, horizontal scroll on desktop */}
             <div 
-              style={{ direction: 'ltr', WebkitOverflowScrolling: 'touch' }}
-              className='overflow-x-auto overflow-y-hidden scrollbar-hide'
+              style={{ direction: 'ltr' }}
+              className='md:overflow-x-auto md:overflow-y-hidden md:scrollbar-hide'
             >
-              <div className='flex gap-6 px-2'>
+              <div className='flex flex-col md:flex-row gap-4 md:gap-6 px-2'>
                 {Products.map((platform, index) => (
-                  <div key={`${platform.name}-${index}`} className='flex-shrink-0'>
+                  <div key={`${platform.name}-${index}`} className='w-full md:flex-shrink-0 md:w-auto'>
                     <Link
                       href={platform.href}
-                      className='flex-shrink-0 group block'
+                      className='group block w-full md:w-auto'
                     >
-                      <div className='w-32 sm:w-48 md:w-56 lg:w-64 h-24 sm:h-36 md:h-40 lg:h-44 rounded-xl overflow-hidden group-hover:scale-105 relative'>
+                      <div className='w-full h-40 md:w-48 md:h-36 lg:w-56 lg:h-40 xl:w-64 xl:h-44 rounded-xl overflow-hidden group-hover:scale-105 relative'>
                         <Image
                           src={platform.image}
                           alt={platform.name}
                           fill
                           className='object-cover'
-                          sizes='(max-width: 640px) 128px, (max-width: 768px) 192px, (max-width: 1024px) 224px, 256px'
+                          sizes='(max-width: 768px) 100vw, (max-width: 1024px) 224px, 256px'
                         />
                         <div className='absolute inset-0 bg-black/40 rounded-xl'></div>
                         <div className='absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30 rounded-xl flex items-end'>

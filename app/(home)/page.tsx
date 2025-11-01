@@ -357,6 +357,11 @@ export default async function HomePage() {
       {/* --- PLATFORMS SECTION --- */}
       <PlatformsSection />
 
+      {/* --- PRODUCTS SECTION --- */}
+      <div className="mt-8">
+        <ProductsSection />
+      </div>
+
       {/* --- PRODUCT SLIDERS --- */}
       <div className='p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8'>
         <div className='max-w-[80%] mx-auto'>
@@ -365,9 +370,6 @@ export default async function HomePage() {
           </Suspense>
         </div>
       </div>
-
-      {/* --- PRODUCTS SECTION --- */}
-      <ProductsSection />
 
       {/* --- REMAINING PRODUCT SLIDERS --- */}
       <div className='p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8'>
