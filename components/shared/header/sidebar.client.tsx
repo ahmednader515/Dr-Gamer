@@ -9,7 +9,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Menu, ChevronRight, X } from "lucide-react";
+import { Menu, ChevronLeft, X } from "lucide-react";
 import Link from "next/link";
 import { SignOut } from "@/lib/actions/user.actions";
 
@@ -61,28 +61,28 @@ export default function SidebarClient({
           <span className="sr-only">Open menu</span>
         </Button>
       </DrawerTrigger>
-                           <DrawerContent className="w-full max-w-sm mt-0 top-0 right-0 bg-gray-900 border-0">
-          <div className="flex flex-col h-full bg-gray-900 text-white min-h-screen">
-           {/* Header with Title and Close Button */}
-           <div className="flex items-center justify-between p-4 border-b border-gray-700">
-             <DrawerTitle className="text-lg font-semibold text-right">
-               Menu
-             </DrawerTitle>
-             <DrawerClose asChild>
-               <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-gray-800">
-                 <X className="h-4 w-4" />
-                 <span className="sr-only">Close</span>
-               </Button>
-             </DrawerClose>
-           </div>
-           
-           {/* Categories Section */}
-           <div className="flex-1 overflow-y-auto p-4">
-             <div className="mb-6">
-               <h2 className="text-lg font-semibold text-right mb-4">
-                 Categories
-               </h2>
-             </div>
+      <DrawerContent className="w-full max-w-sm mt-0 top-0 left-0 bg-gray-900 border-0">
+        <div className="flex flex-col h-full bg-gray-900 text-white min-h-screen">
+          {/* Header with Title and Close Button */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-700">
+            <DrawerTitle className="text-lg font-semibold text-left">
+              Menu
+            </DrawerTitle>
+            <DrawerClose asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-gray-800">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </Button>
+            </DrawerClose>
+          </div>
+          
+          {/* Categories Section */}
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-left mb-4">
+                Categories
+              </h2>
+            </div>
             <nav className="flex flex-col space-y-2">
               {categories.map((category) => (
                 <DrawerClose asChild key={category}>
@@ -90,8 +90,8 @@ export default function SidebarClient({
                     href={`/search?category=${category}`}
                     className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-800 transition-colors duration-200 text-sm"
                   >
-                    <span>{categoryTranslations[category] || category}</span>
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronLeft className="h-4 w-4" />
+                    <span className="text-left flex-1">{categoryTranslations[category] || category}</span>
                   </Link>
                 </DrawerClose>
               ))}
