@@ -43,50 +43,19 @@ export default function Search() {
         </div>
       </form>
 
-      {/* Mobile Search Modal */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <button className="md:hidden flex items-center p-0 bg-transparent border-0 text-gray-300 hover:text-gray-100 transition-colors duration-200">
-            <SearchIcon className="w-6 h-6" />
-          </button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md bg-gray-900 border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="text-right text-white">Search for Products</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="mt-4">
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="Search for products..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 text-base border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-800 text-white"
-                autoFocus
-              />
-              <div className="absolute inset-y-0 left-2 pr-3 flex items-center pointer-events-none">
-                <SearchIcon className="h-5 w-5 text-gray-400" />
-              </div>
-            </div>
-            <div className="flex gap-2 mt-4">
-              <Button
-                type="submit"
-                className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
-                disabled={!query.trim()}
-              >
-                Search
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {/* Mobile Full-Width Search Bar */}
+      <form onSubmit={handleSubmit} className="md:hidden w-full">
+        <div className="relative w-full">
+          <Input
+            type="text"
+            placeholder="Search for products..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 text-base border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-800 text-white placeholder:text-gray-400"
+          />
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+        </div>
+      </form>
     </>
   )
 }

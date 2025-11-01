@@ -13,7 +13,7 @@ export default function CheckoutLayout({
   return (
     <div className='flex flex-col min-h-screen'>
       <Header />
-      <div className='flex-1 p-4 pt-24 md:pt-36'>
+      <div className='flex-1 p-4 pt-36 md:pt-36'>
         <header className='bg-card mb-4 border-b'>
           <div className='max-w-6xl mx-auto flex justify-between items-center'>
             <Link href='/'>

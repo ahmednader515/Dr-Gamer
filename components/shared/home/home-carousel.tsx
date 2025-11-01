@@ -75,11 +75,8 @@ export default function HomeCarousel({ carousels }: HomeCarouselProps) {
                     <span className="text-gray-500 text-lg">No Image</span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <div className="text-center text-white px-4">
-                    <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold mb-3 sm:mb-4 font-cairo">
-                      {carousel.title}
-                    </h2>
+                <div className="absolute inset-0 bg-black bg-opacity-40">
+                  <div className="absolute bottom-14 sm:bottom-16 md:bottom-20 left-0 right-0 text-center text-white px-4 z-20">
                     <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-700 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3">
                       <Link href={carousel.url}>
                         {carousel.buttonCaption}

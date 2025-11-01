@@ -4,14 +4,13 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
-const platforms = [
-  { name: 'Steam', image: '/images/steam.avif', href: '/search?tag=steam' },
-  { name: 'Xbox', image: '/images/xbox.png', href: '/search?tag=xbox' },
-  { name: 'PlayStation', image: '/images/playstation.jpg', href: '/search?tag=playstation' },
-  { name: 'Epic Games', image: '/images/epic.jpg', href: '/search?tag=epic-games' },
+const Products = [
+  { name: 'Games', image: '/images/games.jpg', href: '/search?tag=steam' },
+  { name: 'Subscriptions', image: '/images/sub.jfif', href: '/search?tag=xbox' },
+  { name: 'Gift Cards', image: '/images/gift.png', href: '/search?tag=playstation' },
 ]
 
-export default function PlatformsSection() {
+export default function ProductsSection() {
   return (
     <>
       <style jsx>{`
@@ -26,17 +25,17 @@ export default function PlatformsSection() {
       <div className='py-12' style={{ backgroundColor: '#1f0a4d' }}>
         <div className='w-full px-8 max-w-7xl mx-auto' dir="ltr">
           <h2 className='text-2xl sm:text-3xl font-bold text-white mb-8 text-center'>
-            Discover by Platforms
+            Discover by Products
           </h2>
           
-          <div className='relative mb-4 max-w-6xl mx-auto'>
+          <div className='relative mb-4 max-w-3xl mx-auto'>
             {/* Scrolling container - swipeable on mobile */}
             <div 
               style={{ direction: 'ltr', WebkitOverflowScrolling: 'touch' }}
               className='overflow-x-auto overflow-y-hidden scrollbar-hide'
             >
               <div className='flex gap-6 px-2'>
-                {platforms.map((platform, index) => (
+                {Products.map((platform, index) => (
                   <div key={`${platform.name}-${index}`} className='flex-shrink-0'>
                     <Link
                       href={platform.href}
@@ -50,6 +49,12 @@ export default function PlatformsSection() {
                           className='object-cover'
                           sizes='(max-width: 640px) 160px, (max-width: 768px) 192px, (max-width: 1024px) 224px, 256px'
                         />
+                        <div className='absolute inset-0 bg-black/40 rounded-xl'></div>
+                        <div className='absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30 rounded-xl flex items-end'>
+                          <h3 className='text-white font-bold text-lg sm:text-xl md:text-2xl mb-3 sm:mb-4 px-3 sm:px-4 w-full'>
+                            {platform.name}
+                          </h3>
+                        </div>
                       </div>
                     </Link>
                   </div>

@@ -7,7 +7,7 @@ import Search from "./search";
 import Menu from "./menu";
 import Sidebar from "./sidebar";
 import data from "@/lib/data";
-import { ShoppingCart, User, Package, Shield, Tag } from "lucide-react";
+import { ShoppingCart, User, Package, Shield, Tag, Heart } from "lucide-react";
 import MobileCartCount from './mobile-cart-count'
 
 // Arabic translations for categories
@@ -54,9 +54,9 @@ export default async function Header() {
         <div className="container mx-auto px-4 pt-2 pb-3">
           {/* Header Row */}
           <div className="flex items-center justify-between gap-4">
-            {/* Left Side - Menu on desktop, Menu + Logo + DR.Gamer on mobile */}
+            {/* Left Side - Menu on desktop, Menu + Logo + Dr.GAMER on mobile */}
             <div className="flex items-center gap-3 sm:gap-4">
-              {/* Mobile: Menu button + Logo + DR.Gamer */}
+              {/* Mobile: Menu button + Logo + Dr.GAMER */}
               <div className="flex items-center gap-2 sm:gap-3 md:hidden">
                 <Sidebar />
                 <Link href="/" className="flex items-center">
@@ -71,7 +71,7 @@ export default async function Header() {
                 <div className="flex flex-col">
                   <span className="text-white font-bold text-xl sm:text-2xl">
                     <span className="text-white">DR.</span>
-                    <span className="text-purple-400">Gamer</span>
+                    <span className="text-purple-400">GAMER</span>
                   </span>
                   <span className="text-xs sm:text-sm">
                     by <span className="text-blue-400">Mina</span> & <span className="text-green-400">Hamaki</span>
@@ -90,9 +90,9 @@ export default async function Header() {
               <Search />
             </div>
             
-            {/* Right Side - Logo + DR.Gamer on desktop, Navigation Icons on mobile */}
+            {/* Right Side - Logo + Dr.GAMER on desktop, Navigation Icons on mobile */}
             <div className="flex items-center gap-3 sm:gap-4">
-              {/* Desktop: Logo + DR.Gamer */}
+              {/* Desktop: Logo + Dr.GAMER */}
               <div className="hidden md:flex items-center gap-3">
                 <Link href="/" className="flex items-center gap-3">
                   <Image
@@ -132,10 +132,10 @@ export default async function Header() {
                       <Package className="w-6 h-6 text-gray-300" />
                     </Link>
                     
-                    {/* Search Icon */}
-                    <div className="flex items-center">
-                      <Search />
-                    </div>
+                    {/* Favorites Icon - Replaces search on mobile */}
+                    <Link href="/favorites" className="flex items-center">
+                      <Heart className="w-6 h-6 text-gray-300" />
+                    </Link>
                     
                     {/* Admin/Moderator Button - Show for Admin and Moderator users */}
                     {(session.user.role === 'Admin' || session.user.role === 'Moderator') && (
@@ -149,10 +149,10 @@ export default async function Header() {
                   </>
                 ) : (
                   <>
-                    {/* Search Icon - For non-logged in users */}
-                    <div className="flex items-center">
-                      <Search />
-                    </div>
+                    {/* Favorites Icon - Replaces search on mobile for non-logged in users */}
+                    <Link href="/sign-in" className="flex items-center">
+                      <Heart className="w-6 h-6 text-gray-300" />
+                    </Link>
                     {/* Sign In Button */}
                     <Link href="/sign-in" className="flex items-center">
                       <User className="w-6 h-6 text-gray-300" />
@@ -163,6 +163,11 @@ export default async function Header() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile Search Bar - Full width below navbar */}
+      <div className="md:hidden bg-gray-900 border-b border-gray-700 px-4 py-2">
+        <Search />
       </div>
 
       {/* Categories Section - Hidden on mobile, shown on desktop */}

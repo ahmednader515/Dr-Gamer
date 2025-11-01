@@ -859,14 +859,14 @@ const data: Data = {
     {
       title: 'About Us',
       slug: 'about-us',
-      content: `Welcome to DR.Gamer, your trusted partner in gaming. Since our founding, we have been committed to providing the highest quality games, gaming products, and personalized service to our community.
+      content: `Welcome to Dr.GAMER, your trusted partner in gaming. Since our founding, we have been committed to providing the highest quality games, gaming products, and personalized service to our community.
 
-At DR.Gamer, we understand that your gaming experience is your most valuable asset. That's why we've built our reputation on trust, expertise, and a deep commitment to your satisfaction. Our team of gaming professionals is here to ensure you receive the right products, proper guidance, and the service you deserve.
+At Dr.GAMER, we understand that your gaming experience is your most valuable asset. That's why we've built our reputation on trust, expertise, and a deep commitment to your satisfaction. Our team of gaming professionals is here to ensure you receive the right products, proper guidance, and the service you deserve.
 
 **Our Mission**
 To provide accessible, reliable, and professional pharmaceutical services that enhance the health and quality of life for our customers. We strive to be your first choice for all your medication and health product needs.
 
-**Why Choose DR.Gamer?**
+**Why Choose Dr.GAMER?**
 - **Licensed Pharmacists**: Our team of experienced pharmacists is available to answer your questions and provide medication counseling
 - **Quality Products**: We carry only FDA-approved medications and high-quality health products from trusted manufacturers
 - **Convenient Service**: Easy online ordering, prescription refills, and fast delivery to your doorstep
@@ -881,7 +881,7 @@ To provide accessible, reliable, and professional pharmaceutical services that e
 - Health screenings and consultations
 - Immunization services
 
-Thank you for choosing DR.Gamer. Your gaming experience is our priority, and we're here to serve you with care, expertise, and dedication.`,
+Thank you for choosing Dr.GAMER. Your gaming experience is our priority, and we're here to serve you with care, expertise, and dedication.`,
       isPublished: true,
     },
     {
@@ -907,7 +907,7 @@ We look forward to assisting you! Your satisfaction is our priority.
     {
       title: 'Help',
       slug: 'help',
-      content: `Welcome to DR.Gamer's Help Center! We're here to assist you with all your gaming needs and questions. Whether you need help with orders, game information, or general services, our comprehensive help resources are designed to provide you with the information you need.
+      content: `Welcome to Dr.GAMER's Help Center! We're here to assist you with all your gaming needs and questions. Whether you need help with orders, game information, or general services, our comprehensive help resources are designed to provide you with the information you need.
 
 **Prescription Services**
 Managing your prescriptions is easy with our online platform. You can:
@@ -969,7 +969,7 @@ We strive to ensure all product descriptions, pricing, and availability informat
     {
       title: 'Customer Service',
       slug: 'customer-service',
-      content: `At DR.Gamer, we're committed to providing exceptional customer service and support for all your gaming needs. Our dedicated team is here to help you with any questions, concerns, or assistance you may need.
+      content: `At Dr.GAMER, we're committed to providing exceptional customer service and support for all your gaming needs. Our dedicated team is here to help you with any questions, concerns, or assistance you may need.
 
 **Contact Information**
 - **Phone**: +1 (555) 123-4567
@@ -1180,7 +1180,7 @@ For questions about shipping, please contact our customer service team.`,
       slug: 'faq',
       content: `# الأسئلة الشائعة
 
-مرحباً بكم في صفحة الأسئلة الشائعة في متجر DR.GAMER! لقد جمعنا لكم جميع الأسئلة التي قد تخطر ببالكم لمساعدتكم في الحصول على أفضل تجربة تسوق ممكنة.
+مرحباً بكم في صفحة الأسئلة الشائعة في متجر Dr.GAMER! لقد جمعنا لكم جميع الأسئلة التي قد تخطر ببالكم لمساعدتكم في الحصول على أفضل تجربة تسوق ممكنة.
 
 ## **الطلبات والتوصيل**
 
@@ -1333,15 +1333,15 @@ For questions about shipping, please contact our customer service team.`,
         pageSize: 9,
       },
       site: {
-        name: 'DR.GAMER',
+        name: 'Dr.GAMER',
         description:
-          'dr.gamer - متجرك الرسمي لكل ما يتعلق بـ Xbox! نوفر أحدث الألعاب، اشتراكات Xbox Game Pass Ultimate، بطاقات هدايا Xbox، إكسسوارات Xbox Series X|S، وحدات التحكم، سماعات الألعاب، وكل ما تحتاجه لتجربة ألعاب استثنائية. تسوق الآن واستمتع بأفضل الأسعار والعروض الحصرية!',
-        keywords: 'Xbox، dr.gamer، ألعاب Xbox، Xbox Game Pass، Xbox Live Gold، بطاقات هدايا Xbox، Xbox Series X، Xbox Series S، وحدات تحكم Xbox، إكسسوارات Xbox، اشتراكات Xbox، ألعاب إلكترونية، متجر ألعاب، Game Pass Ultimate',
+          'Dr.GAMER - متجرك الرسمي لكل ما يتعلق بـ Xbox! نوفر أحدث الألعاب، اشتراكات Xbox Game Pass Ultimate، بطاقات هدايا Xbox، إكسسوارات Xbox Series X|S، وحدات التحكم، سماعات الألعاب، وكل ما تحتاجه لتجربة ألعاب استثنائية. تسوق الآن واستمتع بأفضل الأسعار والعروض الحصرية!',
+        keywords: 'Xbox، Dr.GAMER، ألعاب Xbox، Xbox Game Pass، Xbox Live Gold، بطاقات هدايا Xbox، Xbox Series X، Xbox Series S، وحدات تحكم Xbox، إكسسوارات Xbox، اشتراكات Xbox، ألعاب إلكترونية، متجر ألعاب، Game Pass Ultimate',
         url: 'https://dr-gamer.com',
         logo: '/icons/logo.png',
         slogan: 'عالم Xbox بين يديك - اكتشف، العب، استمتع',
-        author: 'DR.GAMER',
-        copyright: '2024، DR.GAMER، جميع الحقوق محفوظة.',
+        author: 'Dr.GAMER',
+        copyright: '2024، Dr.GAMER، جميع الحقوق محفوظة.',
         email: 'support@dr-gamer.com',
         address: 'القاهرة، مصر',
         phone: '+20 123 456 7890',

@@ -8,6 +8,7 @@ import { prisma } from '@/lib/db'
 import { getBestSellingProducts } from '@/lib/actions/product.actions'
 import PlatformsSection from '@/components/shared/home/platforms-section'
 import DiscoverByPrice from '@/components/shared/home/discover-by-price'
+import ProductsSection from '@/components/shared/home/products-section'
 
 export const runtime = 'nodejs'
 
@@ -364,6 +365,9 @@ export default async function HomePage() {
           </Suspense>
         </div>
       </div>
+
+      {/* --- PRODUCTS SECTION --- */}
+      <ProductsSection />
 
       {/* --- REMAINING PRODUCT SLIDERS --- */}
       <div className='p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8'>

@@ -10,11 +10,13 @@ import Rating from "./rating";
 import { formatNumber, generateId, round2 } from "@/lib/utils";
 import ProductPrice from "./product-price";
 import ImageHover from "./image-hover";
-import { Eye } from "lucide-react";
+import { Eye, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import useCartStore from "@/hooks/use-cart-store";
 import { useLoading } from "@/hooks/use-loading";
 import { LoadingSpinner } from "@/components/shared/loading-overlay";
+import { useFavorites } from "@/hooks/use-favorites";
+import { useRouter } from "next/navigation";
 
 const ProductCard = ({
   product,
@@ -27,6 +29,22 @@ const ProductCard = ({
   hideBorder?: boolean;
   hideAddToCart?: boolean;
 }) => {
+  const { toggleFavorite, isFavorited: checkIsFavorited } = useFavorites();
+  const [isFavorited, setIsFavorited] = React.useState(() => checkIsFavorited(product.id));
+  const router = useRouter();
+
+  // Update favorite state when localStorage changes
+  React.useEffect(() => {
+    setIsFavorited(checkIsFavorited(product.id));
+    
+    const handleUpdate = () => {
+      setIsFavorited(checkIsFavorited(product.id));
+    };
+    
+    window.addEventListener('favorites-updated', handleUpdate);
+    return () => window.removeEventListener('favorites-updated', handleUpdate);
+  }, [product.id, checkIsFavorited]);
+  
   // Helper function to get product type label
   const getProductTypeLabel = (productType: string = 'game_code') => {
     const typeMap: { [key: string]: string } = {
@@ -78,9 +96,32 @@ const ProductCard = ({
           )}
           
           {/* Quick action buttons overlay */}
-          <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <button className="p-1.5 sm:p-2 rounded-full shadow-md transition-all duration-200 hover:scale-110" style={{ backgroundColor: 'rgba(53, 21, 100, 0.9)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 1)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 0.9)'}>
+          <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                router.push(`/product/${product.slug}`);
+              }}
+              className="p-1.5 sm:p-2 rounded-full shadow-md transition-all duration-200 hover:scale-110" 
+              style={{ backgroundColor: 'rgba(53, 21, 100, 0.9)' }} 
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 1)'} 
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 0.9)'}
+            >
               <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-purple-400" />
+            </button>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleFavorite(product.id);
+              }}
+              className={`p-1.5 sm:p-2 rounded-full shadow-md transition-all duration-200 hover:scale-110 ${isFavorited ? 'text-red-500' : 'text-purple-400'}`}
+              style={{ backgroundColor: 'rgba(53, 21, 100, 0.9)' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 1)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 0.9)'}
+            >
+              <Heart className={`h-3 w-3 sm:h-4 sm:w-4 ${isFavorited ? 'fill-current' : ''}`} />
             </button>
           </div>
           
@@ -179,13 +220,79 @@ const ProductCard = ({
       );
     };
 
+    const handleBuyNow = async () => {
+      await withLoading(
+        async () => {
+          await addItem({
+            product: product.id,
+            name: product.name,
+            slug: product.slug,
+            category: product.category,
+            image: product.images[0],
+            price: Number(product.price),
+            countInStock: product.countInStock,
+            color: product.colors[0] || '',
+            size: product.sizes[0] || '',
+            quantity: 1,
+            // product type & game account fields
+            productType: (product as any).productType || 'game_code',
+            isAddToOwnAccount: false,
+            accountUsername: undefined,
+            accountPassword: undefined,
+            clientId: `${product.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          }, 1);
+
+          toast({
+            title: 'Added to Cart',
+            description: `Redirecting to checkout...`,
+            variant: 'default',
+          });
+
+          // Navigate to checkout (will redirect to sign-in if not logged in)
+          router.push('/checkout');
+        }
+      );
+    };
+
     return (
-      <div className="p-3 sm:p-4 pt-0">
-         <button 
-           onClick={handleAddToCart}
-           disabled={isAddingToCart}
-           className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
-         >
+      <div className="p-3 sm:p-4 pt-0 space-y-2">
+        {/* Mobile: Favorites button above Add to Cart */}
+        <button 
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleFavorite(product.id);
+          }}
+          className="md:hidden w-full bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+        >
+          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current text-red-500' : ''}`} />
+          {isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
+        </button>
+
+        {/* Buy Now Button */}
+        <button 
+          onClick={handleBuyNow}
+          disabled={isAddingToCart || product.countInStock === 0}
+          className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
+        >
+          {isAddingToCart ? (
+            <LoadingSpinner size="sm" />
+          ) : (
+            <>
+              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Buy Now
+            </>
+          )}
+        </button>
+
+        {/* Add to Cart Button */}
+        <button 
+          onClick={handleAddToCart}
+          disabled={isAddingToCart || product.countInStock === 0}
+          className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium py-2 sm:py-2.5 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
+        >
           {isAddingToCart ? (
             <LoadingSpinner size="sm" />
           ) : (

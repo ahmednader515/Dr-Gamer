@@ -1,5 +1,6 @@
 import CartButton from './cart-button'
 import UserButton from './user-button'
+import FavoritesButton from './favorites-button'
 import { auth } from '@/auth'
 
 const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
@@ -22,7 +23,12 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
             signUp: 'Sign Up'
           }} 
         />
-        {forAdmin ? null : <CartButton />}
+        {forAdmin ? null : (
+          <>
+            <FavoritesButton />
+            <CartButton />
+          </>
+        )}
       </nav>
       {/* Mobile 3 dots menu removed - using hamburger menu only */}
     </div>

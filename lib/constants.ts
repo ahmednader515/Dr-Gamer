@@ -1,4 +1,4 @@
-export const SENDER_NAME = process.env.SENDER_NAME || 'DR.Gamer'
+export const SENDER_NAME = process.env.SENDER_NAME || 'Dr.GAMER'
 export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'noreply@dr-gamer.com'
 
 export const USER_ROLES = ['Admin', 'Moderator', 'User']
