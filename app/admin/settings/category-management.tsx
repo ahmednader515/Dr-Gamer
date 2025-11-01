@@ -322,30 +322,31 @@ export default function CategoryManagement() {
                       </Button>
                     </div>
                     
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      {category.image && (
-                        <div className="relative w-12 h-12 border rounded-lg overflow-hidden flex-shrink-0">
-                          <Image
-                            src={category.image}
-                            alt={category.name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      )}
-                      <div>
-                        <h3 className="font-semibold">{category.name}</h3>
-                        {!category.isActive && (
-                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                            غير نشط
-                          </span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        {category.image && (
+                          <div className="relative w-12 h-12 border rounded-lg overflow-hidden flex-shrink-0">
+                            <Image
+                              src={category.image}
+                              alt={category.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
                         )}
+                        <div>
+                          <h3 className="font-semibold">{category.name}</h3>
+                          {!category.isActive && (
+                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                              غير نشط
+                            </span>
+                          )}
+                        </div>
                       </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {category.description || 'لا يوجد وصف'}
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {category.description || 'لا يوجد وصف'}
-                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
