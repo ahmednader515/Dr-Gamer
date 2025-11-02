@@ -29,9 +29,9 @@ export default function ProductSortSelector({
 }) {
   const router = useRouter()
   
-  // Arabic translations
+  // English translations
   const translations = {
-    sortBy: 'ترتيب حسب'
+    sortBy: 'Sort by'
   }
   
   return (
@@ -41,13 +41,13 @@ export default function ProductSortSelector({
       }}
       value={sort}
     >
-      <SelectTrigger className="text-right bg-gray-800 border-gray-700 text-white" dir="rtl">
+      <SelectTrigger className="text-left bg-gray-800 border-gray-700 text-white" dir="ltr">
         <SelectValue>
           {translations.sortBy}: {sortOrders.find((s) => s.value === sort)!.name}
         </SelectValue>
       </SelectTrigger>
 
-      <SelectContent className="text-right bg-gray-800 border-gray-700" dir="rtl">
+      <SelectContent className="text-left bg-gray-800 border-gray-700" dir="ltr">
         {sortOrders.map((s) => (
           <SelectItem key={s.value} value={s.value} className="text-white focus:bg-gray-700">
             {s.name}

@@ -35,44 +35,44 @@ import { z } from 'zod'
 import { UploadButton } from '@/lib/uploadthing'
 
 const ContactInfoSchema = z.object({
-  email: z.string().email('البريد الإلكتروني غير صالح'),
-  phone: z.string().min(10, 'رقم الهاتف غير صالح'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().min(10, 'Invalid phone number'),
 })
 
 type ContactInfoFormData = z.infer<typeof ContactInfoSchema>
 
 const PaymentDetailsSchema = z.object({
-  paymentNumber: z.string().min(1, 'رقم الدفع مطلوب'),
-  transactionImage: z.string().min(1, 'صورة المعاملة مطلوبة'),
+  paymentNumber: z.string().min(1, 'Payment number is required'),
+  transactionImage: z.string().min(1, 'Transaction image is required'),
 })
 
 type PaymentDetailsFormData = z.infer<typeof PaymentDetailsSchema>
 
 // Payment method details
 const PAYMENT_INFO = {
-  'فودافون كاش': {
+  'Vodafone Cash': {
     number: '01277910038',
-    label: 'رقم فودافون كاش',
+    label: 'Vodafone Cash Number',
     icon: '📱',
   },
-  'إنستا باي': {
+  'InstaPay': {
     number: 'mina.shk',
-    label: 'اسم المستخدم إنستا باي',
+    label: 'InstaPay Username',
     icon: '💳',
     userName: 'mina.shk@instapay',
     link: 'https://ipn.eg/S/mina.shk/instapay/2nU1nh',
   },
-  'تيلدا': {
+  'Telda': {
     number: '@minahakim3',
-    label: 'اسم المستخدم تيلدا',
+    label: 'Telda Username',
     icon: '🟢',
     instagram: '@minahakim3',
   },
-  'حساب بنكي': {
+  'Bank Account': {
     number: '5110333000001242',
-    label: 'رقم الحساب البنكي',
+    label: 'Bank Account Number',
     icon: '🏦',
-    accountHolder: 'مينا سمير حكيم',
+    accountHolder: 'Mina Samir Hakim',
     iban: 'EG060002051105110333000001242',
     swift: 'BMISEGCXXXX',
   },
@@ -164,7 +164,7 @@ export default function CheckoutForm() {
   const handlePlaceOrder = async () => {
     if (!customerEmail || !customerPhone) {
       toast({
-        description: 'يرجى إدخال البريد الإلكتروني ورقم الهاتف',
+        description: 'Please enter email and phone number',
         variant: 'destructive',
       })
       return
@@ -172,7 +172,7 @@ export default function CheckoutForm() {
 
     if (!paymentNumber || !transactionImage) {
       toast({
-        description: 'يرجى إكمال تفاصيل الدفع',
+        description: 'Please complete payment details',
         variant: 'destructive',
       })
       return
@@ -180,7 +180,7 @@ export default function CheckoutForm() {
 
     if (!termsAccepted) {
       toast({
-        description: 'يرجى الموافقة على الشروط والأحكام',
+        description: 'Please accept the terms and conditions',
         variant: 'destructive',
       })
       return
@@ -248,7 +248,7 @@ export default function CheckoutForm() {
   const handleAcceptTerms = () => {
     if (!termsAccepted) {
       toast({
-        description: 'يرجى الموافقة على الشروط والأحكام',
+        description: 'Please accept the terms and conditions',
         variant: 'destructive',
       })
       return
@@ -265,10 +265,10 @@ export default function CheckoutForm() {
               className='rounded-full w-full btn-mobile'
               onClick={handleSelectContactInfo}
             >
-              التالي
+              Next
             </Button>
             <p className='text-xs text-center py-2 px-2'>
-              أدخل بريدك الإلكتروني لإرسال المنتج الرقمي إليك
+              Enter your email to receive the digital product
             </p>
           </div>
         )}
@@ -278,10 +278,10 @@ export default function CheckoutForm() {
               className='rounded-full w-full btn-mobile'
               onClick={handleSelectPaymentMethod}
             >
-              استخدم طريقة الدفع هذه
+              Use this payment method
             </Button>
             <p className='text-xs text-center py-2 px-2'>
-              اختر طريقة الدفع للمتابعة
+              Select a payment method to continue
             </p>
           </div>
         )}
@@ -291,10 +291,10 @@ export default function CheckoutForm() {
               className='rounded-full w-full btn-mobile'
               onClick={handleSelectPaymentDetails}
             >
-              التالي
+              Next
             </Button>
             <p className='text-xs text-center py-2 px-2'>
-              أدخل تفاصيل الدفع وارفع صورة المعاملة
+              Enter payment details and upload transaction screenshot
             </p>
           </div>
         )}
@@ -305,16 +305,16 @@ export default function CheckoutForm() {
               className='rounded-full w-full btn-mobile-lg'
               disabled={isPlacingOrder}
             >
-              {isPlacingOrder ? 'جاري تأكيد الطلب...' : 'تأكيد الطلب'}
+              {isPlacingOrder ? 'Confirming Order...' : 'Confirm Order'}
             </Button>
           </div>
         )}
 
         <div>
-          <div className='text-base sm:text-lg font-bold'>ملخص الطلب</div>
+          <div className='text-base sm:text-lg font-bold'>Order Summary</div>
           <div className='space-y-2'>
             <div className='flex justify-between text-sm sm:text-base'>
-              <span>المنتجات:</span>
+              <span>Products:</span>
               <span>
                 <ProductPrice price={itemsPrice} plain />
               </span>
@@ -331,7 +331,7 @@ export default function CheckoutForm() {
             </div>
 
             <div className='flex justify-between pt-3 sm:pt-4 font-bold text-base sm:text-lg'>
-              <span>المجموع الكلي:</span>
+              <span>Total:</span>
               <span className={appliedPromo ? 'text-purple-400' : ''}>
                 <ProductPrice price={finalTotal} plain />
               </span>
@@ -345,10 +345,10 @@ export default function CheckoutForm() {
   const currentPaymentInfo = paymentMethod && PAYMENT_INFO[paymentMethod as keyof typeof PAYMENT_INFO]
 
   return (
-    <main className='max-w-6xl mx-auto highlight-link px-4 py-6 sm:py-8' dir='rtl'>
+    <main className='max-w-6xl mx-auto highlight-link px-4 py-6 sm:py-8' dir='ltr'>
       <LoadingOverlay 
         isLoading={isPlacingOrder} 
-        text="جاري معالجة الطلب..."
+        text="Processing order..."
       />
       <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6'>
         <div className='lg:col-span-3'>
@@ -359,11 +359,11 @@ export default function CheckoutForm() {
               <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 my-3 pb-3'>
                 <div className='col-span-12 lg:col-span-5 flex text-base sm:text-lg font-bold'>
                   <span className='w-6 sm:w-8'>1 </span>
-                  <span>معلومات التواصل</span>
+                  <span>Contact Information</span>
                 </div>
                 <div className='col-span-12 lg:col-span-5 text-sm sm:text-base'>
-                  <p className='mb-1'><strong>البريد:</strong> {customerEmail}</p>
-                  <p><strong>الهاتف:</strong> {customerPhone}</p>
+                  <p className='mb-1'><strong>Email:</strong> {customerEmail}</p>
+                  <p><strong>Phone:</strong> {customerPhone}</p>
                 </div>
                 <div className='col-span-12 lg:col-span-2'>
                   <Button
@@ -375,7 +375,7 @@ export default function CheckoutForm() {
                     }}
                     className='w-full lg:w-auto btn-mobile'
                   >
-                    تغيير
+                    Change
                   </Button>
                 </div>
               </div>
@@ -383,14 +383,14 @@ export default function CheckoutForm() {
               <>
                 <div className='flex text-primary text-base sm:text-lg font-bold my-2'>
                   <span className='w-6 sm:w-8'>1 </span>
-                  <span>أدخل معلومات التواصل</span>
+                  <span>Enter Contact Information</span>
                 </div>
                 
                 {/* Game Account Options */}
                 {hasGameAccountItem && (
-                  <Card className='lg:mr-8 my-3 sm:my-4'>
+                  <Card className='lg:ml-8 my-3 sm:my-4'>
                     <CardContent className='p-3 sm:p-4 space-y-3 sm:space-y-4'>
-                      <div className='text-base sm:text-lg font-bold mb-2'>خيارات حساب اللعبة</div>
+                      <div className='text-base sm:text-lg font-bold mb-2'>Game Account Options</div>
                       <div className='space-y-2'>
                         <label className='flex items-center gap-2 text-sm sm:text-base'>
                           <input
@@ -399,7 +399,7 @@ export default function CheckoutForm() {
                             checked={gameAccountOption === 'new'}
                             onChange={() => setGameAccountOption('new')}
                           />
-                          الحصول على حساب جديد للعبة (لا حاجة لبيانات حسابك)
+                          Get a new game account (no account credentials needed)
                         </label>
                         <label className='flex items-center gap-2 text-sm sm:text-base'>
                           <input
@@ -408,32 +408,32 @@ export default function CheckoutForm() {
                             checked={gameAccountOption === 'own'}
                             onChange={() => setGameAccountOption('own')}
                           />
-                          إضافة اللعبة إلى حسابي الخاص
+                          Add the game to my existing account
                         </label>
                       </div>
                       {gameAccountOption === 'own' && (
                         <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3'>
                           <div>
-                            <Label className='text-white text-sm sm:text-base'>اسم المستخدم للحساب</Label>
+                            <Label className='text-white text-sm sm:text-base'>Account Username</Label>
                             <Input
                               value={accountUsername}
                               onChange={(e) => setAccountUsername(e.target.value)}
-                              placeholder='أدخل اسم المستخدم'
+                              placeholder='Enter username'
                               className='border-gray-700 bg-gray-800 text-gray-200'
                             />
                           </div>
                           <div>
-                            <Label className='text-white text-sm sm:text-base'>كلمة المرور للحساب</Label>
+                            <Label className='text-white text-sm sm:text-base'>Account Password</Label>
                             <Input
                               type='password'
                               value={accountPassword}
                               onChange={(e) => setAccountPassword(e.target.value)}
-                              placeholder='أدخل كلمة المرور'
+                              placeholder='Enter password'
                               className='border-gray-700 bg-gray-800 text-gray-200'
                             />
                           </div>
                           <p className='col-span-1 sm:col-span-2 text-xs text-gray-400'>
-                            ملاحظة: سيتم استخدام هذه البيانات فقط لإضافة اللعبة إلى حسابك ثم يتم حذفها فوراً بعد الإتمام.
+                            Note: These credentials will only be used to add the game to your account and will be deleted immediately after completion.
                           </p>
                         </div>
                       )}
@@ -447,11 +447,11 @@ export default function CheckoutForm() {
                     onSubmit={contactInfoForm.handleSubmit(onSubmitContactInfo)}
                     className='space-y-3 sm:space-y-4'
                   >
-                    <Card className='lg:mr-8 my-3 sm:my-4'>
+                    <Card className='lg:ml-8 my-3 sm:my-4'>
                       <CardContent className='p-3 sm:p-4 space-y-3 sm:space-y-4'>
                         <div>
                           <div className='text-base sm:text-lg font-bold mb-2'>
-                            البريد الإلكتروني
+                            Email Address
                           </div>
                           <FormField
                             control={contactInfoForm.control}
@@ -459,7 +459,7 @@ export default function CheckoutForm() {
                             render={({ field }) => (
                               <FormItem className='w-full'>
                                 <FormLabel className='text-sm sm:text-base text-white'>
-                                  سيتم إرسال المنتج الرقمي إلى هذا البريد
+                                  The digital product will be sent to this email
                                 </FormLabel>
                                 <FormControl>
                                   <Input
@@ -477,7 +477,7 @@ export default function CheckoutForm() {
                         
                         <div>
                           <div className='text-base sm:text-lg font-bold mb-2'>
-                            رقم الهاتف
+                            Phone Number
                           </div>
                           <FormField
                             control={contactInfoForm.control}
@@ -485,7 +485,7 @@ export default function CheckoutForm() {
                             render={({ field }) => (
                               <FormItem className='w-full'>
                                 <FormLabel className='text-sm sm:text-base text-white'>
-                                  للتواصل في حالة عدم توفر البريد الإلكتروني
+                                  For contact if email is unavailable
                                 </FormLabel>
                                 <FormControl>
                                   <Input
@@ -506,7 +506,7 @@ export default function CheckoutForm() {
                           type='submit'
                           className='rounded-full font-bold w-full btn-mobile-lg'
                         >
-                          التالي
+                          Next
                         </Button>
                       </CardFooter>
                     </Card>
@@ -522,7 +522,7 @@ export default function CheckoutForm() {
               <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 my-3 pb-3'>
                 <div className='flex text-base sm:text-lg font-bold col-span-12 lg:col-span-5'>
                   <span className='w-6 sm:w-8'>2 </span>
-                  <span>طريقة الدفع</span>
+                  <span>Payment Method</span>
                 </div>
                 <div className='col-span-12 lg:col-span-5 text-sm sm:text-base'>
                   <p>{paymentMethod}</p>
@@ -536,7 +536,7 @@ export default function CheckoutForm() {
                     }}
                     className='w-full lg:w-auto btn-mobile'
                   >
-                    تغيير
+                    Change
                   </Button>
                 </div>
               </div>
@@ -544,9 +544,9 @@ export default function CheckoutForm() {
               <>
                 <div className='flex text-primary text-base sm:text-lg font-bold my-2'>
                   <span className='w-6 sm:w-8'>2 </span>
-                  <span>اختر طريقة الدفع</span>
+                  <span>Select Payment Method</span>
                 </div>
-                <Card className='lg:mr-8 my-3 sm:my-4'>
+                <Card className='lg:ml-8 my-3 sm:my-4'>
                   <CardContent className='p-3 sm:p-4'>
                     <RadioGroup
                       value={paymentMethod}
@@ -559,7 +559,7 @@ export default function CheckoutForm() {
                             id={`payment-${pm.name}`}
                           />
                           <Label
-                            className='font-bold pr-2 cursor-pointer text-right w-full text-sm sm:text-base'
+                            className='font-bold pl-2 cursor-pointer text-left w-full text-sm sm:text-base'
                             htmlFor={`payment-${pm.name}`}
                           >
                             {pm.name}
@@ -573,7 +573,7 @@ export default function CheckoutForm() {
                       onClick={handleSelectPaymentMethod}
                       className='rounded-full font-bold w-full btn-mobile-lg'
                     >
-                      استخدم طريقة الدفع هذه
+                      Use this payment method
                     </Button>
                   </CardFooter>
                 </Card>
@@ -581,7 +581,7 @@ export default function CheckoutForm() {
             ) : (
               <div className='flex text-muted-foreground text-base sm:text-lg font-bold my-3 sm:my-4 py-3'>
                 <span className='w-6 sm:w-8'>2 </span>
-                <span>اختر طريقة الدفع</span>
+                <span>Select Payment Method</span>
               </div>
             )}
           </div>
@@ -592,11 +592,11 @@ export default function CheckoutForm() {
               <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 my-3 pb-3'>
                 <div className='flex text-base sm:text-lg font-bold col-span-12 lg:col-span-5'>
                   <span className='w-6 sm:w-8'>3 </span>
-                  <span>تفاصيل الدفع</span>
+                  <span>Payment Details</span>
                 </div>
                 <div className='col-span-12 lg:col-span-5 text-sm sm:text-base'>
-                  <p>رقم الدفع: {paymentNumber}</p>
-                  <p className='text-purple-400'>✓ تم رفع صورة المعاملة</p>
+                  <p>Payment Number: {paymentNumber}</p>
+                  <p className='text-purple-400'>✓ Transaction image uploaded</p>
                 </div>
                 <div className='col-span-12 lg:col-span-2'>
                   <Button
@@ -606,7 +606,7 @@ export default function CheckoutForm() {
                     }}
                     className='w-full lg:w-auto btn-mobile'
                   >
-                    تغيير
+                    Change
                   </Button>
                 </div>
               </div>
@@ -614,7 +614,7 @@ export default function CheckoutForm() {
               <>
                 <div className='flex text-primary text-base sm:text-lg font-bold my-2 pt-3'>
                   <span className='w-6 sm:w-8'>3 </span>
-                  <span>أدخل تفاصيل الدفع</span>
+                  <span>Enter Payment Details</span>
                 </div>
                 <Form {...paymentDetailsForm}>
                   <form
@@ -622,20 +622,20 @@ export default function CheckoutForm() {
                     onSubmit={paymentDetailsForm.handleSubmit(onSubmitPaymentDetails)}
                     className='space-y-3 sm:space-y-4'
                   >
-                    <Card className='lg:mr-8 my-3 sm:my-4'>
+                    <Card className='lg:ml-8 my-3 sm:my-4'>
                       <CardContent className='p-3 sm:p-4 space-y-4'>
                         {/* Payment Info Display */}
                         {currentPaymentInfo && (
                           <div className='bg-gray-800 border border-gray-700 rounded-lg p-4'>
                             <div className='text-lg font-bold mb-3 flex items-center gap-2'>
                               <span>{currentPaymentInfo.icon}</span>
-                              <span>معلومات الدفع</span>
+                              <span>Payment Information</span>
                             </div>
                             <div className='text-sm sm:text-base space-y-2'>
                               {currentPaymentInfo.userName && (
                                 <div>
                                   <p className='mb-1 text-gray-300'>
-                                    اسم المستخدم:
+                                    Username:
                                   </p>
                                   <p className='text-purple-400 font-bold text-lg'>
                                     {currentPaymentInfo.userName}
@@ -672,7 +672,7 @@ export default function CheckoutForm() {
                                       e.currentTarget.style.color = '#ffffff'
                                     }}
                                   >
-                                    اضغط لإرسال نقود
+                                    Click to Send Money
                                   </a>
                                   <p className='text-xs text-gray-400 mt-2 text-center'>
                                     Powered by InstaPay
@@ -683,9 +683,9 @@ export default function CheckoutForm() {
                               {/* Bank Account Details */}
                               {currentPaymentInfo.accountHolder && (
                                 <div className='mt-3 pt-3 border-t border-gray-700 space-y-2'>
-                                  <p className='text-xs text-gray-400'>للدفع من خارج مصر:</p>
+                                  <p className='text-xs text-gray-400'>For payments from outside Egypt:</p>
                                   <p className='text-sm text-gray-300'>
-                                    <span className='font-semibold'>اسم صاحب الحساب:</span> {currentPaymentInfo.accountHolder}
+                                    <span className='font-semibold'>Account Holder:</span> {currentPaymentInfo.accountHolder}
                                   </p>
                                   <p className='text-sm text-gray-300'>
                                     <span className='font-semibold'>IBAN:</span> {currentPaymentInfo.iban}
@@ -698,7 +698,7 @@ export default function CheckoutForm() {
                               
                               {!currentPaymentInfo.link && !currentPaymentInfo.accountHolder && (
                                 <p className='text-xs text-gray-400 mt-2'>
-                                  قم بتحويل المبلغ إلى الرقم أعلاه، ثم أدخل رقمك وارفع صورة المعاملة
+                                  Transfer the amount to the number above, then enter your number and upload the transaction screenshot
                                 </p>
                               )}
                             </div>
@@ -712,11 +712,11 @@ export default function CheckoutForm() {
                           render={({ field }) => (
                             <FormItem className='w-full'>
                               <FormLabel className='text-sm sm:text-base text-white'>
-                                {currentPaymentInfo ? `رقمك في ${paymentMethod}` : 'رقم الدفع الخاص بك'}
+                                {currentPaymentInfo ? `Your number in ${paymentMethod}` : 'Your payment number'}
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder='أدخل رقم الدفع الخاص بك'
+                                  placeholder='Enter your payment number'
                                   {...field}
                                   className='input-mobile'
                                 />
@@ -733,7 +733,7 @@ export default function CheckoutForm() {
                           render={({ field }) => (
                             <FormItem className='w-full'>
                               <FormLabel className='text-sm sm:text-base text-white'>
-                                صورة المعاملة
+                                Transaction Screenshot
                               </FormLabel>
                               <FormControl>
                                 <div className='space-y-3'>
@@ -756,7 +756,7 @@ export default function CheckoutForm() {
                                         }}
                                         className='w-full'
                                       >
-                                        حذف الصورة
+                                        Delete Image
                                       </Button>
                                     </div>
                                   ) : (
@@ -769,13 +769,13 @@ export default function CheckoutForm() {
                                           field.onChange(url)
                                           paymentDetailsForm.setValue('transactionImage', url)
                                           toast({
-                                            description: 'تم رفع الصورة بنجاح',
+                                            description: 'Image uploaded successfully',
                                           })
                                         }
                                       }}
                                       onUploadError={(error: Error) => {
                                         toast({
-                                          description: `خطأ في رفع الصورة: ${error.message}`,
+                                          description: `Error uploading image: ${error.message}`,
                                           variant: 'destructive',
                                         })
                                       }}
@@ -799,7 +799,7 @@ export default function CheckoutForm() {
                           type='submit'
                           className='rounded-full font-bold w-full btn-mobile-lg'
                         >
-                          التالي
+                          Next
                         </Button>
                       </CardFooter>
                     </Card>
@@ -809,7 +809,7 @@ export default function CheckoutForm() {
             ) : (
               <div className='flex text-muted-foreground text-base sm:text-lg font-bold my-3 sm:my-4 py-3'>
                 <span className='w-6 sm:w-8'>3 </span>
-                <span>أدخل تفاصيل الدفع</span>
+                <span>Enter Payment Details</span>
               </div>
             )}
           </div>
@@ -819,7 +819,7 @@ export default function CheckoutForm() {
             {!isPaymentDetailsSelected && !isTermsAccepted ? (
               <div className='flex text-muted-foreground text-base sm:text-lg font-bold my-3 sm:my-4 py-3'>
                 <span className='w-6 sm:w-8'>4 </span>
-                <span>الشروط والأحكام</span>
+                <span>Terms and Conditions</span>
               </div>
             ) : null}
           </div>
@@ -830,7 +830,7 @@ export default function CheckoutForm() {
                 <CardContent className='p-3 sm:p-4'>
                   <div className='flex text-primary text-base sm:text-lg font-bold my-2'>
                     <span className='w-6 sm:w-8'>4 </span>
-                    <span>الشروط والأحكام</span>
+                    <span>Terms and Conditions</span>
                   </div>
                   <div className='mb-3 flex items-start gap-2'>
                     <Checkbox 
@@ -842,9 +842,9 @@ export default function CheckoutForm() {
                       htmlFor="terms-desktop" 
                       className='text-sm cursor-pointer'
                     >
-                      أوافق على{' '}
+                      I agree to the{' '}
                       <Link href="/terms" className='text-purple-400 hover:underline'>
-                        الشروط والأحكام
+                        Terms and Conditions
                       </Link>
                     </label>
                   </div>
@@ -852,10 +852,10 @@ export default function CheckoutForm() {
                     className='rounded-full w-full btn-mobile'
                     onClick={handleAcceptTerms}
                   >
-                    التالي
+                    Next
                   </Button>
                   <p className='text-xs text-center py-2 px-2'>
-                    يرجى قراءة والموافقة على الشروط والأحكام
+                    Please read and accept the terms and conditions
                   </p>
                 </CardContent>
               </Card>
@@ -874,14 +874,14 @@ export default function CheckoutForm() {
                     className='rounded-full btn-mobile-lg'
                     disabled={isPlacingOrder}
                   >
-                    {isPlacingOrder ? 'جاري تأكيد الطلب...' : 'تأكيد الطلب'}
+                    {isPlacingOrder ? 'Confirming Order...' : 'Confirm Order'}
                   </Button>
                   <div className='flex-1'>
                     <p className='font-bold text-base sm:text-lg'>
-                      المجموع الكلي: <ProductPrice price={finalTotal} plain />
+                      Total: <ProductPrice price={finalTotal} plain />
                       {appliedPromo && (
-                        <span className='text-xs text-purple-400 mr-2'>
-                          (وفرت {appliedPromo.discountPercent}%)
+                        <span className='text-xs text-purple-400 ml-2'>
+                          (Saved {appliedPromo.discountPercent}%)
                         </span>
                       )}
                     </p>

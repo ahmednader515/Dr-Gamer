@@ -16,7 +16,7 @@ type CardItem = {
 
 export function HomeCard({ cards }: { cards: CardItem[] }) {
   return (
-    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 font-cairo' dir="rtl">
+    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 font-cairo' dir="ltr">
       {cards.map((card) => (
         <Card key={card.title} className='rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col bg-gray-900'>
           <CardContent className='p-6 flex-1'>

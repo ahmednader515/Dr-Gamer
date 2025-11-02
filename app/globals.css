@@ -23,98 +23,98 @@ input, textarea, select, button, label, span, div, p, h1, h2, h3, h4, h5, h6, a,
   font-family: 'Cairo', sans-serif !important;
 }
 
-/* RTL Support */
-.rtl {
-  direction: rtl;
-  text-align: right;
+/* ltr Support */
+.ltr {
+  direction: ltr;
+  text-align: left;
   font-family: 'Cairo', sans-serif;
 }
 
-.rtl .space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+.ltr .space-x-reverse > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 1;
 }
 
-.rtl .mr-auto {
+.ltr .mr-auto {
   margin-left: auto;
   margin-right: 0;
 }
 
-.rtl .ml-auto {
+.ltr .ml-auto {
   margin-right: auto;
   margin-left: 0;
 }
 
-/* RTL Table Support */
-.rtl .text-right {
+/* ltr Table Support */
+.ltr .text-right {
   text-align: right;
 }
 
-.rtl table th,
-.rtl table td {
-  text-align: right;
+.ltr table th,
+.ltr table td {
+  text-align: left;
 }
 
-/* RTL Button and Link Support */
-.rtl button,
-.rtl a {
-  text-align: right;
+/* ltr Button and Link Support */
+.ltr button,
+.ltr a {
+  text-align: left;
   font-family: 'Cairo', sans-serif;
 }
 
-/* RTL Form Support */
-.rtl input,
-.rtl textarea,
-.rtl select {
-  text-align: right;
+/* ltr Form Support */
+.ltr input,
+.ltr textarea,
+.ltr select {
+  text-align: left;
 }
 
-/* Sign-in Page RTL Support */
-.signin-page-rtl {
-  direction: rtl;
+/* Sign-in Page ltr Support */
+.signin-page-ltr {
+  direction: ltr;
   font-family: 'Cairo', sans-serif;
 }
 
-.signin-page-rtl .form-field {
+.signin-page-ltr .form-field {
   text-align: right;
 }
 
-.signin-page-rtl .form-label {
+.signin-page-ltr .form-label {
   text-align: right;
   display: block;
 }
 
-.signin-page-rtl .form-input {
+.signin-page-ltr .form-input {
   text-align: right;
-  direction: rtl;
+  direction: ltr;
 }
 
-.signin-page-rtl .grid {
-  direction: rtl;
+.signin-page-ltr .grid {
+  direction: ltr;
 }
 
-.signin-page-rtl .logo-section {
+.signin-page-ltr .logo-section {
   order: 2;
 }
 
-.signin-page-rtl .form-section {
+.signin-page-ltr .form-section {
   order: 1;
 }
 
 /* Mobile Responsive Adjustments for Auth Pages */
 @media (max-width: 768px) {
-  .signin-page-rtl .logo-section {
+  .signin-page-ltr .logo-section {
     order: 2;
     margin-bottom: 1rem;
   }
   
-  .signin-page-rtl .form-section {
+  .signin-page-ltr .form-section {
     order: 1;
     margin-bottom: 1rem;
   }
   
   /* Ensure forms are properly sized on mobile */
-  .signin-page-rtl .form-section .card,
-  .signin-page-rtl .form-section > div {
+  .signin-page-ltr .form-section .card,
+  .signin-page-ltr .form-section > div {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0;
@@ -123,60 +123,60 @@ input, textarea, select, button, label, span, div, p, h1, h2, h3, h4, h5, h6, a,
   }
   
   /* Ensure form content takes full width on mobile */
-  .signin-page-rtl .form-section .card .card-content,
-  .signin-page-rtl .form-section > div > div {
+  .signin-page-ltr .form-section .card .card-content,
+  .signin-page-ltr .form-section > div > div {
     width: 100%;
     max-width: 100%;
   }
   
   /* Adjust logo size for mobile */
-  .signin-page-rtl .logo-section .w-32 {
+  .signin-page-ltr .logo-section .w-32 {
     width: 6rem;
     height: 6rem;
   }
   
   /* Ensure proper spacing on mobile */
-  .signin-page-rtl .space-y-6 > * + * {
+  .signin-page-ltr .space-y-6 > * + * {
     margin-top: 1rem;
   }
   
-  .signin-page-rtl .space-y-8 > * + * {
+  .signin-page-ltr .space-y-8 > * + * {
     margin-top: 1.5rem;
   }
 }
 
 @media (min-width: 1024px) {
-  .signin-page-rtl .logo-section {
+  .signin-page-ltr .logo-section {
     order: 1;
   }
   
-  .signin-page-rtl .form-section {
+  .signin-page-ltr .form-section {
     order: 2;
   }
 }
 
-/* RTL Admin Specific Styles */
-.rtl .admin-container {
-  direction: rtl;
-  text-align: right;
+/* ltr Admin Specific Styles */
+.ltr .admin-container {
+  direction: ltr;
+  text-align: left;
   font-family: 'Cairo', sans-serif;
 }
 
-.rtl .admin-table th,
-.rtl .admin-table td {
-  text-align: right;
+.ltr .admin-table th,
+.ltr .admin-table td {
+  text-align: left;
   padding-right: 0.75rem;
   padding-left: 0.75rem;
   font-family: 'Cairo', sans-serif;
 }
 
-.rtl .admin-card {
-  text-align: right;
+.ltr .admin-card {
+  text-align: left;
   font-family: 'Cairo', sans-serif;
 }
 
-.rtl .admin-button {
-  text-align: right;
+.ltr .admin-button {
+  text-align: left;
   font-family: 'Cairo', sans-serif;
 }
 
@@ -527,8 +527,8 @@ input, textarea, select, button, label, span, div, p, h1, h2, h3, h4, h5, h6, a,
 /* Admin Cairo Font Override */
 .admin-container,
 .admin-container *,
-.rtl,
-.rtl * {
+.ltr,
+.ltr * {
   font-family: 'Cairo', sans-serif !important;
 }
 
@@ -546,13 +546,13 @@ input, textarea, select, button, label, span, div, p, h1, h2, h3, h4, h5, h6, a,
   color: #9d60e9;
   font-weight: 600;
   padding: 16px;
-  text-align: right;
+  text-align: left;
   border-bottom: 2px solid #374151;
 }
 
 .admin-table td {
   padding: 16px;
-  text-align: right;
+  text-align: left;
   border-bottom: 1px solid #374151;
   vertical-align: middle;
   color: #e5e7eb;

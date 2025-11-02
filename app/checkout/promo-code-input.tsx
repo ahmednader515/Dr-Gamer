@@ -26,7 +26,7 @@ export default function PromoCodeInput({
   const handleApplyPromoCode = async () => {
     if (!promoCode.trim()) {
       toast({
-        title: 'خطأ',
+        title: 'Error',
         description: 'Please enter a promo code',
         variant: 'destructive',
       })
@@ -46,20 +46,20 @@ export default function PromoCodeInput({
       if (result.success) {
         onPromoApplied(result.data)
         toast({
-          title: 'تم التطبيق',
+          title: 'Applied',
           description: result.message,
         })
       } else {
         toast({
-          title: 'خطأ',
+          title: 'Error',
           description: result.message,
           variant: 'destructive',
         })
       }
     } catch (error) {
       toast({
-        title: 'خطأ',
-        description: 'حدث خطأ في التحقق من الكود',
+        title: 'Error',
+        description: 'Error validating promo code',
         variant: 'destructive',
       })
     } finally {
@@ -71,7 +71,7 @@ export default function PromoCodeInput({
     onPromoRemoved()
     setPromoCode('')
     toast({
-      title: 'تم الإزالة',
+      title: 'Removed',
       description: 'Promo code has been removed',
     })
   }
@@ -95,7 +95,7 @@ export default function PromoCodeInput({
               onClick={handleRemovePromoCode}
               className='text-red-400 hover:text-red-300 hover:bg-red-900/20'
             >
-              إزالة
+              Remove
             </Button>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function PromoCodeInput({
           disabled={isValidatingPromo}
           className='bg-purple-600 hover:bg-purple-700'
         >
-          {isValidatingPromo ? 'جاري التحقق...' : 'تطبيق'}
+          {isValidatingPromo ? 'Validating...' : 'Apply'}
         </Button>
       </div>
     </div>

@@ -142,7 +142,7 @@ export default function TableChart({
 
           <ProgressBar value={percentage} />
 
-          <div className='text-sm text-right flex items-center'>
+          <div className='text-sm text-left flex items-center'>
             <ProductPrice price={value} plain />
           </div>
         </div>

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function FAQPage() {
   const faqData = await getAllFAQs()
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl" dir="rtl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl" dir="ltr">
       {/* Breadcrumb */}
       <div className="flex gap-2 text-sm mb-6">
         <Link href="/" className="text-gray-400 hover:text-white transition-colors">

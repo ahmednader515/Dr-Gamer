@@ -48,7 +48,7 @@ export default function CartSidebar() {
   }
 
   return (
-    <div className='w-32 h-full bg-gray-900 border-l border-gray-700 shadow-lg flex-shrink-0' style={{ direction: 'ltr' }}>
+    <div className='w-32 bg-gray-900 border-l border-gray-700 shadow-lg flex-shrink-0 fixed right-0 top-0 bottom-0 pt-36 md:pt-36 z-40' style={{ direction: 'ltr' }}>
       <div className='p-3 h-full flex flex-col gap-3 justify-start items-center'>
         <div className='text-center space-y-2 w-full'>
           <div className='text-sm font-medium text-gray-300'>Subtotal</div>

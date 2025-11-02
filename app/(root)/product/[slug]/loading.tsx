@@ -2,7 +2,7 @@ import { Separator } from '@/components/ui/separator'
 
 export default function ProductLoading() {
   return (
-    <div className='container mx-auto px-4 py-8' dir="rtl">
+    <div className='container mx-auto px-4 py-8' dir="ltr">
       {/* Product Header Skeleton */}
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12'>
         {/* Product Images Skeleton */}

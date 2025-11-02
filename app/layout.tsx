@@ -57,7 +57,7 @@ export default async function AppLayout({
   // Do not pass a server session to avoid hydration drift; client will resolve it
 
   return (
-    <html lang="ar" dir="rtl" suppressHydrationWarning>
+    <html lang="ar" dir="ltr" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </head>

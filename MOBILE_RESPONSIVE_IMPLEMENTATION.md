@@ -41,7 +41,7 @@ Added comprehensive mobile-first responsive utility classes in `app/globals.css`
 - **Typography**: Responsive text sizes
 - **Spacing**: Responsive padding and margins
 - **Button Sizing**: Responsive button dimensions
-- **Arabic Text**: Proper RTL support for mobile
+- **Arabic Text**: Proper ltr support for mobile
 
 ### 4. Home Page (`app/(home)/page.tsx`)
 - **Grid Layout**: Responsive grid columns (2 on mobile, 3 on tablet, 4+ on desktop)

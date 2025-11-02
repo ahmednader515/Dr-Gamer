@@ -11,7 +11,7 @@ export default function SignUpPage() {
   const { site } = data.settings[0];
   
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-gray-900 signin-page-rtl" dir="ltr">
+    <div className="w-full min-h-screen flex items-center justify-center bg-gray-900 signin-page-ltr" dir="ltr">
       <div className="w-full max-w-[1800px] mx-auto p-4 sm:p-6 md:p-8">
         <div className="grid lg:grid-cols-2 gap-8 md:gap-16 lg:gap-32 items-center">
           {/* Logo Section - Right Side */}

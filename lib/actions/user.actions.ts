@@ -40,7 +40,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
         role: 'User',
       }
     })
-    return { success: true, message: 'تم إنشاء المستخدم بنجاح' }
+    return { success: true, message: 'تم إنشاء الUser بنجاح' }
   } catch (error) {
     // Handle specific validation errors
     if (error instanceof Error) {
@@ -70,7 +70,7 @@ export async function deleteUser(id: string) {
     revalidatePath('/admin/users')
     return {
       success: true,
-      message: 'تم حذف المستخدم بنجاح',
+      message: 'تم Delete الUser بنجاح',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }
@@ -164,7 +164,7 @@ export async function updateUserPassword(user: {
     })
     
     if (!currentUser) {
-      return { success: false, message: 'المستخدم غير موجود' }
+      return { success: false, message: 'الUser غير موجود' }
     }
     
     const isCurrentPasswordValid = await bcrypt.compare(user.currentPassword, currentUser.password)

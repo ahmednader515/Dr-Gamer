@@ -94,7 +94,7 @@ The website now includes comprehensive loading states for all actions that take 
 
 ### 1. useLoading
 - **Purpose**: Single loading state management
-- **Features**: `isLoading`, `startLoading`, `stopLoading`, `withLoading`
+- **Features**: `isLoading`, `staltroading`, `stopLoading`, `withLoading`
 - **Usage**: Most common loading state management
 
 ### 2. useMultiLoading

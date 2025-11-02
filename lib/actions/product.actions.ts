@@ -180,7 +180,7 @@ export async function deleteProduct(id: string) {
     revalidatePath('/admin/products')
     return {
       success: true,
-      message: 'تم حذف المنتج بنجاح',
+      message: 'تم Delete المنتج بنجاح',
     }
   } catch (error) {
     console.error('Error deleting product:', error)

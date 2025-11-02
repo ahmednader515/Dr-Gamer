@@ -29,7 +29,7 @@ export default function ClientProviders({
         <AppInitializer setting={setting}>
           {visible ? (
             <div 
-              className='flex min-h-screen'
+              className='min-h-screen mr-32'
               style={{
                 backgroundImage: `linear-gradient(rgba(0, 0, 0, ${overlayOpacity}), rgba(0, 0, 0, ${overlayOpacity})), url(/icons/background.jpeg)`,
                 backgroundSize: 'cover',
@@ -38,18 +38,7 @@ export default function ClientProviders({
                 backgroundAttachment: 'fixed'
               }}
             >
-              <div 
-                className='flex-1 overflow-hidden'
-                style={{
-                  backgroundImage: `linear-gradient(rgba(0, 0, 0, ${overlayOpacity}), rgba(0, 0, 0, ${overlayOpacity})), url(/icons/background.jpeg)`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundAttachment: 'fixed'
-                }}
-              >
-                {children}
-              </div>
+              {children}
               <CartSidebar />
             </div>
           ) : (

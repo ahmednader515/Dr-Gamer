@@ -35,7 +35,7 @@ export default function PricingSettings({ productPricing, onProductPricingChange
       seasonalDiscounts: [
         ...productPricing.seasonalDiscounts,
         {
-          name: 'خصم جديد',
+          name: 'New Discount',
           startDate: new Date().toISOString().split('T')[0],
           endDate: new Date().toISOString().split('T')[0],
           discountRate: 10,
@@ -67,13 +67,13 @@ export default function PricingSettings({ productPricing, onProductPricingChange
       <CardHeader>
         <CardTitle className='text-xl flex items-center gap-2'>
           <DollarSign className='h-5 w-5' />
-          إعدادات تسعير المنتجات
+          Product Pricing Settings
         </CardTitle>
       </CardHeader>
       <CardContent className='space-y-6'>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
           <div className='space-y-2'>
-            <Label htmlFor='defaultMarkup'>الهامش الافتراضي (%)</Label>
+            <Label htmlFor='defaultMarkup'>Default Markup (%)</Label>
             <Input
               id='defaultMarkup'
               type='number'
@@ -87,7 +87,7 @@ export default function PricingSettings({ productPricing, onProductPricingChange
             />
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='bulkDiscountThreshold'>حد الخصم بالجملة</Label>
+            <Label htmlFor='bulkDiscountThreshold'>Bulk Discount Threshold</Label>
             <Input
               id='bulkDiscountThreshold'
               type='number'
@@ -100,7 +100,7 @@ export default function PricingSettings({ productPricing, onProductPricingChange
             />
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='bulkDiscountRate'>نسبة الخصم بالجملة (%)</Label>
+            <Label htmlFor='bulkDiscountRate'>Bulk Discount Rate (%)</Label>
             <Input
               id='bulkDiscountRate'
               type='number'
@@ -119,10 +119,10 @@ export default function PricingSettings({ productPricing, onProductPricingChange
         {/* Seasonal Discounts */}
         <div className='space-y-4'>
           <div className='flex items-center justify-between'>
-            <h4 className='font-semibold text-lg'>الخصومات الموسمية</h4>
+            <h4 className='font-semibold text-lg'>Seasonal Discounts</h4>
             <Button onClick={addSeasonalDiscount} size='sm'>
               <Plus className='h-4 w-4 ml-2' />
-              إضافة خصم موسمي
+              Add Seasonal Discount
             </Button>
           </div>
           
@@ -130,29 +130,29 @@ export default function PricingSettings({ productPricing, onProductPricingChange
             {productPricing.seasonalDiscounts.map((discount, index) => (
               <div key={index} className='border rounded-lg p-4 space-y-4'>
                 <div className='flex items-center justify-between'>
-                  <h5 className='font-medium'>الخصم الموسمي {index + 1}</h5>
+                  <h5 className='font-medium'>Seasonal Discount {index + 1}</h5>
                   <Button
                     variant='destructive'
                     size='sm'
                     onClick={() => removeSeasonalDiscount(index)}
                   >
                     <Trash2 className='h-4 w-4 ml-2' />
-                    حذف
+                    Delete
                   </Button>
                 </div>
                 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div className='space-y-2'>
-                    <Label htmlFor={`discountName${index}`}>اسم الخصم</Label>
+                    <Label htmlFor={`discountName${index}`}>Discount Name</Label>
                     <Input
                       id={`discountName${index}`}
                       value={discount.name}
                       onChange={(e) => updateSeasonalDiscount(index, 'name', e.target.value)}
-                      placeholder='اسم الخصم'
+                      placeholder='Discount name'
                     />
                   </div>
                   <div className='space-y-2'>
-                    <Label htmlFor={`discountRate${index}`}>نسبة الخصم (%)</Label>
+                    <Label htmlFor={`discountRate${index}`}>Discount Rate (%)</Label>
                     <Input
                       id={`discountRate${index}`}
                       type='number'
@@ -167,7 +167,7 @@ export default function PricingSettings({ productPricing, onProductPricingChange
                 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div className='space-y-2'>
-                    <Label htmlFor={`startDate${index}`}>تاريخ البداية</Label>
+                    <Label htmlFor={`startDate${index}`}>Start Date</Label>
                     <Input
                       id={`startDate${index}`}
                       type='date'
@@ -176,7 +176,7 @@ export default function PricingSettings({ productPricing, onProductPricingChange
                     />
                   </div>
                   <div className='space-y-2'>
-                    <Label htmlFor={`endDate${index}`}>تاريخ النهاية</Label>
+                    <Label htmlFor={`endDate${index}`}>End Date</Label>
                     <Input
                       id={`endDate${index}`}
                       type='date'
@@ -187,10 +187,10 @@ export default function PricingSettings({ productPricing, onProductPricingChange
                 </div>
                 
                 <div className='space-y-2'>
-                  <Label htmlFor={`applicableCategories${index}`}>الفئات المطبقة</Label>
+                  <Label htmlFor={`applicableCategories${index}`}>Applicable Categories</Label>
                   <Textarea
                     id={`applicableCategories${index}`}
-                    placeholder='أدخل الفئات مفصولة بفواصل (مثال: vitamins, supplements)'
+                    placeholder='Enter categories separated by commas (e.g.: vitamins, supplements)'
                     value={discount.applicableCategories.join(', ')}
                     onChange={(e) => updateSeasonalDiscount(index, 'applicableCategories', e.target.value.split(',').map(cat => cat.trim()).filter(cat => cat))}
                     rows={2}

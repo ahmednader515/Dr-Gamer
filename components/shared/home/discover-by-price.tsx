@@ -4,12 +4,12 @@ import React from 'react'
 import Link from 'next/link'
 
 const priceRanges = [
-  { label: 'Under $50', maxPrice: 50 },
-  { label: 'Under $100', maxPrice: 100 },
-  { label: 'Under $200', maxPrice: 200 },
-  { label: 'Under $500', maxPrice: 500 },
-  { label: 'Under $1000', maxPrice: 1000 },
-  { label: 'Under $2000', maxPrice: 2000 },
+  { label: 'Under 50 EGP', maxPrice: 50 },
+  { label: 'Under 100 EGP', maxPrice: 100 },
+  { label: 'Under 200 EGP', maxPrice: 200 },
+  { label: 'Under 500 EGP', maxPrice: 500 },
+  { label: 'Under 1000 EGP', maxPrice: 1000 },
+  { label: 'Under 2000 EGP', maxPrice: 2000 },
 ]
 
 export default function DiscoverByPrice() {

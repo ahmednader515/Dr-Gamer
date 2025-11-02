@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import PromoCodesList from './promo-codes-list'
 
 export const metadata: Metadata = {
-  title: 'أكواد الخصم - لوحة الإدارة',
+  title: 'Promo Codes - Admin Panel',
 }
 
 export default async function PromoCodesPage() {

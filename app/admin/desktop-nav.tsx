@@ -15,14 +15,14 @@ interface DesktopNavProps {
 
 // Navigation translations
 const navigationTranslations: { [key: string]: string } = {
-  'Overview': 'لوحة التحكم',
-  'Products': 'المنتجات',
-  'Orders': 'الطلبات',
-  'Users': 'المستخدمون',
-  'Promo Codes': 'أكواد الخصم',
-  'Web Pages': 'صفحات الويب',
-  'FAQ': 'الأسئلة الشائعة',
-  'Settings': 'الإعدادات',
+  'Overview': 'Overview',
+  'Products': 'Products',
+  'Orders': 'Orders',
+  'Users': 'Users',
+  'Promo Codes': 'Promo Codes',
+  'Web Pages': 'Web Pages',
+  'FAQ': 'FAQ',
+  'Settings': 'Settings',
 }
 
 // Default navigation if not provided
@@ -48,7 +48,7 @@ export default function DesktopNav({ navigation = defaultNavigation }: DesktopNa
   }
 
   return (
-    <nav className='hidden md:flex items-center space-x-6 space-x-reverse'>
+    <nav className='hidden md:flex items-center space-x-6'>
       {navigation.map((item) => (
         <Link
           key={item.name}
@@ -64,7 +64,7 @@ export default function DesktopNav({ navigation = defaultNavigation }: DesktopNa
         className='text-red-400 hover:text-red-200 hover:bg-red-900 transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2'
       >
         <LogOut className="h-4 w-4" />
-        تسجيل الخروج
+        Sign Out
       </button>
     </nav>
   )

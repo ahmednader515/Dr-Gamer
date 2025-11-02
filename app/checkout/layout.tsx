@@ -29,7 +29,7 @@ export default function CheckoutLayout({
               />
             </Link>
             <div>
-              <h1 className='text-3xl'>إتمام الطلب</h1>
+              <h1 className='text-3xl'>Complete Order</h1>
             </div>
           </div>
         </header>

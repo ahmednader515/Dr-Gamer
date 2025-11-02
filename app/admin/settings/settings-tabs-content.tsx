@@ -133,14 +133,14 @@ export default function SettingsTabsContent({ setting, tab }: SettingsTabsConten
       const res = await updateSetting(newSetting)
       if (!res.success) {
         toast({
-          title: 'خطأ في الحفظ',
+          title: 'Save Error',
           description: res.message,
           variant: 'destructive'
         })
       } else {
         toast({
-          title: 'تم حفظ الإعدادات',
-          description: 'تم تحديث إعدادات الموقع بنجاح',
+          title: 'Settings Saved',
+          description: 'Site settings have been updated successfully',
           variant: 'default'
         })
       }
@@ -148,8 +148,8 @@ export default function SettingsTabsContent({ setting, tab }: SettingsTabsConten
     } catch (error) {
       console.error('Settings save error:', error)
       toast({
-        title: 'خطأ في الحفظ',
-        description: 'فشل في حفظ الإعدادات. يرجى المحاولة مرة أخرى.',
+        title: 'Save Error',
+        description: 'Failed to save settings. Please try again.',
         variant: 'destructive'
       })
     } finally {
@@ -200,7 +200,7 @@ export default function SettingsTabsContent({ setting, tab }: SettingsTabsConten
       <div className='flex justify-end'>
         <Button onClick={handleSubmit} disabled={isLoading} size='lg'>
           <Save className='h-4 w-4 ml-2' />
-          {isLoading ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
+          {isLoading ? 'Saving...' : 'Save Settings'}
         </Button>
       </div>
     </div>

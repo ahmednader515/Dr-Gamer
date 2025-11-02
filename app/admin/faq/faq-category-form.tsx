@@ -25,15 +25,15 @@ import { useState } from 'react'
 import { createFAQQuestion, deleteFAQQuestion, updateFAQQuestion } from '@/lib/actions/faq.actions'
 
 const FAQCategoryFormSchema = z.object({
-  title: z.string().min(3, 'العنوان يجب أن يكون 3 أحرف على الأقل'),
-  slug: z.string().min(3, 'الرابط يجب أن يكون 3 أحرف على الأقل'),
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  slug: z.string().min(3, 'Slug must be at least 3 characters'),
   sortOrder: z.coerce.number().int().default(0),
   isActive: z.boolean().default(true),
 })
 
 const FAQQuestionFormSchema = z.object({
-  question: z.string().min(1, 'السؤال مطلوب'),
-  answer: z.string().min(1, 'الإجابة مطلوبة'),
+  question: z.string().min(1, 'Question is required'),
+  answer: z.string().min(1, 'Answer is required'),
   sortOrder: z.coerce.number().int().default(0),
   isActive: z.boolean().default(true),
 })
@@ -96,7 +96,7 @@ const FAQCategoryForm = ({
     if (!categoryId && type === 'Update') {
       toast({
         variant: 'destructive',
-        description: 'خطأ في معرّف الفئة',
+        description: 'Invalid category ID',
       })
       return
     }
@@ -177,8 +177,8 @@ const FAQCategoryForm = ({
         {/* Category Info */}
         <Card>
           <CardHeader>
-            <CardTitle>معلومات الفئة</CardTitle>
-            <CardDescription>أدخل معلومات فئة الأسئلة الشائعة</CardDescription>
+            <CardTitle>Category Information</CardTitle>
+            <CardDescription>Enter FAQ category information</CardDescription>
           </CardHeader>
           <CardContent className='space-y-6'>
             <div className='flex flex-col gap-5 md:flex-row'>
@@ -187,11 +187,11 @@ const FAQCategoryForm = ({
                 name='title'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel className='text-right'>العنوان</FormLabel>
+                    <FormLabel className='text-left'>Title</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder='مثال: الطلبات والتوصيل' 
-                        className='text-right' 
+                        placeholder='Example: Orders and Delivery' 
+                        className='text-left' 
                         {...field}
                         onChange={(e) => {
                           field.onChange(e)
@@ -210,11 +210,11 @@ const FAQCategoryForm = ({
                 name='slug'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel className='text-right'>الرابط</FormLabel>
+                    <FormLabel className='text-left'>Slug</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='سيتم توليد الرابط تلقائياً'
-                        className='text-right bg-gray-800 text-gray-200 border-gray-700'
+                        placeholder='Slug will be auto-generated'
+                        className='text-left bg-gray-800 text-gray-200 border-gray-700'
                         readOnly
                         {...field}
                       />
@@ -231,12 +231,12 @@ const FAQCategoryForm = ({
                 name='sortOrder'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel className='text-right'>ترتيب العرض</FormLabel>
+                    <FormLabel className='text-left'>Sort Order</FormLabel>
                     <FormControl>
                       <Input
                         type='number'
                         placeholder='0'
-                        className='text-right'
+                        className='text-left'
                         {...field}
                       />
                     </FormControl>
@@ -256,7 +256,7 @@ const FAQCategoryForm = ({
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <FormLabel className='text-right'>نشط</FormLabel>
+                    <FormLabel className='text-left'>Active</FormLabel>
                   </FormItem>
                 )}
               />
@@ -270,12 +270,12 @@ const FAQCategoryForm = ({
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>الأسئلة</CardTitle>
-                  <CardDescription>إدارة الأسئلة لهذه الفئة</CardDescription>
+                  <CardTitle>Questions</CardTitle>
+                  <CardDescription>Manage questions for this category</CardDescription>
                 </div>
                 <Button type='button' onClick={addQuestion} size='sm' className='bg-purple-600 hover:bg-purple-700'>
                   <Plus className="h-4 w-4 ml-2" />
-                  إضافة سؤال
+                  Add Question
                 </Button>
               </div>
             </CardHeader>
@@ -285,7 +285,7 @@ const FAQCategoryForm = ({
                   <div key={question.id} className='border border-gray-700 rounded-lg p-4 bg-gray-900'>
                     <div className='flex items-center justify-between mb-4'>
                       <div className='flex items-center gap-2 text-purple-400 font-medium'>
-                        السؤال #{index + 1}
+                        Question #{index + 1}
                       </div>
                       <div className='flex gap-2'>
                         <Button
@@ -316,33 +316,33 @@ const FAQCategoryForm = ({
                       <div className='space-y-4'>
                         <div>
                           <label className='block text-sm font-medium text-gray-300 mb-2'>
-                            السؤال
+                            Question
                           </label>
                           <input
                             type='text'
                             value={question.question}
                             onChange={(e) => updateQuestion(question.id, 'question', e.target.value)}
                             className='w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500'
-                            placeholder='أدخل السؤال...'
+                            placeholder='Enter question...'
                           />
                         </div>
 
                         <div>
                           <label className='block text-sm font-medium text-gray-300 mb-2'>
-                            الإجابة
+                            Answer
                           </label>
                           <textarea
                             value={question.answer}
                             onChange={(e) => updateQuestion(question.id, 'answer', e.target.value)}
                             className='w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 min-h-[100px]'
-                            placeholder='أدخل الإجابة...'
+                            placeholder='Enter answer...'
                           />
                         </div>
 
                         <div className='flex gap-4'>
                           <div className='flex-1'>
                             <label className='block text-sm font-medium text-gray-300 mb-2'>
-                              ترتيب العرض
+                              Sort Order
                             </label>
                             <input
                               type='number'
@@ -359,7 +359,7 @@ const FAQCategoryForm = ({
                                 onChange={(e) => updateQuestion(question.id, 'isActive', e.target.checked)}
                                 className='w-4 h-4'
                               />
-                              <span className='text-sm text-gray-300'>نشط</span>
+                              <span className='text-sm text-gray-300'>Active</span>
                             </label>
                           </div>
                         </div>
@@ -370,7 +370,7 @@ const FAQCategoryForm = ({
 
                 {questions.length === 0 && (
                   <div className='text-center py-8 text-gray-400'>
-                    لا توجد أسئلة. انقر على "إضافة سؤال" لإضافة أول سؤال.
+                    No questions yet. Click "Add Question" to add the first question.
                   </div>
                 )}
               </div>
@@ -386,7 +386,7 @@ const FAQCategoryForm = ({
             disabled={form.formState.isSubmitting}
             className='bg-purple-600 hover:bg-purple-700 text-white'
           >
-            {form.formState.isSubmitting ? 'جاري الإرسال...' : `${type === 'Create' ? 'إنشاء' : 'تحديث'} الفئة`}
+            {form.formState.isSubmitting ? 'Submitting...' : `${type === 'Create' ? 'Create' : 'Update'} Category`}
           </Button>
           <Button
             type='button'
@@ -394,7 +394,7 @@ const FAQCategoryForm = ({
             size='lg'
             onClick={() => router.push('/admin/faq')}
           >
-            إلغاء
+            Cancel
           </Button>
         </div>
       </form>

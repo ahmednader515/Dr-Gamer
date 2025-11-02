@@ -6,7 +6,7 @@ import LoadingOverlay, { LoadingSpinner, FullPageLoading } from './loading-overl
 import { useLoading } from '@/hooks/use-loading'
 
 export default function LoadingExample() {
-  const { isLoading, startLoading, stopLoading, withLoading } = useLoading()
+  const { isLoading, staltroading, stopLoading, withLoading } = useLoading()
   const [showFullPage, setShowFullPage] = useState(false)
 
   const simulateAsyncOperation = async () => {
@@ -28,7 +28,7 @@ export default function LoadingExample() {
   }
 
   const handleManualLoading = () => {
-    startLoading()
+    staltroading()
     setTimeout(() => stopLoading(), 3000)
   }
 
@@ -38,7 +38,7 @@ export default function LoadingExample() {
   }
 
   return (
-    <div className="p-8 space-y-6" dir="rtl">
+    <div className="p-8 space-y-6" dir="ltr">
       <h1 className="text-2xl font-bold text-center mb-8">أمثلة على مكونات التحميل</h1>
       
       {/* Loading Overlay Example */}

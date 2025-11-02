@@ -658,7 +658,7 @@ export const i18n = {
 }
 
 export const getDirection = (locale: string) => {
-  return locale === 'ar' ? 'rtl' : 'ltr'
+  return locale === 'ar' ? 'ltr' : 'ltr'
 }
 export type I18nConfig = typeof i18n
 export type Locale = I18nConfig['locales'][number]
@@ -941,7 +941,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     "Sign up": "اشتراك",
     "Sign in": "تسجيل الدخول",
     "Sign out": "تسجيل الخروج",
-    "Admin": "مدير",
+    "Admin": "Admin",
     "Your account": "حسابك",
     "Your orders": "طلباتك",
     "New Customer": "عميل جديد",
@@ -982,7 +982,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
   "Product": {
     "Added to Cart": "أضيف إلى السلة",
     "Go to Cart": "اذهب إلى السلة",
-    "Deleted User": "مستخدم محذوف",
+    "Deleted User": "User محذوف",
     "Brand": "العلامة التجارية",
     "Limited time deal": "صفقة محدودة الوقت",
     "Was": "كان",
@@ -1051,7 +1051,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     "Shipping": "التوصيل",
     "Tax": "الضريبة",
     "Proceed to Checkout": "المتابعة إلى الخروج",
-    "Delete": "حذف",
+    "Delete": "Delete",
     "Update": "تحديث",
     "Checkout": "الخروج"
   },
@@ -1111,11 +1111,11 @@ export default getRequestConfig(async ({ requestLocale }) => {
     "Back To Home": "العودة إلى الرئيسية"
   },
   "Admin": {
-    "Deleted User": "مستخدم محذوف",
+    "Deleted User": "User محذوف",
     "Overview": "نظرة عامة",
     "Products": "المنتجات",
     "Orders": "الطلبات",
-    "Users": "المستخدمون",
+    "Users": "الUserون",
     "Pages": "الصفحات",
     "Carousel": "دائري",
     "Settings": "الإعدادات",
@@ -1481,7 +1481,7 @@ import { getDirection } from '@/i18n-config'
     <div className='w-32 overflow-y-auto'>
       <div
         className={`w-32 fixed  h-full ${
-          getDirection(locale) === 'rtl' ? 'border-r' : 'border-l'
+          getDirection(locale) === 'ltr' ? 'border-r' : 'border-l'
         }`}
       >
         <div className='p-2 h-full flex flex-col gap-2 justify-center items-center'>
@@ -1751,7 +1751,7 @@ import { getDirection } from '@/i18n-config'
   const locale = useLocale()
 -              `bg-black  px-1 rounded-full text-primary text-base font-bold absolute right-[30px] top-[-4px] z-10`,
               `bg-black  px-1 rounded-full text-primary text-base font-bold absolute ${
-                getDirection(locale) === 'rtl' ? 'right-[5px]' : 'left-[10px]'
+                getDirection(locale) === 'ltr' ? 'right-[5px]' : 'left-[10px]'
               } top-[-4px] z-10`,
 -        <span className='font-bold'>Cart</span>
 -        {isCartSidebarOpen && (
@@ -1760,7 +1760,7 @@ import { getDirection } from '@/i18n-config'
         {showSidebar && (
 -            className={`absolute top-[20px] right-[-16px] rotate-[-90deg] z-10 w-0 h-0 border-l-[7px] border-r-[7px] border-b-[8px] border-transparent border-b-background`}
             className={`absolute top-[20px] ${
-              getDirection(locale) === 'rtl'
+              getDirection(locale) === 'ltr'
                 ? 'left-[-16px] rotate-[-270deg]'
                 : 'right-[-16px] rotate-[-90deg]'
             }  z-10   w-0 h-0 border-l-[7px] border-r-[7px] border-b-[8px] border-transparent border-b-background`}
@@ -1822,7 +1822,7 @@ import { getTranslations } from 'next-intl/server'
   const t = await getTranslations()
 -        <SelectTrigger className='w-auto h-full dark:border-gray-200 bg-gray-100 text-black border-r  rounded-r-none rounded-l-md'>
 -          <SelectValue placeholder='All' />
-        <SelectTrigger className='w-auto h-full dark:border-gray-200 bg-gray-100 text-black border-r  rounded-r-none rounded-l-md rtl:rounded-r-md rtl:rounded-l-none  '>
+        <SelectTrigger className='w-auto h-full dark:border-gray-200 bg-gray-100 text-black border-r  rounded-r-none rounded-l-md ltr:rounded-r-md ltr:rounded-l-none  '>
           <SelectValue placeholder={t('Header.All')} />
 -          <SelectItem value='all'>All</SelectItem>
           <SelectItem value='all'>{t('Header.All')}</SelectItem>
@@ -1839,7 +1839,7 @@ import { getDirection } from '@/i18n-config'
 
   const t = await getTranslations()
 -    <Drawer direction='left'>
-    <Drawer direction={getDirection(locale) === 'rtl' ? 'right' : 'left'}>
+    <Drawer direction={getDirection(locale) === 'ltr' ? 'right' : 'left'}>
 -        All
         {t('Header.All')}
 -                        Hello, {session.user.name}
@@ -8151,7 +8151,7 @@ export default async function AppLayout({
   return (
     <html
       lang={locale}
-      dir={getDirection(locale) === 'rtl' ? 'rtl' : 'ltr'}
+      dir={getDirection(locale) === 'ltr' ? 'ltr' : 'ltr'}
       suppressHydrationWarning
     >
       <body

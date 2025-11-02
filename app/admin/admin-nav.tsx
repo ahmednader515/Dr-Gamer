@@ -20,14 +20,14 @@ import {
 import { SignOut } from '@/lib/actions/user.actions'
 
 const navigationTranslations: { [key: string]: string } = {
-  'Overview': 'لوحة التحكم',
-  'Products': 'المنتجات',
-  'Orders': 'الطلبات',
-  'Users': 'المستخدمون',
-  'Promo Codes': 'أكواد الخصم',
-  'Web Pages': 'صفحات الويب',
-  'FAQ': 'الأسئلة الشائعة',
-  'Settings': 'الإعدادات',
+  'Overview': 'Overview',
+  'Products': 'Products',
+  'Orders': 'Orders',
+  'Users': 'Users',
+  'Promo Codes': 'Promo Codes',
+  'Web Pages': 'Web Pages',
+  'FAQ': 'FAQ',
+  'Settings': 'Settings',
 }
 
 const allNavigation = [
@@ -113,10 +113,11 @@ export default function AdminNav({ userRole }: { userRole: string }) {
           <div 
             ref={sidebarRef}
             className="fixed inset-0 bg-black z-50 w-full h-full"
+            dir="ltr"
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-700">
-              <h2 className="text-lg font-semibold text-white">لوحة الإدارة</h2>
+              <h2 className="text-lg font-semibold text-white">Admin Panel</h2>
               <Button
                 variant="ghost"
                 size="sm"
@@ -158,7 +159,7 @@ export default function AdminNav({ userRole }: { userRole: string }) {
                 className="w-full justify-start text-red-400 hover:bg-red-900 hover:text-red-200 transition-colors"
               >
                 <LogOut className="h-5 w-5 mr-2" />
-                تسجيل الخروج
+                Sign Out
               </Button>
             </div>
           </div>

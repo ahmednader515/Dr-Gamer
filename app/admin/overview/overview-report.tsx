@@ -83,9 +83,9 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
 
   if (!header)
     return (
-      <div className='space-y-4 rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <div className='space-y-4 ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
         <div>
-          <h1 className='h1-bold'>لوحة التحكم</h1>
+          <h1 className='h1-bold'>Dashboard</h1>
         </div>
         {/* First Row */}
         <div className='flex gap-4'>
@@ -116,17 +116,17 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
     )
 
   return (
-    <div className='rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
+    <div className='ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
       <div className='flex items-center justify-between mb-2'>
-        <h1 className='h1-bold'>لوحة التحكم</h1>
+        <h1 className='h1-bold'>Dashboard</h1>
         <CalendarDateRangePicker defaultDate={date} setDate={setDate} />
       </div>
       <div className='space-y-4'>
         <div className='grid gap-4  grid-cols-2 lg:grid-cols-4'>
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium text-right'>
-                إجمالي الإيرادات
+              <CardTitle className='text-sm font-medium text-left'>
+                Total Revenue
               </CardTitle>
               <BadgeDollarSign />
             </CardHeader>
@@ -136,14 +136,14 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
               </div>
               <div>
                 <Link className='text-xs' href='/admin/orders'>
-                  عرض الإيرادات
+                  View Revenue
                 </Link>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium text-right'>الطلبات المدفوعة</CardTitle>
+              <CardTitle className='text-sm font-medium text-left'>Paid Orders</CardTitle>
               <CreditCard />
             </CardHeader>
             <CardContent className='space-y-2'>
@@ -152,35 +152,35 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
               </div>
               <div>
                 <Link className='text-xs' href='/admin/orders'>
-                  عرض الطلبات المدفوعة
+                  View Paid Orders
                 </Link>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium text-right'>العملاء</CardTitle>
+              <CardTitle className='text-sm font-medium text-left'>Customers</CardTitle>
               <Users />
             </CardHeader>
             <CardContent className='space-y-2'>
               <div className='text-2xl font-bold'>{header.usersCount}</div>
               <div>
                 <Link className='text-xs' href='/admin/users'>
-                  عرض العملاء
+                  View Customers
                 </Link>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium text-right'>المنتجات</CardTitle>
+              <CardTitle className='text-sm font-medium text-left'>Products</CardTitle>
               <Barcode />
             </CardHeader>
             <CardContent className='space-y-2'>
               <div className='text-2xl font-bold'>{header.productsCount}</div>
               <div>
                 <Link className='text-xs' href='/admin/products'>
-                  عرض المنتجات
+                  View Products
                 </Link>
               </div>
             </CardContent>
@@ -189,9 +189,9 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
 
         <div className='grid gap-4 md:grid-cols-2'>
           <Card>
-            <CardHeader className='text-right'>
-              <CardTitle>كم تربح</CardTitle>
-              <CardDescription>تقديري · آخر 6 أشهر</CardDescription>
+            <CardHeader className='text-left'>
+              <CardTitle>Revenue Trends</CardTitle>
+              <CardDescription>Estimated · Last 6 months</CardDescription>
             </CardHeader>
             <CardContent>
               {charts ? (
@@ -202,10 +202,10 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
             </CardContent>
           </Card>
           <Card>
-            <CardHeader className='text-right'>
-              <CardTitle>أداء المنتجات</CardTitle>
+            <CardHeader className='text-left'>
+              <CardTitle>Product Performance</CardTitle>
               <CardDescription>
-                من {formatDateTime(date!.from!).dateOnly} إلى{' '}
+                From {formatDateTime(date!.from!).dateOnly} to{' '}
                 {formatDateTime(date!.to!).dateOnly}
               </CardDescription>
             </CardHeader>
@@ -221,8 +221,8 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
 
         <div>
           <Card>
-            <CardHeader className='text-right'>
-              <CardTitle>المبيعات الحديثة (الطلبات المدفوعة فقط)</CardTitle>
+            <CardHeader className='text-left'>
+              <CardTitle>Recent Sales (Paid Orders Only)</CardTitle>
             </CardHeader>
             <CardContent>
               {/* Desktop Table - Hidden on mobile */}
@@ -231,29 +231,29 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
                   <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className='text-right'>المشتري</TableHead>
-                      <TableHead className='text-right'>التاريخ</TableHead>
-                      <TableHead className='text-right'>المجموع</TableHead>
-                      <TableHead className='text-right'>الإجراءات</TableHead>
+                      <TableHead className='text-left'>Customer</TableHead>
+                      <TableHead className='text-left'>Date</TableHead>
+                      <TableHead className='text-left'>Total</TableHead>
+                      <TableHead className='text-left'>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {(latest || []).map((order: IOrderList) => (
-                      <TableRow key={order.id}>
-                        <TableCell className='text-right'>
-                          {order.user ? order.user.name : 'مستخدم محذوف'}
+                      <TableRow key={order.id} className='bg-gray-800 hover:bg-gray-700 border-b border-gray-700'>
+                        <TableCell className='text-left'>
+                          {order.user ? order.user.name : 'Deleted user'}
                         </TableCell>
 
-                        <TableCell className='text-right'>
+                        <TableCell className='text-left'>
                           {formatDateTime(order.createdAt).dateOnly}
                         </TableCell>
-                        <TableCell className='text-right'>
+                        <TableCell className='text-left'>
                           <ProductPrice price={order.totalPrice} plain />
                         </TableCell>
 
-                        <TableCell className='text-right'>
+                        <TableCell className='text-left'>
                           <Link href={`/admin/orders/${order.id}`}>
-                            <span className='px-2'>التفاصيل</span>
+                            <span className='px-2'>Details</span>
                           </Link>
                         </TableCell>
                       </TableRow>
@@ -271,7 +271,7 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
                   <div key={order.id} className="bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-2">
                     {/* Customer Name */}
                     <div className="font-medium text-gray-900">
-                      {order.user ? order.user.name : 'مستخدم محذوف'}
+                      {order.user ? order.user.name : 'Deleted user'}
                     </div>
                     
                     {/* Order Details */}
@@ -288,7 +288,7 @@ export default function OverviewReport({ initialDate, initialHeader }: { initial
                         href={`/admin/orders/${order.id}`}
                         className="text-purple-600 hover:text-purple-800 text-sm font-medium"
                       >
-                        عرض التفاصيل
+                        View Details
                       </Link>
                     </div>
                   </div>

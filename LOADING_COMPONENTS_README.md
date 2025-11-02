@@ -90,7 +90,7 @@ Hook لإدارة حالة تحميل واحدة.
 import { useLoading } from '@/hooks/use-loading'
 
 function MyComponent() {
-  const { isLoading, startLoading, stopLoading, withLoading } = useLoading()
+  const { isLoading, staltroading, stopLoading, withLoading } = useLoading()
   
   const handleAsyncOperation = async () => {
     try {
@@ -121,7 +121,7 @@ function MyComponent() {
 
 **الخصائص المتاحة:**
 - `isLoading`: boolean - حالة التحميل الحالية
-- `startLoading()`: function - بدء التحميل
+- `staltroading()`: function - بدء التحميل
 - `stopLoading()`: function - إيقاف التحميل
 - `withLoading()`: function - تنفيذ عملية مع إدارة التحميل التلقائي
 
@@ -135,18 +135,18 @@ import { useMultiLoading } from '@/hooks/use-loading'
 function MyComponent() {
   const { 
     isLoading, 
-    startLoading, 
+    staltroading, 
     stopLoading, 
     isAnyLoading 
   } = useMultiLoading()
   
   const handleOperation1 = () => {
-    startLoading('operation1')
+    staltroading('operation1')
     setTimeout(() => stopLoading('operation1'), 2000)
   }
   
   const handleOperation2 = () => {
-    startLoading('operation2')
+    staltroading('operation2')
     setTimeout(() => stopLoading('operation2'), 3000)
   }
   
@@ -253,7 +253,7 @@ function ProductsPage() {
 ## المميزات
 
 ✅ **نص عربي**: جميع النصوص باللغة العربية  
-✅ **دعم RTL**: تخطيط من اليمين إلى اليسار  
+✅ **دعم ltr**: تخطيط من اليمين إلى اليسار  
 ✅ **سهولة الاستخدام**: API بسيط وواضح  
 ✅ **مرونة**: يمكن تخصيص المظهر والسلوك  
 ✅ **أداء جيد**: لا يؤثر على أداء التطبيق  

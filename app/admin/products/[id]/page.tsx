@@ -23,8 +23,8 @@ const UpdateProduct = async (props: UpdateProductProps) => {
   const product = await getProductById(id)
   if (!product) notFound()
   return (
-    <main className='max-w-6xl mx-auto p-4'>
-      <div className='flex mb-4'>
+    <main className='max-w-6xl mx-auto p-4 ltr' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <div className='flex mb-4 text-left'>
         <Link href='/admin/products'>Products</Link>
         <span className='mx-1'>›</span>
         <Link href={`/admin/products/${product.id}`}>{product.id}</Link>

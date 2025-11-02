@@ -40,10 +40,10 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
 
   const addCarouselItem = () => {
     const newItem: CarouselItem = {
-      title: 'عنوان جديد',
-      buttonCaption: 'زر جديد',
+      title: 'New Title',
+      buttonCaption: 'New Button',
       image: '/images/banner1.jpg',
-      url: '/search?category=عنوان جديد'
+      url: '/search?category=new-title'
     }
     
     onCarouselItemsChange([...carouselItems, newItem])
@@ -55,8 +55,8 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
       onCarouselItemsChange(newCarouselItems)
     } else {
       toast({
-        title: 'لا يمكن الحذف',
-        description: 'يجب أن يحتوي الكاروسيل على عنصر واحد على الأقل',
+        title: 'Cannot Delete',
+        description: 'Carousel must contain at least one item',
         variant: 'destructive'
       })
     }
@@ -76,8 +76,8 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
         onCarouselItemsChange(newCarouselItems)
         
         toast({
-          title: 'تم تحديث الصورة',
-          description: 'تم رفع الصورة بنجاح إلى الخادم',
+          title: 'Image Updated',
+          description: 'Image uploaded successfully to server',
           variant: 'default'
         })
       } else {
@@ -86,8 +86,8 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
     } catch (error) {
       console.error('Image upload error:', error)
       toast({
-        title: 'خطأ في رفع الصورة',
-        description: 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.',
+        title: 'Image Upload Error',
+        description: 'Failed to upload image. Please try again.',
         variant: 'destructive'
       })
     } finally {
@@ -105,11 +105,11 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
         <div className='flex items-center justify-between'>
           <CardTitle className='text-xl flex items-center gap-2'>
             <ImageIcon className='h-5 w-5' />
-            إعدادات الكاروسيل
+            Carousel Settings
           </CardTitle>
           <Button onClick={addCarouselItem} size='sm'>
             <Plus className='h-4 w-4 ml-2' />
-            إضافة عنصر
+            Add Item
           </Button>
         </div>
       </CardHeader>
@@ -117,18 +117,18 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
         {carouselItems.length === 0 ? (
           <div className='text-center py-8 text-muted-foreground'>
             <ImageIcon className='h-12 w-12 mx-auto mb-4 opacity-50' />
-            <p>لا توجد عناصر في الكاروسيل</p>
-            <p className='text-sm'>اضغط على "إضافة عنصر" لبدء إضافة عناصر الكاروسيل</p>
+            <p>No carousel items</p>
+            <p className='text-sm'>Click "Add Item" to start adding carousel items</p>
           </div>
         ) : (
           carouselItems.map((item, index) => (
           <div key={index} className='border rounded-lg p-4 space-y-4'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
-                <h4 className='font-semibold'>عنصر الكاروسيل {index + 1}</h4>
+                <h4 className='font-semibold'>Carousel Item {index + 1}</h4>
                 {(!item.title.trim() || !item.buttonCaption.trim() || !item.image.trim() || !item.url.trim()) && (
                   <span className='text-xs text-orange-500 bg-orange-50 px-2 py-1 rounded'>
-                    غير مكتمل
+                    Incomplete
                   </span>
                 )}
               </div>
@@ -139,33 +139,33 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
                 disabled={carouselItems.length <= 1}
               >
                 <Trash2 className='h-4 w-4 ml-2' />
-                حذف
+                Delete
               </Button>
             </div>
             
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div className='space-y-2'>
-                <Label htmlFor={`carouselTitle${index}`}>العنوان</Label>
+                <Label htmlFor={`carouselTitle${index}`}>Title</Label>
                 <Input
                   id={`carouselTitle${index}`}
                   value={item.title}
                   onChange={(e) => handleCarouselChange(index, 'title', e.target.value)}
-                  placeholder='عنوان الكاروسيل'
+                  placeholder='Carousel title'
                 />
               </div>
               <div className='space-y-2'>
-                <Label htmlFor={`carouselButton${index}`}>نص الزر</Label>
+                <Label htmlFor={`carouselButton${index}`}>Button Text</Label>
                 <Input
                   id={`carouselButton${index}`}
                   value={item.buttonCaption}
                   onChange={(e) => handleCarouselChange(index, 'buttonCaption', e.target.value)}
-                  placeholder='نص الزر'
+                  placeholder='Button text'
                 />
               </div>
             </div>
             
             <div className='space-y-2'>
-              <Label htmlFor={`carouselUrl${index}`}>رابط الزر</Label>
+              <Label htmlFor={`carouselUrl${index}`}>Button URL</Label>
               <Input
                 id={`carouselUrl${index}`}
                 value={item.url}
@@ -173,13 +173,13 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
                 placeholder='/search?category=example'
               />
               <p className='text-xs text-muted-foreground'>
-                سيتم إنشاء الرابط تلقائياً عند تغيير العنوان، أو يمكنك تعديله يدوياً
+                URL will be auto-generated when changing the title, or you can edit it manually
               </p>
             </div>
             
             <div className='space-y-4'>
               <div className='space-y-2'>
-                <Label>صورة الكاروسيل</Label>
+                <Label>Carousel Image</Label>
                 <div className='flex items-center gap-4'>
                   <div className='w-32 h-20 rounded-lg overflow-hidden border border-gray-200'>
                     <img
@@ -213,10 +213,10 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
                       disabled={uploadingImages.has(index) || isUploading}
                     >
                       <Upload className='h-4 w-4 ml-2' />
-                      {uploadingImages.has(index) || isUploading ? 'جاري الرفع...' : 'رفع صورة جديدة'}
+                      {uploadingImages.has(index) || isUploading ? 'Uploading...' : 'Upload New Image'}
                     </Button>
                     <p className='text-xs text-muted-foreground'>
-                      الصورة الحالية: {item.image.length > 50 ? `${item.image.substring(0, 50)}...` : item.image}
+                      Current image: {item.image.length > 50 ? `${item.image.substring(0, 50)}...` : item.image}
                     </p>
                   </div>
                 </div>

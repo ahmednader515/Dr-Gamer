@@ -21,13 +21,13 @@ export default function DeliverySettings({ deliverySettings, onDeliverySettingsC
       <CardHeader>
         <CardTitle className='text-xl flex items-center gap-2'>
           <Truck className='h-5 w-5' />
-          إعدادات التوصيل
+          Delivery Settings
         </CardTitle>
       </CardHeader>
       <CardContent className='space-y-6'>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
           <div className='space-y-2'>
-            <Label htmlFor='deliveryTimeHours'>وقت التوصيل (بالساعات)</Label>
+            <Label htmlFor='deliveryTimeHours'>Delivery Time (in hours)</Label>
             <Input
               id='deliveryTimeHours'
               type='number'
@@ -37,13 +37,13 @@ export default function DeliverySettings({ deliverySettings, onDeliverySettingsC
                 ...deliverySettings,
                 deliveryTimeHours: parseInt(e.target.value) || 1
               })}
-              placeholder='مثال: 4'
+              placeholder='Example: 4'
             />
-            <p className='text-xs text-muted-foreground'>الوقت المتوقع للتوصيل</p>
+            <p className='text-xs text-muted-foreground'>Expected delivery time</p>
           </div>
           
           <div className='space-y-2'>
-            <Label htmlFor='deliveryPrice'>سعر التوصيل</Label>
+            <Label htmlFor='deliveryPrice'>Delivery Price</Label>
             <Input
               id='deliveryPrice'
               type='number'
@@ -54,13 +54,13 @@ export default function DeliverySettings({ deliverySettings, onDeliverySettingsC
                 ...deliverySettings,
                 deliveryPrice: parseFloat(e.target.value) || 0
               })}
-              placeholder='مثال: 4.99'
+              placeholder='Example: 4.99'
             />
-            <p className='text-xs text-muted-foreground'>سعر التوصيل لكل طلب</p>
+            <p className='text-xs text-muted-foreground'>Delivery price per order</p>
           </div>
           
           <div className='space-y-2'>
-            <Label htmlFor='freeShippingThreshold'>حد التوصيل المجاني</Label>
+            <Label htmlFor='freeShippingThreshold'>Free Shipping Threshold</Label>
             <Input
               id='freeShippingThreshold'
               type='number'
@@ -71,9 +71,9 @@ export default function DeliverySettings({ deliverySettings, onDeliverySettingsC
                 ...deliverySettings,
                 freeShippingThreshold: parseFloat(e.target.value) || 0
               })}
-              placeholder='مثال: 50'
+              placeholder='Example: 50'
             />
-            <p className='text-xs text-muted-foreground'>الحد الأدنى للطلب للحصول على توصيل مجاني</p>
+            <p className='text-xs text-muted-foreground'>Minimum order amount for free shipping</p>
           </div>
         </div>
       </CardContent>

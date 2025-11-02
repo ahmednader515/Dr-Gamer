@@ -31,8 +31,8 @@ const AdminOrderDetailsPage = async (props: {
   }
 
   return (
-    <main className='max-w-6xl mx-auto p-4'>
-      <div className='flex mb-4'>
+    <main className='max-w-6xl mx-auto p-4 ltr' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <div className='flex mb-4 text-left'>
         <Link href='/admin/orders'>Orders</Link> <span className='mx-1'>›</span>
         <Link href={`/admin/orders/${order.id}`}>{order.id}</Link>
       </div>

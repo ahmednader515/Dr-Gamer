@@ -109,10 +109,10 @@ export default function SettingsForm({ setting }: { setting: any }) {
 
   const addCarouselItem = () => {
     const newItem: CarouselItem = {
-      title: 'عنوان جديد',
-      buttonCaption: 'زر جديد',
+      title: 'New Title',
+      buttonCaption: 'New Button',
       image: '/images/banner1.jpg',
-      url: '/search?category=عنوان جديد'
+      url: '/search?category=new-title'
     }
     
     setCarouselItems(prev => [...prev, newItem])
@@ -124,8 +124,8 @@ export default function SettingsForm({ setting }: { setting: any }) {
       setCarouselItems(newCarouselItems)
     } else {
       toast({
-        title: 'لا يمكن الحذف',
-        description: 'يجب أن يحتوي الكاروسيل على عنصر واحد على الأقل',
+        title: 'Cannot Delete',
+        description: 'Carousel must contain at least one item',
         variant: 'destructive'
       })
     }
@@ -146,8 +146,8 @@ export default function SettingsForm({ setting }: { setting: any }) {
         setCarouselItems(newCarouselItems)
         
         toast({
-          title: 'تم تحديث الصورة',
-          description: 'تم رفع الصورة بنجاح إلى الخادم',
+          title: 'Image Updated',
+          description: 'Image uploaded successfully to server',
           variant: 'default'
         })
       } else {
@@ -156,8 +156,8 @@ export default function SettingsForm({ setting }: { setting: any }) {
     } catch (error) {
       console.error('Image upload error:', error)
       toast({
-        title: 'خطأ في رفع الصورة',
-        description: 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.',
+        title: 'Image Upload Error',
+        description: 'Failed to upload image. Please try again.',
         variant: 'destructive'
       })
     } finally {
@@ -175,7 +175,7 @@ export default function SettingsForm({ setting }: { setting: any }) {
       seasonalDiscounts: [
         ...productPricing.seasonalDiscounts,
         {
-          name: 'خصم جديد',
+          name: 'New Discount',
           startDate: new Date().toISOString().split('T')[0],
           endDate: new Date().toISOString().split('T')[0],
           discountRate: 10,
@@ -216,8 +216,8 @@ export default function SettingsForm({ setting }: { setting: any }) {
 
       if (validCarouselItems.length === 0) {
         toast({
-          title: 'خطأ في التحقق',
-          description: 'يجب أن يحتوي الكاروسيل على عنصر واحد صالح على الأقل',
+          title: 'Validation Error',
+          description: 'Carousel must contain at least one valid item',
           variant: 'destructive'
         })
         setIsLoading(false)
@@ -237,14 +237,14 @@ export default function SettingsForm({ setting }: { setting: any }) {
       const res = await updateSetting(newSetting)
       if (!res.success) {
         toast({
-          title: 'خطأ في الحفظ',
+          title: 'Save Error',
           description: res.message,
           variant: 'destructive'
         })
       } else {
         toast({
-          title: 'تم حفظ الإعدادات',
-          description: 'تم تحديث إعدادات الموقع بنجاح',
+          title: 'Settings Saved',
+          description: 'Site settings updated successfully',
           variant: 'default'
         })
       }
@@ -252,8 +252,8 @@ export default function SettingsForm({ setting }: { setting: any }) {
     } catch (error) {
       console.error('Settings save error:', error)
       toast({
-        title: 'خطأ في الحفظ',
-        description: 'فشل في حفظ الإعدادات. يرجى المحاولة مرة أخرى.',
+        title: 'Save Error',
+        description: 'Failed to save settings. Please try again.',
         variant: 'destructive'
       })
     } finally {
@@ -269,11 +269,11 @@ export default function SettingsForm({ setting }: { setting: any }) {
           <div className='flex items-center justify-between'>
             <CardTitle className='text-xl flex items-center gap-2'>
               <ImageIcon className='h-5 w-5' />
-              إعدادات الكاروسيل
+              Carousel Settings
             </CardTitle>
             <Button onClick={addCarouselItem} size='sm'>
               <Plus className='h-4 w-4 ml-2' />
-              إضافة عنصر
+              Add Item
             </Button>
           </div>
         </CardHeader>
@@ -281,18 +281,18 @@ export default function SettingsForm({ setting }: { setting: any }) {
           {carouselItems.length === 0 ? (
             <div className='text-center py-8 text-muted-foreground'>
               <ImageIcon className='h-12 w-12 mx-auto mb-4 opacity-50' />
-              <p>لا توجد عناصر في الكاروسيل</p>
-              <p className='text-sm'>اضغط على "إضافة عنصر" لبدء إضافة عناصر الكاروسيل</p>
+              <p>No carousel items</p>
+              <p className='text-sm'>Click "Add Item" to start adding carousel items</p>
             </div>
           ) : (
             carouselItems.map((item, index) => (
             <div key={index} className='border rounded-lg p-4 space-y-4'>
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                  <h4 className='font-semibold'>عنصر الكاروسيل {index + 1}</h4>
+                  <h4 className='font-semibold'>Carousel Item {index + 1}</h4>
                   {(!item.title.trim() || !item.buttonCaption.trim() || !item.image.trim() || !item.url.trim()) && (
                     <span className='text-xs text-orange-500 bg-orange-50 px-2 py-1 rounded'>
-                      غير مكتمل
+                      Incomplete
                     </span>
                   )}
                 </div>
@@ -303,33 +303,33 @@ export default function SettingsForm({ setting }: { setting: any }) {
                   disabled={carouselItems.length <= 1}
                 >
                   <Trash2 className='h-4 w-4 ml-2' />
-                  حذف
+                  Delete
                 </Button>
               </div>
               
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div className='space-y-2'>
-                  <Label htmlFor={`carouselTitle${index}`}>العنوان</Label>
+                  <Label htmlFor={`carouselTitle${index}`}>Title</Label>
                   <Input
                     id={`carouselTitle${index}`}
                     value={item.title}
                     onChange={(e) => handleCarouselChange(index, 'title', e.target.value)}
-                    placeholder='عنوان الكاروسيل'
+                    placeholder='Carousel title'
                   />
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor={`carouselButton${index}`}>نص الزر</Label>
+                  <Label htmlFor={`carouselButton${index}`}>Button Text</Label>
                   <Input
                     id={`carouselButton${index}`}
                     value={item.buttonCaption}
                     onChange={(e) => handleCarouselChange(index, 'buttonCaption', e.target.value)}
-                    placeholder='نص الزر'
+                    placeholder='Button text'
                   />
                 </div>
               </div>
               
               <div className='space-y-2'>
-                <Label htmlFor={`carouselUrl${index}`}>رابط الزر</Label>
+                <Label htmlFor={`carouselUrl${index}`}>Button URL</Label>
                 <Input
                   id={`carouselUrl${index}`}
                   value={item.url}
@@ -337,13 +337,13 @@ export default function SettingsForm({ setting }: { setting: any }) {
                   placeholder='/search?category=example'
                 />
                 <p className='text-xs text-muted-foreground'>
-                  سيتم إنشاء الرابط تلقائياً عند تغيير العنوان، أو يمكنك تعديله يدوياً
+                  URL will be auto-generated when changing the title, or you can edit it manually
                 </p>
               </div>
               
               <div className='space-y-4'>
                 <div className='space-y-2'>
-                  <Label>صورة الكاروسيل</Label>
+                  <Label>Carousel Image</Label>
                   <div className='flex items-center gap-4'>
                     {/* Current Image Preview */}
                     <div className='w-32 h-20 rounded-lg overflow-hidden border border-gray-200'>
@@ -379,10 +379,10 @@ export default function SettingsForm({ setting }: { setting: any }) {
                         disabled={uploadingImages.has(index) || isUploading}
                       >
                         <Upload className='h-4 w-4 ml-2' />
-                        {uploadingImages.has(index) || isUploading ? 'جاري الرفع...' : 'رفع صورة جديدة'}
+                        {uploadingImages.has(index) || isUploading ? 'Uploading...' : 'Upload New Image'}
                       </Button>
                       <p className='text-xs text-muted-foreground'>
-                        الصورة الحالية: {item.image.length > 50 ? `${item.image.substring(0, 50)}...` : item.image}
+                        Current image: {item.image.length > 50 ? `${item.image.substring(0, 50)}...` : item.image}
                       </p>
                     </div>
                   </div>
@@ -401,13 +401,13 @@ export default function SettingsForm({ setting }: { setting: any }) {
         <CardHeader>
           <CardTitle className='text-xl flex items-center gap-2'>
             <Truck className='h-5 w-5' />
-            إعدادات التوصيل
+            Delivery Settings
           </CardTitle>
         </CardHeader>
         <CardContent className='space-y-6'>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             <div className='space-y-2'>
-              <Label htmlFor='deliveryTimeHours'>وقت التوصيل (بالساعات)</Label>
+              <Label htmlFor='deliveryTimeHours'>Delivery Time (in hours)</Label>
               <Input
                 id='deliveryTimeHours'
                 type='number'
@@ -417,13 +417,13 @@ export default function SettingsForm({ setting }: { setting: any }) {
                   ...deliverySettings,
                   deliveryTimeHours: parseInt(e.target.value) || 1
                 })}
-                placeholder='مثال: 4'
+                placeholder='Example: 4'
               />
-              <p className='text-xs text-muted-foreground'>الوقت المتوقع للتوصيل</p>
+              <p className='text-xs text-muted-foreground'>Expected delivery time</p>
             </div>
             
             <div className='space-y-2'>
-              <Label htmlFor='deliveryPrice'>سعر التوصيل</Label>
+              <Label htmlFor='deliveryPrice'>Delivery Price</Label>
               <Input
                 id='deliveryPrice'
                 type='number'
@@ -434,13 +434,13 @@ export default function SettingsForm({ setting }: { setting: any }) {
                   ...deliverySettings,
                   deliveryPrice: parseFloat(e.target.value) || 0
                 })}
-                placeholder='مثال: 4.99'
+                placeholder='Example: 4.99'
               />
-              <p className='text-xs text-muted-foreground'>سعر التوصيل لكل طلب</p>
+              <p className='text-xs text-muted-foreground'>Delivery price per order</p>
             </div>
             
             <div className='space-y-2'>
-              <Label htmlFor='freeShippingThreshold'>حد التوصيل المجاني</Label>
+              <Label htmlFor='freeShippingThreshold'>Free Shipping Threshold</Label>
               <Input
                 id='freeShippingThreshold'
                 type='number'
@@ -451,9 +451,9 @@ export default function SettingsForm({ setting }: { setting: any }) {
                   ...deliverySettings,
                   freeShippingThreshold: parseFloat(e.target.value) || 0
                 })}
-                placeholder='مثال: 50'
+                placeholder='Example: 50'
               />
-              <p className='text-xs text-muted-foreground'>الحد الأدنى للطلب للحصول على توصيل مجاني</p>
+              <p className='text-xs text-muted-foreground'>Minimum order amount for free shipping</p>
             </div>
           </div>
         </CardContent>
@@ -464,14 +464,14 @@ export default function SettingsForm({ setting }: { setting: any }) {
         <CardHeader>
           <CardTitle className='text-xl flex items-center gap-2'>
             <Calculator className='h-5 w-5' />
-            إعدادات الضرائب
+            Tax Settings
           </CardTitle>
         </CardHeader>
         <CardContent className='space-y-6'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             <div className='space-y-4'>
               <div className='space-y-2'>
-                <Label htmlFor='taxRate'>معدل الضريبة (%)</Label>
+                <Label htmlFor='taxRate'>Tax Rate (%)</Label>
                 <Input
                   id='taxRate'
                   type='number'
@@ -486,7 +486,7 @@ export default function SettingsForm({ setting }: { setting: any }) {
                 />
               </div>
               <div className='space-y-2'>
-                <Label htmlFor='taxExemptThreshold'>حد الإعفاء الضريبي</Label>
+                <Label htmlFor='taxExemptThreshold'>Tax Exempt Threshold</Label>
                 <Input
                   id='taxExemptThreshold'
                   type='number'
@@ -499,7 +499,7 @@ export default function SettingsForm({ setting }: { setting: any }) {
                   })}
                 />
               </div>
-              <div className='flex items-center space-x-2 rtl:space-x-reverse'>
+              <div className='flex items-center space-x-2 ltr:space-x-reverse'>
                 <Switch
                   id='taxIncluded'
                   checked={taxSettings.taxIncluded}
@@ -508,16 +508,16 @@ export default function SettingsForm({ setting }: { setting: any }) {
                     taxIncluded: checked
                   })}
                 />
-                <Label htmlFor='taxIncluded'>الضريبة مشمولة في السعر</Label>
+                <Label htmlFor='taxIncluded'>Tax Included in Price</Label>
               </div>
             </div>
             
             <div className='space-y-4'>
               <div className='space-y-2'>
-                <Label htmlFor='taxExemptCategories'>فئات الإعفاء الضريبي</Label>
+                <Label htmlFor='taxExemptCategories'>Tax Exempt Categories</Label>
                 <Textarea
                   id='taxExemptCategories'
-                  placeholder='أدخل الفئات مفصولة بفواصل (مثال: prescription-medications, medical-devices)'
+                  placeholder='Enter categories separated by commas (e.g.: prescription-medications, medical-devices)'
                   value={taxSettings.taxExemptCategories.join(', ')}
                   onChange={(e) => setTaxSettings({
                     ...taxSettings,
@@ -536,13 +536,13 @@ export default function SettingsForm({ setting }: { setting: any }) {
         <CardHeader>
           <CardTitle className='text-xl flex items-center gap-2'>
             <DollarSign className='h-5 w-5' />
-            إعدادات تسعير المنتجات
+            Product Pricing Settings
           </CardTitle>
         </CardHeader>
         <CardContent className='space-y-6'>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             <div className='space-y-2'>
-              <Label htmlFor='defaultMarkup'>الهامش الافتراضي (%)</Label>
+              <Label htmlFor='defaultMarkup'>Default Markup (%)</Label>
               <Input
                 id='defaultMarkup'
                 type='number'
@@ -556,7 +556,7 @@ export default function SettingsForm({ setting }: { setting: any }) {
               />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='bulkDiscountThreshold'>حد الخصم بالجملة</Label>
+              <Label htmlFor='bulkDiscountThreshold'>Bulk Discount Threshold</Label>
               <Input
                 id='bulkDiscountThreshold'
                 type='number'
@@ -569,7 +569,7 @@ export default function SettingsForm({ setting }: { setting: any }) {
               />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='bulkDiscountRate'>نسبة الخصم بالجملة (%)</Label>
+              <Label htmlFor='bulkDiscountRate'>Bulk Discount Rate (%)</Label>
               <Input
                 id='bulkDiscountRate'
                 type='number'
@@ -588,10 +588,10 @@ export default function SettingsForm({ setting }: { setting: any }) {
           {/* Seasonal Discounts */}
           <div className='space-y-4'>
             <div className='flex items-center justify-between'>
-              <h4 className='font-semibold text-lg'>الخصومات الموسمية</h4>
+              <h4 className='font-semibold text-lg'>Seasonal Discounts</h4>
               <Button onClick={addSeasonalDiscount} size='sm'>
                 <Plus className='h-4 w-4 ml-2' />
-                إضافة خصم موسمي
+                Add Seasonal Discount
               </Button>
             </div>
             
@@ -599,29 +599,29 @@ export default function SettingsForm({ setting }: { setting: any }) {
               {productPricing.seasonalDiscounts.map((discount, index) => (
                 <div key={index} className='border rounded-lg p-4 space-y-4'>
                   <div className='flex items-center justify-between'>
-                    <h5 className='font-medium'>الخصم الموسمي {index + 1}</h5>
+                    <h5 className='font-medium'>Seasonal Discount {index + 1}</h5>
                     <Button
                       variant='destructive'
                       size='sm'
                       onClick={() => removeSeasonalDiscount(index)}
                     >
                       <Trash2 className='h-4 w-4 ml-2' />
-                      حذف
+                      Delete
                     </Button>
                   </div>
                   
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <div className='space-y-2'>
-                      <Label htmlFor={`discountName${index}`}>اسم الخصم</Label>
+                      <Label htmlFor={`discountName${index}`}>Discount Name</Label>
                       <Input
                         id={`discountName${index}`}
                         value={discount.name}
                         onChange={(e) => updateSeasonalDiscount(index, 'name', e.target.value)}
-                        placeholder='اسم الخصم'
+                        placeholder='Discount name'
                       />
                     </div>
                     <div className='space-y-2'>
-                      <Label htmlFor={`discountRate${index}`}>نسبة الخصم (%)</Label>
+                      <Label htmlFor={`discountRate${index}`}>Discount Rate (%)</Label>
                       <Input
                         id={`discountRate${index}`}
                         type='number'
@@ -636,7 +636,7 @@ export default function SettingsForm({ setting }: { setting: any }) {
                   
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <div className='space-y-2'>
-                      <Label htmlFor={`startDate${index}`}>تاريخ البداية</Label>
+                      <Label htmlFor={`startDate${index}`}>Start Date</Label>
                       <Input
                         id={`startDate${index}`}
                         type='date'
@@ -645,7 +645,7 @@ export default function SettingsForm({ setting }: { setting: any }) {
                       />
                     </div>
                     <div className='space-y-2'>
-                      <Label htmlFor={`endDate${index}`}>تاريخ النهاية</Label>
+                      <Label htmlFor={`endDate${index}`}>End Date</Label>
                       <Input
                         id={`endDate${index}`}
                         type='date'
@@ -656,10 +656,10 @@ export default function SettingsForm({ setting }: { setting: any }) {
                   </div>
                   
                   <div className='space-y-2'>
-                    <Label htmlFor={`applicableCategories${index}`}>الفئات المطبقة</Label>
+                    <Label htmlFor={`applicableCategories${index}`}>Applicable Categories</Label>
                     <Textarea
                       id={`applicableCategories${index}`}
-                      placeholder='أدخل الفئات مفصولة بفواصل (مثال: vitamins, supplements)'
+                      placeholder='Enter categories separated by commas (e.g.: vitamins, supplements)'
                       value={discount.applicableCategories.join(', ')}
                       onChange={(e) => updateSeasonalDiscount(index, 'applicableCategories', e.target.value.split(',').map(cat => cat.trim()).filter(cat => cat))}
                       rows={2}
@@ -678,7 +678,7 @@ export default function SettingsForm({ setting }: { setting: any }) {
       <div className='flex justify-end'>
         <Button onClick={handleSubmit} disabled={isLoading} size='lg'>
           <Save className='h-4 w-4 ml-2' />
-          {isLoading ? 'جاري الحفظ...' : 'حفظ جميع الإعدادات'}
+          {isLoading ? 'Saving...' : 'Save All Settings'}
         </Button>
       </div>
     </div>

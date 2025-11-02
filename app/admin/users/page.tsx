@@ -34,25 +34,25 @@ export default async function AdminUser(props: {
   })
   
   return (
-    <div className='space-y-4 rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
-      <h1 className='h1-bold'>المستخدمون</h1>
+    <div className='space-y-4 ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <h1 className='h1-bold'>Users</h1>
       
       {/* Desktop Table - Hidden on mobile */}
       <div className='hidden md:block overflow-x-auto'>
         <Table className="admin-table border border-gray-300 rounded-lg overflow-hidden shadow-lg">
           <TableHeader>
             <TableRow className="bg-gray-100 border-b-2 border-gray-300">
-              <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>الاسم</TableHead>
-              <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>البريد الإلكتروني</TableHead>
-              <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>الدور</TableHead>
-              <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>تاريخ التسجيل</TableHead>
-              <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>الإجراءات</TableHead>
+              <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Name</TableHead>
+              <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Email</TableHead>
+              <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Role</TableHead>
+              <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Registered</TableHead>
+              <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {users?.data.map((user) => (
-              <TableRow key={user.id} className="border-b border-gray-200">
-                <TableCell className='text-right py-4 px-4'>
+              <TableRow key={user.id} className="bg-gray-800 hover:bg-gray-700 border-b border-gray-700">
+                <TableCell className='text-left py-4 px-4'>
                   <div>
                     <div className='font-medium'>{user.name}</div>
                     {user.email && (
@@ -60,10 +60,10 @@ export default async function AdminUser(props: {
                     )}
                   </div>
                 </TableCell>
-                <TableCell className='text-right py-4 px-4'>
-                  {user.email || 'غير متوفر'}
+                <TableCell className='text-left py-4 px-4'>
+                  {user.email || 'Not available'}
                 </TableCell>
-                <TableCell className='text-right py-4 px-4'>
+                <TableCell className='text-left py-4 px-4'>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     user.role === 'Admin' 
                       ? 'bg-purple-100 text-purple-800' 
@@ -71,16 +71,16 @@ export default async function AdminUser(props: {
                         ? 'bg-blue-100 text-blue-800'
                         : 'bg-purple-100 text-purple-800'
                   }`}>
-                    {user.role === 'Admin' ? 'مدير' : user.role === 'Moderator' ? 'مشرف' : 'مستخدم'}
+                    {user.role === 'Admin' ? 'Admin' : user.role === 'Moderator' ? 'Moderator' : 'User'}
                   </span>
                 </TableCell>
-                <TableCell className='text-right py-4 px-4'>
+                <TableCell className='text-left py-4 px-4'>
                   {formatDateTime(user.createdAt).dateTime}
                 </TableCell>
-                <TableCell className='text-right py-4 px-4'>
+                <TableCell className='text-left py-4 px-4'>
                   <Button asChild size='sm'>
                     <Link href={`/admin/users/${user.id}`}>
-                      تعديل
+                      Edit
                     </Link>
                   </Button>
                 </TableCell>
@@ -109,13 +109,13 @@ export default async function AdminUser(props: {
                     ? 'bg-blue-100 text-blue-800'
                     : 'bg-purple-100 text-purple-800'
               }`}>
-                {user.role === 'Admin' ? 'مدير' : user.role === 'Moderator' ? 'مشرف' : 'مستخدم'}
+                {user.role === 'Admin' ? 'Admin' : user.role === 'Moderator' ? 'Moderator' : 'User'}
               </span>
             </div>
 
             {/* Registration Date */}
             <div className="border-t border-gray-100 pt-3">
-              <div className="text-sm text-gray-600 mb-1">تاريخ التسجيل:</div>
+              <div className="text-sm text-gray-600 mb-1">Registered:</div>
               <div className="text-sm text-gray-900">
                 {formatDateTime(user.createdAt).dateTime}
               </div>
@@ -125,7 +125,7 @@ export default async function AdminUser(props: {
             <div className="border-t border-gray-100 pt-3">
               <Button asChild size='sm' className="w-full">
                 <Link href={`/admin/users/${user.id}`}>
-                  تعديل
+                  edit
                 </Link>
               </Button>
             </div>

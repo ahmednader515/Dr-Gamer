@@ -24,14 +24,14 @@ export default function TaxSettings({ taxSettings, onTaxSettingsChange }: TaxSet
       <CardHeader>
         <CardTitle className='text-xl flex items-center gap-2'>
           <Calculator className='h-5 w-5' />
-          إعدادات الضرائب
+          Tax Settings
         </CardTitle>
       </CardHeader>
       <CardContent className='space-y-6'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           <div className='space-y-4'>
             <div className='space-y-2'>
-              <Label htmlFor='taxRate'>معدل الضريبة (%)</Label>
+              <Label htmlFor='taxRate'>Tax Rate (%)</Label>
               <Input
                 id='taxRate'
                 type='number'
@@ -46,7 +46,7 @@ export default function TaxSettings({ taxSettings, onTaxSettingsChange }: TaxSet
               />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='taxExemptThreshold'>حد الإعفاء الضريبي</Label>
+              <Label htmlFor='taxExemptThreshold'>Tax Exempt Threshold</Label>
               <Input
                 id='taxExemptThreshold'
                 type='number'
@@ -59,7 +59,7 @@ export default function TaxSettings({ taxSettings, onTaxSettingsChange }: TaxSet
                 })}
               />
             </div>
-            <div className='flex items-center space-x-2 rtl:space-x-reverse'>
+            <div className='flex items-center space-x-2 ltr:space-x-reverse'>
               <Switch
                 id='taxIncluded'
                 checked={taxSettings.taxIncluded}
@@ -68,16 +68,16 @@ export default function TaxSettings({ taxSettings, onTaxSettingsChange }: TaxSet
                   taxIncluded: checked
                 })}
               />
-              <Label htmlFor='taxIncluded'>الضريبة مشمولة في السعر</Label>
+              <Label htmlFor='taxIncluded'>Tax Included in Price</Label>
             </div>
           </div>
           
           <div className='space-y-4'>
             <div className='space-y-2'>
-              <Label htmlFor='taxExemptCategories'>فئات الإعفاء الضريبي</Label>
+                <Label htmlFor='taxExemptCategories'>Tax Exempt Categories</Label>
               <Textarea
                 id='taxExemptCategories'
-                placeholder='أدخل الفئات مفصولة بفواصل (مثال: prescription-medications, medical-devices)'
+                placeholder='Enter categories separated by commas (e.g.: prescription-medications, medical-devices)'
                 value={taxSettings.taxExemptCategories.join(', ')}
                 onChange={(e) => onTaxSettingsChange({
                   ...taxSettings,

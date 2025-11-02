@@ -7,7 +7,7 @@ import SettingsTabsContent from './settings-tabs-content'
 import { getSetting } from '@/lib/actions/setting.actions'
 
 export const metadata: Metadata = {
-  title: 'إعدادات الموقع - لوحة الإدارة',
+  title: 'Site Settings - Admin Panel',
 }
 
 export default async function SettingsPage() {
@@ -18,36 +18,36 @@ export default async function SettingsPage() {
   const setting = await getSetting()
 
   return (
-    <div className='space-y-6 rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
+    <div className='space-y-6 ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
       <div>
-        <h1 className='text-3xl font-bold mb-2'>إعدادات الموقع</h1>
+        <h1 className='text-3xl font-bold mb-2'>Site Settings</h1>
         <p className='text-muted-foreground'>
-          قم بإدارة إعدادات الموقع والفئات والمنتجات
+          Manage site settings, categories and products
         </p>
       </div>
       
-      <Tabs defaultValue="carousel" className="w-full" dir="rtl">
+      <Tabs defaultValue="carousel" className="w-full" dir="ltr">
         <div className="mb-6">
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 h-auto">
             <TabsTrigger value="carousel" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
-              <span className="hidden sm:inline">الكاروسيل</span>
-              <span className="sm:hidden">كاروسيل</span>
+              <span className="hidden sm:inline">Carousel</span>
+              <span className="sm:hidden">Carousel</span>
             </TabsTrigger>
             <TabsTrigger value="categories" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
-              <span className="hidden sm:inline">إدارة الفئات</span>
-              <span className="sm:hidden">فئات</span>
+              <span className="hidden sm:inline">Manage Categories</span>
+              <span className="sm:hidden">Categories</span>
             </TabsTrigger>
             <TabsTrigger value="delivery" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
-              <span className="hidden sm:inline">التوصيل</span>
-              <span className="sm:hidden">توصيل</span>
+              <span className="hidden sm:inline">Delivery</span>
+              <span className="sm:hidden">Delivery</span>
             </TabsTrigger>
             <TabsTrigger value="tax" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
-              <span className="hidden sm:inline">الضرائب</span>
-              <span className="sm:hidden">ضرائب</span>
+              <span className="hidden sm:inline">Tax</span>
+              <span className="sm:hidden">Tax</span>
             </TabsTrigger>
             <TabsTrigger value="pricing" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
-              <span className="hidden sm:inline">التسعير</span>
-              <span className="sm:hidden">سعر</span>
+              <span className="hidden sm:inline">Pricing</span>
+              <span className="sm:hidden">Pricing</span>
             </TabsTrigger>
           </TabsList>
         </div>

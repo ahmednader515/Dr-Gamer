@@ -13,7 +13,7 @@ export default function BrowsingHistoryList() {
   if (products.length === 0) {
     return (
       <Card>
-        <CardContent className='p-6 text-center font-cairo' dir="rtl">
+        <CardContent className='p-6 text-center font-cairo' dir="ltr">
           <Clock className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
           <h3 className='text-lg font-semibold mb-2'>لا يوجد سجل تصفح</h3>
           <p className='text-muted-foreground mb-4'>
@@ -42,7 +42,7 @@ export default function BrowsingHistoryList() {
   }
 
   return (
-    <div className='space-y-4 font-cairo' dir="rtl">
+    <div className='space-y-4 font-cairo' dir="ltr">
       <div className='flex items-center justify-between'>
         <h2 className='text-2xl font-bold text-gray-800'>سجل التصفح</h2>
         <Button variant='outline' onClick={clear}>

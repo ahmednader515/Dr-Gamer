@@ -25,12 +25,12 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'تم حذف كود الخصم بنجاح'
+      message: 'تم Delete كود الخصم بنجاح'
     })
   } catch (error) {
     console.error('Error deleting promo code:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في حذف كود الخصم' },
+      { success: false, message: 'حدث خطأ في Delete كود الخصم' },
       { status: 500 }
     )
   }

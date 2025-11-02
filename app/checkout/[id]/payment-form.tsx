@@ -115,7 +115,7 @@ export default function OrderDetailsForm({
   console.log('Is paid:', isPaid)
 
   return (
-    <main className='max-w-6xl mx-auto px-4 py-6' dir='rtl'>
+    <main className='max-w-6xl mx-auto px-4 py-6' dir='ltr'>
       <div className='mb-6'>
         <h1 className='text-2xl sm:text-3xl font-bold text-purple-400 mb-2'>
           ✓ تم استلام طلبك بنجاح

@@ -38,16 +38,18 @@ export default async function AdminLayout({
   
   return (
     <>
-      <div className='flex flex-col min-h-screen rtl admin-container' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <div className='flex flex-col min-h-screen ltr admin-container' style={{ fontFamily: 'Cairo, sans-serif' }}>
         <div className='bg-black text-white relative'>
           <div className='flex items-center justify-between h-16 px-4 py-2'>
+            {/* Desktop Navigation Links on the left - hidden on mobile */}
+            <div className='hidden md:block'>
+              <DesktopNav navigation={navigation} />
+            </div>
+            
             {/* Menu button on the left - visible only on mobile */}
             <div className='md:hidden'>
               <AdminNav userRole={userRole as string} />
             </div>
-            
-            {/* Desktop Navigation Links - hidden on mobile */}
-            <DesktopNav navigation={navigation} />
             
             {/* Logo on the right */}
             <Link href='/' className='flex items-center'>
@@ -61,7 +63,7 @@ export default async function AdminLayout({
             </Link>
           </div>
         </div>
-        <main className='flex-1 p-3 sm:p-4 lg:p-6 rtl admin-container' style={{ fontFamily: 'Cairo, sans-serif' }}>{children}</main>
+        <main className='flex-1 p-3 sm:p-4 lg:p-6 ltr admin-container' style={{ fontFamily: 'Cairo, sans-serif' }}>{children}</main>
         <Footer />
       </div>
     </>

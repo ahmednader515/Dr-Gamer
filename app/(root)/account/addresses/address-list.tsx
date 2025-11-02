@@ -53,18 +53,18 @@ export default function AddressList() {
         localStorage.setItem('userAddresses', JSON.stringify(newAddresses))
         
         toast({
-          description: 'تم حذف العنوان بنجاح',
+          description: 'تم Delete العنوان بنجاح',
         })
       } else {
         toast({
           variant: 'destructive',
-          description: res.message || 'حدث خطأ أثناء حذف العنوان',
+          description: res.message || 'حدث خطأ أثناء Delete العنوان',
         })
       }
     } catch (error) {
       toast({
         variant: 'destructive',
-        description: 'حدث خطأ أثناء حذف العنوان',
+        description: 'حدث خطأ أثناء Delete العنوان',
       })
     }
   }
@@ -161,7 +161,7 @@ export default function AddressList() {
                     </span>
                   )}
                 </div>
-                <div className='text-sm text-muted-foreground space-y-1' dir="rtl">
+                <div className='text-sm text-muted-foreground space-y-1' dir="ltr">
                   <p>{address.street}</p>
                   <p>{address.city}, {address.province} {address.postalCode}</p>
                   <p>{address.country}</p>
@@ -182,7 +182,7 @@ export default function AddressList() {
                 <Button asChild variant='outline' size='sm'>
                   <Link href={`/account/addresses/edit/${index}`}>
                     <Edit className='h-4 w-4 ml-1' />
-                    تعديل
+                    edit
                   </Link>
                 </Button>
                 <Button

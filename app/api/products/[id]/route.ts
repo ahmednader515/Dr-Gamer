@@ -32,7 +32,7 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'تم حذف المنتج بنجاح',
+      message: 'تم Delete المنتج بنجاح',
       data: deletedProduct
     })
 

@@ -134,7 +134,7 @@ export async function deleteFAQCategory(id: string) {
     revalidatePath('/admin/faq')
     return {
       success: true,
-      message: 'تم حذف فئة الأسئلة بنجاح',
+      message: 'تم Delete فئة الأسئلة بنجاح',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }
@@ -204,7 +204,7 @@ export async function deleteFAQQuestion(id: string) {
     revalidatePath('/admin/faq')
     return {
       success: true,
-      message: 'تم حذف السؤال بنجاح',
+      message: 'تم Delete السؤال بنجاح',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }

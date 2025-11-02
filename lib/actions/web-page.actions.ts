@@ -60,7 +60,7 @@ export async function deleteWebPage(id: string) {
     revalidatePath('/admin/web-pages')
     return {
       success: true,
-      message: 'تم الحذف بنجاح',
+      message: 'Deleted succesfully',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }

@@ -183,7 +183,7 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
           <div className="mb-4 sm:mb-6">
             <Label className="text-sm font-semibold mb-3 sm:mb-4 block text-white">{translations.category}</Label>
             <div className="space-y-2 sm:space-y-3">
-              <div className="flex items-center space-x-2 space-x-reverse">
+              <div className="flex items-center space-x-2">
                 <Checkbox
                   id="all-categories"
                   checked={!currentCategory}
@@ -195,7 +195,7 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
                 </Label>
               </div>
               {categories.map((category) => (
-                <div key={category} className="flex items-center space-x-2 space-x-reverse">
+                <div key={category} className="flex items-center space-x-2">
                   <Checkbox
                     id={category}
                     checked={currentCategory === category}

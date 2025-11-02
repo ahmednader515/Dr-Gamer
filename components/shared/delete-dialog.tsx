@@ -30,7 +30,7 @@ export default function DeleteDialog({
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button size='sm' variant='destructive' className='shadow-sm border border-gray-200'>
-          حذف
+          Delete
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -66,7 +66,7 @@ export default function DeleteDialog({
               })
             }
           >
-            {isPending ? 'جاري الحذف...' : 'حذف'}
+            {isPending ? 'جاري الDelete...' : 'Delete'}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

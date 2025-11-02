@@ -51,7 +51,7 @@ export async function deleteAddress(address: ShippingAddress) {
     // Always use database
     
     // TODO: Implement database deletion for addresses
-    return { success: true, message: 'تم حذف العنوان بنجاح' }
+    return { success: true, message: 'تم Delete العنوان بنجاح' }
   } catch (error) {
     return { success: false, message: formatError(error) }
   }

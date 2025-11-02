@@ -265,7 +265,7 @@ export const deleteReview = async (reviewId: string, path: string) => {
     }
     return {
       success: true,
-      message: 'تم حذف التقييم بنجاح',
+      message: 'تم Delete التقييم بنجاح',
     }
   } catch (error) {
     return {

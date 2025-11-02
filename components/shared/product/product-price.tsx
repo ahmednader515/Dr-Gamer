@@ -49,7 +49,7 @@ export default function ProductPrice({
   }
 
   return (
-    <div className={cn('flex flex-col gap-1 items-start text-left', className)} dir="rtl">
+    <div className={cn('flex flex-col gap-1 items-start text-left', className)} dir="ltr">
       <span className='text-2xl font-bold text-white text-left'>
         {formatPrice(price)}
       </span>

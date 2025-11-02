@@ -39,29 +39,29 @@ type ProductListProps = {
 
 // Loading skeleton component for table rows
 const TableRowSkeleton = () => (
-  <TableRow className="animate-pulse">
-    <TableCell className='text-right py-4 px-4'>
+  <TableRow className="bg-gray-800 animate-pulse border-b border-gray-700">
+    <TableCell className='text-left py-4 px-4'>
       <div className="w-16 h-16 bg-gray-200 rounded-md"></div>
     </TableCell>
-    <TableCell className='text-right py-4 px-4'>
+    <TableCell className='text-left py-4 px-4'>
       <div className="h-4 bg-gray-200 rounded w-32"></div>
     </TableCell>
-    <TableCell className='text-right py-4 px-4'>
+    <TableCell className='text-left py-4 px-4'>
       <div className="h-4 bg-gray-200 rounded w-16"></div>
     </TableCell>
-    <TableCell className='text-right py-4 px-4'>
+    <TableCell className='text-left py-4 px-4'>
       <div className="h-4 bg-gray-200 rounded w-20"></div>
     </TableCell>
-    <TableCell className='text-right py-4 px-4'>
+    <TableCell className='text-left py-4 px-4'>
       <div className="h-6 bg-gray-200 rounded-full w-12"></div>
     </TableCell>
-    <TableCell className='text-right py-4 px-4'>
+    <TableCell className='text-left py-4 px-4'>
       <div className="h-4 bg-gray-200 rounded w-16"></div>
     </TableCell>
-    <TableCell className='text-right py-4 px-4'>
+    <TableCell className='text-left py-4 px-4'>
       <div className="h-6 bg-gray-200 rounded-full w-16"></div>
     </TableCell>
-    <TableCell className='text-right py-4 px-4'>
+    <TableCell className='text-left py-4 px-4'>
       <div className="h-4 bg-gray-200 rounded w-24"></div>
     </TableCell>
     <TableCell className='py-4 px-4'>
@@ -145,7 +145,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
       if (result.success) {
         // Show success message
         toast({
-          title: 'تم حذف المنتج بنجاح',
+          title: 'Product deleted successfully',
           description: result.message,
         })
         // Product is already removed from state
@@ -154,33 +154,33 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
         // Revert optimistic update on failure
         window.location.reload()
         toast({
-          title: 'خطأ في حذف المنتج',
-          description: result.message || 'حدث خطأ غير متوقع',
+          title: 'Error deleting product',
+          description: result.message || 'An unexpected error occurred',
           variant: 'destructive',
         })
-        return { success: false, message: result.message || 'حدث خطأ غير متوقع' }
+        return { success: false, message: result.message || 'An unexpected error occurred' }
       }
     } catch (error) {
       console.error('Error deleting product:', error)
       // Revert optimistic update on error
       window.location.reload()
       toast({
-        title: 'خطأ في حذف المنتج',
-        description: 'حدث خطأ غير متوقع أثناء الحذف',
+        title: 'Error deleting product',
+        description: 'An unexpected error occurred during deletion',
         variant: 'destructive',
       })
-      return { success: false, message: 'حدث خطأ أثناء الحذف' }
+      return { success: false, message: 'An error occurred during deletion' }
     }
   }
 
   return (
-    <div className='rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
+    <div className='ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
       <div className='space-y-4'>
         {/* Title and Create Button Row */}
         <div className='flex justify-between items-center'>
-          <h1 className='font-bold text-lg text-right'>المنتجات</h1>
+          <h1 className='font-bold text-lg text-left'>Products</h1>
           <Button asChild variant='default'>
-            <Link href='/admin/products/create'>إنشاء منتج</Link>
+            <Link href='/admin/products/create'>Create Product</Link>
           </Button>
         </div>
 
@@ -191,14 +191,14 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
             type='text'
             value={searchQuery}
             onChange={handleSearch}
-            placeholder='تصفية بالاسم أو الفئة...'
+            placeholder='Filter by name or category...'
           />
 
           <p>
             {filteredProducts.length === 0
-              ? 'لا توجد'
-              : `${startIndex + 1}-${Math.min(endIndex, filteredProducts.length)} من ${filteredProducts.length}`}
-            {' نتيجة'}
+              ? 'No'
+              : `${startIndex + 1}-${Math.min(endIndex, filteredProducts.length)} of ${filteredProducts.length}`}
+            {' results'}
           </p>
         </div>
         
@@ -207,22 +207,22 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
           <Table className="admin-table border border-gray-300 rounded-lg overflow-hidden shadow-lg">
             <TableHeader>
               <TableRow className="bg-gray-100 border-b-2 border-gray-300">
-                <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>الصورة</TableHead>
-                <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>الاسم</TableHead>
-                <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>السعر</TableHead>
-                <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>الفئة</TableHead>
-                <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>المخزون</TableHead>
-                <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>التقييم</TableHead>
-                <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>منشور</TableHead>
-                <TableHead className='text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>آخر تحديث</TableHead>
-                <TableHead className='w-[120px] text-right bg-gray-100 text-gray-800 font-semibold py-4 px-4'>الإجراءات</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Image</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Name</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Price</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Category</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Stock</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Rating</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Published</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Last Updated</TableHead>
+                <TableHead className='w-[120px] text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {currentProducts.length > 0 ? (
                 currentProducts.map((product) => (
-                  <TableRow key={product.id} className="hover:bg-gray-50 border-b border-gray-200">
-                    <TableCell className='text-right py-4 px-4'>
+                  <TableRow key={product.id} className="bg-gray-800 hover:bg-gray-700 border-b border-gray-700">
+                    <TableCell className='text-left py-4 px-4'>
                       <div className="w-16 h-16 rounded-md overflow-hidden border border-gray-200">
                         <Image
                           src={product.images[0] || '/images/placeholder.jpg'}
@@ -233,18 +233,18 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                         />
                       </div>
                     </TableCell>
-                    <TableCell className='text-right py-4 px-4'>
+                    <TableCell className='text-left py-4 px-4'>
                       <Link href={`/admin/products/${product.id}`} className="text-white hover:text-gray-300 hover:underline font-medium">
                         {product.name}
                       </Link>
                     </TableCell>
-                    <TableCell className='text-right py-4 px-4 font-semibold text-purple-700'>
-                      {product.price.toFixed(2)} ج.م
+                    <TableCell className='text-left py-4 px-4 font-semibold text-purple-700'>
+                      {product.price.toFixed(2)} EGP
                     </TableCell>
-                    <TableCell className='text-right py-4 px-4'>
+                    <TableCell className='text-left py-4 px-4'>
                       {product.category}
                     </TableCell>
-                    <TableCell className='text-right py-4 px-4'>
+                    <TableCell className='text-left py-4 px-4'>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
                         product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
@@ -253,30 +253,30 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                         {product.countInStock}
                       </span>
                     </TableCell>
-                    <TableCell className='text-right py-4 px-4'>
+                    <TableCell className='text-left py-4 px-4'>
                       <span className="flex items-center gap-1">
                         <span className="text-yellow-500">★</span>
                         <span className="font-medium">{product.avgRating}</span>
                       </span>
                     </TableCell>
-                    <TableCell className='text-right py-4 px-4'>
+                    <TableCell className='text-left py-4 px-4'>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         product.isPublished ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
                       }`}>
-                        {product.isPublished ? 'نعم' : 'لا'}
+                        {product.isPublished ? 'Yes' : 'No'}
                       </span>
                     </TableCell>
-                    <TableCell className='text-right py-4 px-4 text-sm text-gray-600'>
-                      {formatDateTime(product.updatedAt)?.dateTime || 'غير متوفر'}
+                    <TableCell className='text-left py-4 px-4 text-sm text-gray-600'>
+                      {formatDateTime(product.updatedAt)?.dateTime || 'Not available'}
                     </TableCell>
                     <TableCell className='py-4 px-4'>
                       <div className='flex flex-row gap-2 items-center'>
                         <Button asChild variant='default' size='sm'>
-                          <Link href={`/admin/products/${product.id}`}>تعديل</Link>
+                          <Link href={`/admin/products/${product.id}`}>Edit</Link>
                         </Button>
                         <Button asChild variant='secondary' size='sm'>
                           <Link target='_blank' href={`/product/${product.slug}`}>
-                            عرض
+                            View
                           </Link>
                         </Button>
                         <DeleteDialog
@@ -290,7 +290,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center py-8 text-gray-500">
-                    لا توجد منتجات
+                    No products found
                   </TableCell>
                 </TableRow>
               )}
@@ -325,11 +325,11 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                 {/* Product Details */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">السعر:</span>
-                    <span className="font-semibold text-purple-700">{product.price.toFixed(2)} ج.م</span>
+                    <span className="text-sm text-gray-600">Price:</span>
+                    <span className="font-semibold text-purple-700">{product.price.toFixed(2)} EGP</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">المخزون:</span>
+                    <span className="text-sm text-gray-600">Stock:</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
                       product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
@@ -339,24 +339,24 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">التقييم:</span>
+                    <span className="text-sm text-gray-600">Rating:</span>
                     <span className="flex items-center gap-1">
                       <span className="text-yellow-500">★</span>
                       <span className="font-medium">{product.avgRating}</span>
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">منشور:</span>
+                    <span className="text-sm text-gray-600">Published:</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       product.isPublished ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {product.isPublished ? 'نعم' : 'لا'}
+                      {product.isPublished ? 'Yes' : 'No'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">آخر تحديث:</span>
+                    <span className="text-sm text-gray-600">Last Updated:</span>
                     <span className="text-sm text-gray-600">
-                      {formatDateTime(product.updatedAt)?.dateTime || 'غير متوفر'}
+                      {formatDateTime(product.updatedAt)?.dateTime || 'Not available'}
                     </span>
                   </div>
                 </div>
@@ -365,12 +365,12 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                 <div className="border-t border-gray-100 pt-3 flex gap-2">
                   <Button asChild variant='default' size='sm' className="flex-1">
                     <Link href={`/admin/products/${product.id}`}>
-                      تعديل
+                      Edit
                     </Link>
                   </Button>
                   <Button asChild variant='secondary' size='sm' className="flex-1">
                     <Link target='_blank' href={`/product/${product.slug}`}>
-                      عرض
+                      View
                     </Link>
                   </Button>
                   <DeleteDialog
@@ -382,7 +382,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
             ))
           ) : (
             <div className="text-center py-8 text-gray-500">
-              لا توجد منتجات
+              No products
             </div>
           )}
         </div>
@@ -396,16 +396,16 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
               disabled={page <= 1}
               className='w-24'
             >
-              <ChevronRight /> السابق
+              <ChevronLeft /> Previous
             </Button>
-            صفحة {page} من {totalPages}
+            Page {page} of {totalPages}
             <Button
               variant='outline'
               onClick={() => handlePageChange(page + 1)}
               disabled={page >= totalPages}
               className='w-24'
             >
-              التالي <ChevronLeft />
+              Next <ChevronRight />
             </Button>
           </div>
         )}

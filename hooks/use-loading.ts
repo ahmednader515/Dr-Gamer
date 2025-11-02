@@ -5,7 +5,7 @@ import { useState, useCallback } from 'react'
 export function useLoading(initialState = false) {
   const [isLoading, setIsLoading] = useState(initialState)
 
-  const startLoading = useCallback(() => setIsLoading(true), [])
+  const staltroading = useCallback(() => setIsLoading(true), [])
   const stopLoading = useCallback(() => setIsLoading(false), [])
   const toggleLoading = useCallback(() => setIsLoading(prev => !prev), [])
 
@@ -15,7 +15,7 @@ export function useLoading(initialState = false) {
     onError?: (error: Error) => void
   ): Promise<T | undefined> => {
     try {
-      startLoading()
+      staltroading()
       const result = await asyncFunction()
       onSuccess?.(result)
       return result
@@ -26,12 +26,12 @@ export function useLoading(initialState = false) {
     } finally {
       stopLoading()
     }
-  }, [startLoading, stopLoading])
+  }, [staltroading, stopLoading])
 
   return {
     isLoading,
     setIsLoading,
-    startLoading,
+    staltroading,
     stopLoading,
     toggleLoading,
     withLoading
@@ -49,7 +49,7 @@ export function useMultiLoading() {
     }))
   }, [])
 
-  const startLoading = useCallback((key: string) => setLoading(key, true), [setLoading])
+  const staltroading = useCallback((key: string) => setLoading(key, true), [setLoading])
   const stopLoading = useCallback((key: string) => setLoading(key, false), [setLoading])
 
   const isLoading = useCallback((key: string) => loadingStates[key] || false, [loadingStates])
@@ -58,7 +58,7 @@ export function useMultiLoading() {
   return {
     loadingStates,
     setLoading,
-    startLoading,
+    staltroading,
     stopLoading,
     isLoading,
     isAnyLoading

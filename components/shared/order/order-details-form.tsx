@@ -54,7 +54,7 @@ export default function OrderDetailsForm({
   if (!order) {
     return (
       <div className="flex items-center justify-center h-[400px] text-muted-foreground">
-        الطلب غير موجود
+        Order not found
       </div>
     )
   }
@@ -72,7 +72,7 @@ export default function OrderDetailsForm({
   if (orderItemsList.length === 0) {
     return (
       <div className="flex items-center justify-center h-[400px] text-muted-foreground">
-        لا توجد منتجات في الطلب
+        No products in this order
         <br />
         <small className="text-xs mt-2">
           Items: {items?.length || 0}, OrderItems: {orderItems?.length || 0}
@@ -82,43 +82,43 @@ export default function OrderDetailsForm({
   }
 
   return (
-    <div className='grid md:grid-cols-3 md:gap-5' dir='rtl'>
+    <div className='grid md:grid-cols-3 md:gap-5' dir='ltr'>
       <div className='overflow-x-auto md:col-span-2 space-y-4'>
         
         {/* Customer Contact Info Card */}
         <Card>
           <CardContent className='p-4 gap-4'>
-            <h2 className='text-xl pb-4'>معلومات التواصل</h2>
+            <h2 className='text-xl pb-4'>Contact Information</h2>
             <div className='space-y-3'>
               <div>
-                <p className='text-sm text-gray-400'>البريد الإلكتروني:</p>
+                <p className='text-sm text-gray-400'>Email:</p>
                 <p className='text-lg font-semibold'>
-                  {customerEmail || 'غير متوفر'}
+                  {customerEmail || 'Not available'}
                 </p>
                 <p className='text-xs text-gray-400 mt-1'>
-                  سيتم إرسال المنتج الرقمي إلى هذا البريد
+                  Digital product will be sent to this email
                 </p>
               </div>
               
               <div className='border-t border-gray-700 pt-3'>
-                <p className='text-sm text-gray-400'>رقم الهاتف للتواصل:</p>
+                <p className='text-sm text-gray-400'>Contact Phone:</p>
                 <p className='text-lg font-semibold'>
-                  {customerPhone || 'غير متوفر'}
+                  {customerPhone || 'Not available'}
                 </p>
                 <p className='text-xs text-gray-400 mt-1'>
-                  للتواصل في حالة عدم توفر البريد الإلكتروني
+                  For contact if email is unavailable
                 </p>
               </div>
               
               {!isModerator && (
                 <>
                   <div className='border-t border-gray-700 pt-3'>
-                    <p className='text-sm text-gray-400'>اسم العميل:</p>
-                    <p className='text-base'>{order.user?.name || 'غير متوفر'}</p>
+                    <p className='text-sm text-gray-400'>Customer Name:</p>
+                    <p className='text-base'>{order.user?.name || 'Not available'}</p>
                   </div>
                   <div>
-                    <p className='text-sm text-gray-400'>رقم هاتف الحساب:</p>
-                    <p className='text-base'>{order.user?.phone || 'غير متوفر'}</p>
+                    <p className='text-sm text-gray-400'>Account Phone:</p>
+                    <p className='text-base'>{order.user?.phone || 'Not available'}</p>
                   </div>
                 </>
               )}
@@ -126,15 +126,15 @@ export default function OrderDetailsForm({
 
             {isDelivered ? (
               <Badge className='mt-3'>
-                تم التسليم في {deliveredAt ? formatDateTime(deliveredAt).dateTime : 'غير محدد'}
+                Delivered on {deliveredAt ? formatDateTime(deliveredAt).dateTime : 'Not specified'}
               </Badge>
             ) : (
               <div className='mt-3'>
                 {' '}
-                <Badge variant='destructive'>لم يتم التسليم بعد</Badge>
+                <Badge variant='destructive'>Not delivered yet</Badge>
                 <div className='mt-2'>
-                  <strong>موعد التسليم المتوقع:</strong> <br />
-                  {expectedDeliveryDate ? formatDateTime(expectedDeliveryDate).dateTime : 'غير محدد'}
+                  <strong>Expected Delivery:</strong> <br />
+                  {expectedDeliveryDate ? formatDateTime(expectedDeliveryDate).dateTime : 'Not specified'}
                 </div>
               </div>
             )}
@@ -144,23 +144,23 @@ export default function OrderDetailsForm({
         {/* Payment Method Card */}
         <Card>
           <CardContent className='p-4 gap-4'>
-            <h2 className='text-xl pb-4'>طريقة الدفع</h2>
+            <h2 className='text-xl pb-4'>Payment Method</h2>
             <div className='space-y-3'>
               <div>
-                <p className='text-sm text-gray-400'>طريقة الدفع:</p>
-                <p className='text-lg font-semibold'>{paymentMethod || 'غير محدد'}</p>
+                <p className='text-sm text-gray-400'>Payment Method:</p>
+                <p className='text-lg font-semibold'>{paymentMethod || 'Not specified'}</p>
               </div>
               
               {paymentNumber && (
                 <div>
-                  <p className='text-sm text-gray-400'>رقم الدفع للعميل:</p>
+                  <p className='text-sm text-gray-400'>Customer Payment Number:</p>
                   <p className='text-lg font-semibold'>{paymentNumber}</p>
                 </div>
               )}
 
               {transactionImage && (
                 <div>
-                  <p className='text-sm text-gray-400 mb-2'>صورة المعاملة:</p>
+                  <p className='text-sm text-gray-400 mb-2'>Transaction Screenshot:</p>
                   <a 
                     href={transactionImage} 
                     target='_blank' 
@@ -175,15 +175,15 @@ export default function OrderDetailsForm({
                       />
                     </div>
                   </a>
-                  <p className='text-xs text-gray-500 mt-1'>اضغط لعرض الصورة بالحجم الكامل</p>
+                  <p className='text-xs text-gray-500 mt-1'>Click to view full size image</p>
                 </div>
               )}
             </div>
 
             {isPaid ? (
-              <Badge className='mt-3'>تم الدفع في {paidAt ? formatDateTime(paidAt).dateTime : 'غير محدد'}</Badge>
+              <Badge className='mt-3'>Paid on {paidAt ? formatDateTime(paidAt).dateTime : 'Not specified'}</Badge>
             ) : (
-              <Badge variant='destructive' className='mt-3'>لم يتم الدفع بعد</Badge>
+              <Badge variant='destructive' className='mt-3'>Not paid yet</Badge>
             )}
           </CardContent>
         </Card>
@@ -191,13 +191,13 @@ export default function OrderDetailsForm({
         {/* Order Items Card */}
         <Card>
           <CardContent className='p-4 gap-4'>
-            <h2 className='text-xl pb-4'>تفاصيل الطلب</h2>
+            <h2 className='text-xl pb-4'>Order Details</h2>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className='text-right'>المنتج</TableHead>
-                  <TableHead className='text-right'>الكمية</TableHead>
-                  <TableHead className='text-right'>السعر</TableHead>
+                  <TableHead className='text-left'>Product</TableHead>
+                  <TableHead className='text-left'>Quantity</TableHead>
+                  <TableHead className='text-left'>Price</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -214,13 +214,13 @@ export default function OrderDetailsForm({
                           width={50}
                           height={50}
                         ></Image>
-                        <span className='px-2'>{item.name || 'منتج غير معروف'}</span>
+                        <span className='px-2'>{item.name || 'Unknown product'}</span>
                       </Link>
                     </TableCell>
                     <TableCell>
                       <span className='px-2'>{item.quantity || 0}</span>
                     </TableCell>
-                    <TableCell className='text-right'>
+                    <TableCell className='text-left'>
                       <ProductPrice price={item.price || 0} plain />
                     </TableCell>
                   </TableRow>
@@ -233,16 +233,16 @@ export default function OrderDetailsForm({
       <div>
         <Card>
           <CardContent className='p-4 space-y-4 gap-4'>
-            <h2 className='text-xl pb-4'>ملخص الطلب</h2>
+            <h2 className='text-xl pb-4'>Order Summary</h2>
             <div className='flex justify-between'>
-              <div>المنتجات</div>
+              <div>Products</div>
               <div>
                 {' '}
                 <ProductPrice price={itemsPrice || 0} plain />
               </div>
             </div>
             <div className='flex justify-between font-bold text-lg'>
-              <div>المجموع الكلي</div>
+              <div>Total</div>
               <div>
                 {' '}
                 <ProductPrice price={totalPrice || 0} plain />
@@ -251,13 +251,13 @@ export default function OrderDetailsForm({
 
             {(isAdmin || isModerator) && !isPaid && (
               <ActionButton
-                caption='تحديد كمدفوع'
+                caption='Mark as Paid'
                 action={() => updateOrderToPaid(order.id)}
               />
             )}
             {(isAdmin || isModerator) && isPaid && !isDelivered && (
               <ActionButton
-                caption='تحديد كمُسلم'
+                caption='Mark as Delivered'
                 action={() => deliverOrder(order.id)}
               />
             )}

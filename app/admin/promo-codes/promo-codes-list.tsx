@@ -61,22 +61,22 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
 
       if (result.success) {
         toast({
-          title: 'نجح',
+          title: 'Success',
           description: result.message,
         })
         setPromoCodes([result.data, ...promoCodes])
         setFormData({ code: '', discountPercent: '', expiresAt: '', usageLimit: '' })
       } else {
         toast({
-          title: 'خطأ',
+          title: 'Error',
           description: result.message,
           variant: 'destructive',
         })
       }
     } catch (error) {
       toast({
-        title: 'خطأ',
-        description: 'حدث خطأ في إنشاء كود الخصم',
+        title: 'Error',
+        description: 'Error creating promo code',
         variant: 'destructive',
       })
     } finally {
@@ -94,14 +94,14 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
 
       if (result.success) {
         toast({
-          title: 'نجح',
+          title: 'Success',
           description: result.message,
         })
         setPromoCodes(promoCodes.filter((code) => code.id !== id))
         return { success: true, message: result.message }
       } else {
         toast({
-          title: 'خطأ',
+          title: 'Error',
           description: result.message,
           variant: 'destructive',
         })
@@ -109,11 +109,11 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
       }
     } catch (error) {
       toast({
-        title: 'خطأ',
-        description: 'حدث خطأ في حذف كود الخصم',
+        title: 'Error',
+        description: 'Error deleting promo code',
         variant: 'destructive',
       })
-      return { success: false, message: 'حدث خطأ' }
+      return { success: false, message: 'An error occurred' }
     }
   }
 
@@ -134,52 +134,52 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
           )
         )
         toast({
-          title: 'نجح',
+          title: 'Success',
           description: result.message,
         })
       } else {
         toast({
-          title: 'خطأ',
+          title: 'Error',
           description: result.message,
           variant: 'destructive',
         })
       }
     } catch (error) {
       toast({
-        title: 'خطأ',
-        description: 'حدث خطأ في تحديث الكود',
+        title: 'Error',
+        description: 'Error updating code',
         variant: 'destructive',
       })
     }
   }
 
   return (
-    <div className='space-y-6 rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
-      <h1 className='h1-bold text-white'>إدارة أكواد الخصم</h1>
+    <div className='space-y-6 ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <h1 className='h1-bold text-white'>Manage Promo Codes</h1>
 
       {/* Create Promo Code Form */}
       <Card className='border-2 border-purple-600 bg-gray-900'>
         <CardHeader>
-          <CardTitle className='text-white'>إنشاء كود خصم جديد</CardTitle>
-          <CardDescription className='text-gray-300'>أضف كود خصم جديد للعملاء</CardDescription>
+          <CardTitle className='text-white'>Create New Promo Code</CardTitle>
+          <CardDescription className='text-gray-300'>Add a new discount code for customers</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleCreate} className='space-y-4'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div className='space-y-2'>
-                <Label htmlFor='code' className='text-white'>الكود *</Label>
+                <Label htmlFor='code' className='text-white'>Code *</Label>
                 <Input
                   id='code'
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  placeholder='مثال: SUMMER2024'
+                  placeholder='Example: SUMMER2024'
                   required
                   className='bg-gray-800 text-white border-gray-700'
                 />
               </div>
 
               <div className='space-y-2'>
-                <Label htmlFor='discountPercent' className='text-white'>نسبة الخصم (%) *</Label>
+                <Label htmlFor='discountPercent' className='text-white'>Discount Percentage (%) *</Label>
                 <Input
                   id='discountPercent'
                   type='number'
@@ -187,14 +187,14 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
                   max='100'
                   value={formData.discountPercent}
                   onChange={(e) => setFormData({ ...formData, discountPercent: e.target.value })}
-                  placeholder='مثال: 20'
+                  placeholder='Example: 20'
                   required
                   className='bg-gray-800 text-white border-gray-700'
                 />
               </div>
 
               <div className='space-y-2'>
-                <Label htmlFor='expiresAt' className='text-white'>تاريخ الانتهاء (اختياري)</Label>
+                <Label htmlFor='expiresAt' className='text-white'>Expiry Date (Optional)</Label>
                 <Input
                   id='expiresAt'
                   type='datetime-local'
@@ -205,21 +205,21 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
               </div>
 
               <div className='space-y-2'>
-                <Label htmlFor='usageLimit' className='text-white'>حد الاستخدام (اختياري)</Label>
+                <Label htmlFor='usageLimit' className='text-white'>Usage Limit (Optional)</Label>
                 <Input
                   id='usageLimit'
                   type='number'
                   min='1'
                   value={formData.usageLimit}
                   onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
-                  placeholder='مثال: 100'
+                  placeholder='Example: 100'
                   className='bg-gray-800 text-white border-gray-700'
                 />
               </div>
             </div>
 
             <Button type='submit' disabled={isCreating} className='bg-purple-600 hover:bg-purple-700'>
-              {isCreating ? 'جاري الإنشاء...' : 'إنشاء كود الخصم'}
+              {isCreating ? 'Creating...' : 'Create Promo Code'}
             </Button>
           </form>
         </CardContent>
@@ -228,9 +228,9 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
       {/* Promo Codes List */}
       <Card className='border-2 border-purple-600 bg-gray-900'>
         <CardHeader>
-          <CardTitle className='text-white'>أكواد الخصم الحالية</CardTitle>
+          <CardTitle className='text-white'>Current Promo Codes</CardTitle>
           <CardDescription className='text-gray-300'>
-            إجمالي الأكواد: {promoCodes.length}
+            Total Codes: {promoCodes.length}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -238,18 +238,18 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
             <Table className='admin-table border border-gray-700 rounded-lg'>
               <TableHeader>
                 <TableRow className='bg-gray-800 border-b-2 border-gray-700'>
-                  <TableHead className='text-right text-purple-400'>الكود</TableHead>
-                  <TableHead className='text-right text-purple-400'>الخصم</TableHead>
-                  <TableHead className='text-right text-purple-400'>الحالة</TableHead>
-                  <TableHead className='text-right text-purple-400'>الاستخدام</TableHead>
-                  <TableHead className='text-right text-purple-400'>الانتهاء</TableHead>
-                  <TableHead className='text-right text-purple-400'>تاريخ الإنشاء</TableHead>
-                  <TableHead className='text-right text-purple-400'>الإجراءات</TableHead>
+                  <TableHead className='text-left text-purple-400'>Code</TableHead>
+                  <TableHead className='text-left text-purple-400'>Discount</TableHead>
+                  <TableHead className='text-left text-purple-400'>Status</TableHead>
+                  <TableHead className='text-left text-purple-400'>Usage</TableHead>
+                  <TableHead className='text-left text-purple-400'>Expires</TableHead>
+                  <TableHead className='text-left text-purple-400'>Created</TableHead>
+                  <TableHead className='text-left text-purple-400'>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {promoCodes.map((code) => (
-                  <TableRow key={code.id} className='border-b border-gray-700'>
+                  <TableRow key={code.id} className='bg-gray-800 hover:bg-gray-700 border-b border-gray-700'>
                     <TableCell className='font-bold text-white'>{code.code}</TableCell>
                     <TableCell className='text-purple-400'>{code.discountPercent}%</TableCell>
                     <TableCell>
@@ -263,7 +263,7 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
                             : 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
                         }`}
                       >
-                        {code.isActive ? '✓ نشط' : '✕ غير نشط'}
+                        {code.isActive ? '✓ Active' : '✕ Inactive'}
                       </Button>
                     </TableCell>
                     <TableCell className='text-gray-300'>
@@ -272,7 +272,7 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
                     <TableCell className='text-gray-300'>
                       {code.expiresAt
                         ? formatDateTime(new Date(code.expiresAt)).dateTime
-                        : 'بلا حد'}
+                        : 'No limit'}
                     </TableCell>
                     <TableCell className='text-gray-300'>
                       {formatDateTime(new Date(code.createdAt)).dateTime}
@@ -288,7 +288,7 @@ export default function PromoCodesList({ initialPromoCodes }: { initialPromoCode
 
           {promoCodes.length === 0 && (
             <div className='text-center py-8 text-gray-400'>
-              لا توجد أكواد خصم حالياً
+              No promo codes currently
             </div>
           )}
         </CardContent>

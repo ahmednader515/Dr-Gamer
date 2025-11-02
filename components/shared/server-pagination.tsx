@@ -57,7 +57,7 @@ export default function ServerPagination({
   }
 
   return (
-    <div className={`flex items-center justify-center gap-1 sm:gap-2 ${className}`} dir="rtl">
+    <div className={`flex items-center justify-center gap-1 sm:gap-2 ${className}`} dir="ltr">
       {/* First page button - hidden on mobile */}
       <Button
         variant='outline'

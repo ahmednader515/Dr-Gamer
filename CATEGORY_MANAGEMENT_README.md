@@ -92,12 +92,12 @@ npm run migrate-categories
    - Set sort order and active status
 
 3. **Edit Category**:
-   - Click "تعديل" on any category
+   - Click "edit" on any category
    - Modify details as needed
    - Save changes
 
 4. **Delete Category**:
-   - Click "حذف" on category
+   - Click "Delete" on category
    - Confirm deletion
    - Note: Categories with products cannot be deleted
 

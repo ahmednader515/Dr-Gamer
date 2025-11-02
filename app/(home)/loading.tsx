@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card'
 
 export default function HomeLoading() {
   return (
-    <div className="font-cairo bg-black min-h-screen" dir="rtl">
+    <div className="font-cairo bg-black min-h-screen" dir="ltr">
       {/* Hero section skeleton */}
       <div className="w-full h-96 bg-gray-800 animate-pulse"></div>
       

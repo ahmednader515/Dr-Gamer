@@ -288,7 +288,7 @@ export async function deleteOrder(id: string) {
     revalidatePath('/admin/orders')
     return {
       success: true,
-      message: 'تم حذف الطلب بنجاح',
+      message: 'تم Delete الطلب بنجاح',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }

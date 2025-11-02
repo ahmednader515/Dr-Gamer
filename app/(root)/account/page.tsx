@@ -95,7 +95,7 @@ async function AccountCards() {
             <div>
               <h2 className='text-xl font-bold'>العناوين</h2>
               <p className='text-muted-foreground'>
-                تعديل، إزالة أو تعيين العنوان الافتراضي
+                edit، إزالة أو تعيين العنوان الافتراضي
               </p>
             </div>
           </CardContent>

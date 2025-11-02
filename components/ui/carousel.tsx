@@ -28,7 +28,7 @@ type CarouselContextProps = {
   scrollNext: () => void
   canScrollPrev: boolean
   canScrollNext: boolean
-  isRTL: boolean
+  isltr: boolean
 } & CarouselProps
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null)
@@ -61,20 +61,20 @@ const Carousel = React.forwardRef<
   ) => {
     // Determine document/prop direction early for Embla options
     const propDir = (props as any)?.dir
-    const initialIsRTL = (propDir ?? "").toLowerCase() === "rtl"
+    const initialIsltr = (propDir ?? "").toLowerCase() === "ltr"
 
     const [carouselRef, api] = useEmblaCarousel(
       {
         ...opts,
-        // Ensure Embla knows the scroll direction in RTL contexts
-        direction: (opts as any)?.direction ?? (initialIsRTL ? "rtl" : "ltr"),
+        // Ensure Embla knows the scroll direction in ltr contexts
+        direction: (opts as any)?.direction ?? (initialIsltr ? "ltr" : "ltr"),
         axis: orientation === "horizontal" ? "x" : "y",
       },
       plugins
     )
     const [canScrollPrev, setCanScrollPrev] = React.useState(false)
     const [canScrollNext, setCanScrollNext] = React.useState(false)
-    const [isRTL, setIsRTL] = React.useState(false)
+    const [isltr, setIsltr] = React.useState(false)
 
     const onSelect = React.useCallback((api: CarouselApi) => {
       if (!api) {
@@ -114,13 +114,13 @@ const Carousel = React.forwardRef<
       setApi(api)
     }, [api, setApi])
 
-    // Detect RTL once on mount; relies on <html dir="rtl"> or nearest ancestor
+    // Detect ltr once on mount; relies on <html dir="ltr"> or nearest ancestor
     React.useEffect(() => {
       try {
         const docDir = typeof document !== "undefined" ? document.documentElement.getAttribute("dir") : null
-        setIsRTL((docDir || "").toLowerCase() === "rtl")
+        setIsltr((docDir || "").toLowerCase() === "ltr")
       } catch {
-        setIsRTL(false)
+        setIsltr(false)
       }
     }, [])
 
@@ -150,7 +150,7 @@ const Carousel = React.forwardRef<
           scrollNext,
           canScrollPrev,
           canScrollNext,
-          isRTL,
+          isltr,
         }}
       >
         <div
@@ -173,7 +173,7 @@ const CarouselContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  const { carouselRef, orientation, isRTL } = useCarousel()
+  const { carouselRef, orientation, isltr } = useCarousel()
 
   return (
     <div ref={carouselRef} className="overflow-hidden">
@@ -181,7 +181,7 @@ const CarouselContent = React.forwardRef<
         ref={ref}
         className={cn(
           "flex",
-          orientation === "horizontal" ? (isRTL ? "-mr-4" : "-ml-4") : "-mt-4 flex-col",
+          orientation === "horizontal" ? (isltr ? "-mr-4" : "-ml-4") : "-mt-4 flex-col",
           className
         )}
         {...props}
@@ -195,7 +195,7 @@ const CarouselItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  const { orientation, isRTL } = useCarousel()
+  const { orientation, isltr } = useCarousel()
 
   return (
     <div
@@ -204,7 +204,7 @@ const CarouselItem = React.forwardRef<
       aria-roledescription="slide"
       className={cn(
         "min-w-0 shrink-0 grow-0 basis-full",
-        orientation === "horizontal" ? (isRTL ? "pr-4" : "pl-4") : "pt-4",
+        orientation === "horizontal" ? (isltr ? "pr-4" : "pl-4") : "pt-4",
         className
       )}
       {...props}

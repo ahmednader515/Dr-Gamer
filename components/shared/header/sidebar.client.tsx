@@ -9,7 +9,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Menu, ChevronLeft, X } from "lucide-react";
+import { Menu, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
 import { SignOut } from "@/lib/actions/user.actions";
 
@@ -90,8 +90,8 @@ export default function SidebarClient({
                     href={`/search?category=${category}`}
                     className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-800 transition-colors duration-200 text-sm"
                   >
-                    <ChevronLeft className="h-4 w-4" />
                     <span className="text-left flex-1">{categoryTranslations[category] || category}</span>
+                    <ChevronRight className="h-4 w-4" />
                   </Link>
                 </DrawerClose>
               ))}

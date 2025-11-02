@@ -6,7 +6,7 @@ import Link from 'next/link'
 import WebPageForm from '../web-page-form'
 
 export const metadata: Metadata = {
-  title: 'تعديل صفحة الويب',
+  title: 'Edit Web Page',
 }
 
 type UpdateWebPageProps = {
@@ -24,14 +24,14 @@ const UpdateWebPage = async (props: UpdateWebPageProps) => {
   if (!webPage) notFound()
   return (
     <main className='max-w-6xl mx-auto p-4'>
-      <div className='space-y-4 rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <div className='space-y-4 ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
         <div className='flex mb-4'>
-          <Link href='/admin/web-pages'>صفحات الويب</Link>
+          <Link href='/admin/web-pages'>Web Pages</Link>
           <span className='mx-1'>›</span>
           <Link href={`/admin/web-pages/${webPage.id}`}>{webPage.title}</Link>
         </div>
 
-        <h1 className='h1-bold'>تعديل صفحة الويب</h1>
+        <h1 className='h1-bold'>Edit Web Page</h1>
 
         <div className='my-8'>
           <WebPageForm type='Update' webPage={webPage} webPageId={webPage.id} />

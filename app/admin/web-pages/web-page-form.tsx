@@ -30,9 +30,9 @@ import { toSlug } from '@/lib/utils'
 const webPageDefaultValues =
   process.env.NODE_ENV === 'development'
     ? {
-        title: 'صفحة تجريبية',
+        title: 'Test Page',
         slug: 'sample-page',
-        content: 'محتوى تجريبي',
+        content: 'Test content',
       }
     : {
         title: '',
@@ -142,18 +142,18 @@ const WebPageForm = ({
 
   return (
     <Form {...form}>
-      <div className='space-y-8 rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <div className='space-y-8 ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
         <div className='flex flex-col gap-5 md:flex-row'>
           <FormField
             control={form.control}
             name='title'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='text-right'>العنوان</FormLabel>
+                <FormLabel className='text-left'>Title</FormLabel>
                 <FormControl>
                   <Input 
-                    placeholder='أدخل العنوان' 
-                    className='text-right' 
+                    placeholder='Enter title' 
+                    className='text-left' 
                     {...field}
                     onChange={(e) => {
                       field.onChange(e)
@@ -174,12 +174,12 @@ const WebPageForm = ({
             name='slug'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='text-right'>الرابط</FormLabel>
+                <FormLabel className='text-left'>Slug</FormLabel>
 
                 <FormControl>
                   <Input
-                    placeholder='سيتم توليد الرابط تلقائياً من العنوان'
-                    className='text-right bg-gray-800 text-gray-200 border-gray-700'
+                    placeholder='Slug will be auto-generated from title'
+                    className='text-left bg-gray-800 text-gray-200 border-gray-700'
                     readOnly
                     {...field}
                   />
@@ -196,7 +196,7 @@ const WebPageForm = ({
             name='content'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='text-right'>المحتوى</FormLabel>
+                <FormLabel className='text-left'>Content</FormLabel>
                 <FormControl>
                   <MdEditor
                     {...field}
@@ -224,7 +224,7 @@ const WebPageForm = ({
                     onCheckedChange={field.onChange}
                   />
                 </FormControl>
-                <FormLabel className='text-right'>منشور؟</FormLabel>
+                <FormLabel className='text-left'>Published?</FormLabel>
               </FormItem>
             )}
           />
@@ -240,7 +240,7 @@ const WebPageForm = ({
             }}
             className='button col-span-2 w-full bg-purple-600 hover:bg-purple-700 text-white'
           >
-            {form.formState.isSubmitting ? 'جاري الإرسال...' : `${type === 'Create' ? 'إنشاء' : 'تحديث'} الصفحة`}
+            {form.formState.isSubmitting ? 'Submitting...' : `${type === 'Create' ? 'Create' : 'Update'} Page`}
           </Button>
         </div>
       </div>

@@ -98,8 +98,8 @@ export default function CategoryManagement() {
     } catch (error) {
       console.error('Error loading categories:', error)
       toast({
-        title: 'خطأ',
-        description: 'حدث خطأ أثناء تحميل الفئات',
+        title: 'Error',
+        description: 'Error loading categories',
         variant: 'destructive',
       })
     } finally {
@@ -124,7 +124,7 @@ export default function CategoryManagement() {
 
       if (result.success) {
         toast({
-          title: 'نجح',
+          title: 'Success',
           description: result.message,
         })
         setIsDialogOpen(false)
@@ -133,7 +133,7 @@ export default function CategoryManagement() {
         loadCategories()
       } else {
         toast({
-          title: 'خطأ',
+          title: 'Error',
           description: result.message,
           variant: 'destructive',
         })
@@ -141,8 +141,8 @@ export default function CategoryManagement() {
     } catch (error) {
       console.error('Error submitting category:', error)
       toast({
-        title: 'خطأ',
-        description: 'حدث خطأ أثناء حفظ الفئة',
+        title: 'Error',
+        description: 'Error saving category',
         variant: 'destructive',
       })
     }
@@ -155,13 +155,13 @@ export default function CategoryManagement() {
       
       if (result.success) {
         toast({
-          title: 'نجح',
+          title: 'Success',
           description: result.message,
         })
         loadCategories()
       } else {
         toast({
-          title: 'خطأ',
+          title: 'Error',
           description: result.message,
           variant: 'destructive',
         })
@@ -169,8 +169,8 @@ export default function CategoryManagement() {
     } catch (error) {
       console.error('Error deleting category:', error)
       toast({
-        title: 'خطأ',
-        description: 'حدث خطأ أثناء حذف الفئة',
+        title: 'Error',
+        description: 'Error deleting category',
         variant: 'destructive',
       })
     }
@@ -237,13 +237,13 @@ export default function CategoryManagement() {
       const result = await reorderCategories({ orders })
       if (result.success) {
         toast({
-          title: 'نجح',
+          title: 'Success',
           description: result.message,
         })
         setCategories(newCategories)
       } else {
         toast({
-          title: 'خطأ',
+          title: 'Error',
           description: result.message,
           variant: 'destructive',
         })
@@ -251,8 +251,8 @@ export default function CategoryManagement() {
     } catch (error) {
       console.error('Error reordering categories:', error)
       toast({
-        title: 'خطأ',
-        description: 'حدث خطأ أثناء تحديث ترتيب الفئات',
+        title: 'Error',
+        description: 'Error updating category order',
         variant: 'destructive',
       })
     }
@@ -262,9 +262,9 @@ export default function CategoryManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">إدارة الفئات</h2>
+          <h2 className="text-2xl font-bold">Manage Categories</h2>
           <p className="text-muted-foreground">
-            قم بإدارة فئات المنتجات في المتجر
+            Manage product categories in the store
           </p>
         </div>
         <div className="flex gap-2">
@@ -273,7 +273,7 @@ export default function CategoryManagement() {
             className="flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
-            إضافة فئة جديدة
+            Add New Category
           </Button>
         </div>
       </div>
@@ -281,14 +281,14 @@ export default function CategoryManagement() {
       {/* Categories List */}
       <Card>
         <CardHeader>
-          <CardTitle>الفئات الحالية</CardTitle>
+          <CardTitle>Current Categories</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8">جاري التحميل...</div>
+            <div className="text-center py-8">Loading...</div>
           ) : categories.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              لا توجد فئات حالياً
+              No categories currently
             </div>
           ) : (
             <div className="space-y-4">
@@ -306,7 +306,7 @@ export default function CategoryManagement() {
                         size="sm"
                         disabled={index === 0}
                         className="h-6 w-6 p-0"
-                        title="نقل لأعلى"
+                        title="Move Up"
                       >
                         <ChevronUp className="h-3 w-3" />
                       </Button>
@@ -316,7 +316,7 @@ export default function CategoryManagement() {
                         size="sm"
                         disabled={index === categories.length - 1}
                         className="h-6 w-6 p-0"
-                        title="نقل لأسفل"
+                        title="Move Down"
                       >
                         <ChevronDown className="h-3 w-3" />
                       </Button>
@@ -338,13 +338,13 @@ export default function CategoryManagement() {
                           <h3 className="font-semibold">{category.name}</h3>
                           {!category.isActive && (
                             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                              غير نشط
+                              Inactive
                             </span>
                           )}
                         </div>
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {category.description || 'لا يوجد وصف'}
+                        {category.description || 'No description'}
                       </p>
                     </div>
                   </div>
@@ -356,7 +356,7 @@ export default function CategoryManagement() {
                       className="flex items-center gap-1"
                     >
                       <Edit className="h-3 w-3" />
-                      تعديل
+                      Edit
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -366,24 +366,24 @@ export default function CategoryManagement() {
                           className="flex items-center gap-1 text-red-600 hover:text-red-700"
                         >
                           <Trash2 className="h-3 w-3" />
-                          حذف
+                          Delete
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                          <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
                           <AlertDialogDescription>
-                            هل أنت متأكد من حذف الفئة "{category.name}"؟ 
-                            لا يمكن التراجع عن هذا الإجراء.
+                            Are you sure you want to delete the category "{category.name}"? 
+                            This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => handleDelete(category)}
                             className="bg-red-600 hover:bg-red-700"
                           >
-                            حذف
+                            Delete
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -406,7 +406,7 @@ export default function CategoryManagement() {
         <DialogContent className="max-w-sm max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle>
-              {editingCategory ? 'تعديل الفئة' : 'إضافة فئة جديدة'}
+              {editingCategory ? 'Edit Category' : 'Add New Category'}
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto pr-2">
@@ -417,7 +417,7 @@ export default function CategoryManagement() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>اسم الفئة</FormLabel>
+                    <FormLabel>Category Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -425,7 +425,7 @@ export default function CategoryManagement() {
                           field.onChange(e)
                           handleNameChange(e.target.value)
                         }}
-                        placeholder="أدخل اسم الفئة"
+                        placeholder="Enter category name"
                       />
                     </FormControl>
                     <FormMessage />
@@ -438,11 +438,11 @@ export default function CategoryManagement() {
                 name="slug"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>رابط الفئة</FormLabel>
+                    <FormLabel>Category Slug</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="أدخل رابط الفئة"
+                        placeholder="Enter category slug"
                       />
                     </FormControl>
                     <FormMessage />
@@ -455,11 +455,11 @@ export default function CategoryManagement() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>الوصف</FormLabel>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="أدخل وصف الفئة (اختياري)"
+                        placeholder="Enter category description (optional)"
                         rows={2}
                       />
                     </FormControl>
@@ -473,7 +473,7 @@ export default function CategoryManagement() {
                 name="image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>صورة الفئة</FormLabel>
+                    <FormLabel>Category Image</FormLabel>
                     <FormControl>
                       <div className="space-y-3">
                         {field.value && (
@@ -511,17 +511,17 @@ export default function CategoryManagement() {
                               setIsUploading(false)
                               toast({
                                 variant: 'destructive',
-                                description: `خطأ في رفع الصورة: ${error.message}`,
+                                description: `Error uploading image: ${error.message}`,
                               })
                             }}
                             content={{
-                              button: isUploading ? 'جاري الرفع...' : (field.value ? 'تغيير الصورة' : 'رفع صورة الفئة'),
-                              allowedContent: 'PNG, JPG, GIF حتى 4MB',
+                              button: isUploading ? 'Uploading...' : (field.value ? 'Change Image' : 'Upload Category Image'),
+                              allowedContent: 'PNG, JPG, GIF up to 4MB',
                             }}
                           />
                           {isUploading && (
                             <p className="text-xs text-purple-600 mt-2">
-                              جاري رفع الصورة، يرجى الانتظار...
+                              Uploading image, please wait...
                             </p>
                           )}
                         </div>
@@ -546,7 +546,7 @@ export default function CategoryManagement() {
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>فئة نشطة</FormLabel>
+                      <FormLabel>Active Category</FormLabel>
                     </div>
                   </FormItem>
                 )}
@@ -562,14 +562,14 @@ export default function CategoryManagement() {
               onClick={() => setIsDialogOpen(false)}
               disabled={isUploading}
             >
-              إلغاء
+              Cancel
             </Button>
             <Button 
               type="submit"
               onClick={form.handleSubmit(onSubmit)}
               disabled={isUploading}
             >
-              {isUploading ? 'جاري الرفع...' : (editingCategory ? 'تحديث' : 'إنشاء')}
+              {isUploading ? 'Uploading...' : (editingCategory ? 'Update' : 'Create')}
             </Button>
           </div>
         </DialogContent>

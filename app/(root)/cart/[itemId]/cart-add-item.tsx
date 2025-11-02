@@ -45,8 +45,8 @@ export default function CartAddItem({
       async () => {
         onRemove()
         toast({
-          title: 'تم حذف المنتج',
-          description: 'تم حذف المنتج من عربة التسوق',
+          title: 'تم Delete المنتج',
+          description: 'تم Delete المنتج من عربة التسوق',
           variant: 'default',
         })
       }

@@ -1188,7 +1188,7 @@ For questions about shipping, please contact our customer service team.`,
 ستتلقى رسالة تأكيد بالبريد الإلكتروني فور إتمام طلبك، بالإضافة إلى رقم تتبع يمكنك استخدامه لمتابعة حالة الطلب.
 
 ### ما هي طرق الدفع المتاحة؟
-نقبل الدفع نقداً عند الاستلام، فودافون كاش، إنستا باي، وبطاقات الائتمان.
+We accept cash on delivery, Vodafone Cash, InstaPay, and credit cards.
 
 ### ما هي مدة التوصيل المتوقعة؟
 نوفر توصيل سريع خلال 4 ساعات للتوصيل الفوري، أو خلال 5 أيام عمل للتوصيل القياسي.
@@ -1204,7 +1204,7 @@ For questions about shipping, please contact our customer service team.`,
 نعم، جميع منتجاتنا أصلية 100% ومضمونة من Xbox. نحن متجر معتمد نضمن جودة جميع المنتجات.
 
 ### هل يمكنني إرجاع أو استبدال المنتج؟
-يمكنك إرجاع أو استبدال المنتج خلال 7 أيام من تاريخ الاستلام إذا كان في حالة جيدة وغير مستخدم.
+يمكنك إرجاع أو استبدال المنتج خلال 7 أيام من تاريخ الاستلام إذا كان في حالة جيدة وغير User.
 
 ### كيف أتأكد من توفر المنتج؟
 يمكنك الاطلاع على حالة التوفر على صفحة المنتج. إذا كان المنتج غير متوفر، يمكنك تسجيل بريدك الإلكتروني ليتم إشعارك عند عودة التوفر.
@@ -1243,7 +1243,7 @@ For questions about shipping, please contact our customer service team.`,
 يمكنك متابعة حالة طلبك من خلال تسجيل الدخول إلى حسابك وزيارة صفحة "طلباتي".
 
 ### كيف أغير بياناتي الشخصية؟
-قم بتسجيل الدخول إلى حسابك واضغط على "حسابي" لتعديل معلوماتك الشخصية.
+قم بتسجيل الدخول إلى حسابك واضغط على "حسابي" لedit معلوماتك الشخصية.
 
 ### ماذا أفعل إذا نسيت كلمة المرور؟
 انقر على "نسيت كلمة المرور" في صفحة تسجيل الدخول واتبع التعليمات لإعادة تعيين كلمة المرور.
@@ -1335,15 +1335,15 @@ For questions about shipping, please contact our customer service team.`,
       site: {
         name: 'Dr.GAMER',
         description:
-          'Dr.GAMER - متجرك الرسمي لكل ما يتعلق بـ Xbox! نوفر أحدث الألعاب، اشتراكات Xbox Game Pass Ultimate، بطاقات هدايا Xbox، إكسسوارات Xbox Series X|S، وحدات التحكم، سماعات الألعاب، وكل ما تحتاجه لتجربة ألعاب استثنائية. تسوق الآن واستمتع بأفضل الأسعار والعروض الحصرية!',
-        keywords: 'Xbox، Dr.GAMER، ألعاب Xbox، Xbox Game Pass، Xbox Live Gold، بطاقات هدايا Xbox، Xbox Series X، Xbox Series S، وحدات تحكم Xbox، إكسسوارات Xbox، اشتراكات Xbox، ألعاب إلكترونية، متجر ألعاب، Game Pass Ultimate',
+          'Dr.GAMER - Your official store for everything Xbox! We offer the latest games, Xbox Game Pass Ultimate subscriptions, Xbox gift cards, Xbox Series X|S accessories, controllers, gaming headsets, and everything you need for an exceptional gaming experience. Shop now and enjoy the best prices and exclusive offers!',
+        keywords: 'Xbox, Dr.GAMER, Xbox games, Xbox Game Pass, Xbox Live Gold, Xbox gift cards, Xbox Series X, Xbox Series S, Xbox controllers, Xbox accessories, Xbox subscriptions, video games, game store, Game Pass Ultimate',
         url: 'https://dr-gamer.com',
         logo: '/icons/logo.png',
-        slogan: 'عالم Xbox بين يديك - اكتشف، العب، استمتع',
+        slogan: 'The Xbox world at your fingertips - Discover, Play, Enjoy',
         author: 'Dr.GAMER',
-        copyright: '2024، Dr.GAMER، جميع الحقوق محفوظة.',
+        copyright: '2024, Dr.GAMER, All rights reserved.',
         email: 'support@dr-gamer.com',
-        address: 'القاهرة، مصر',
+        address: 'Cairo, Egypt',
         phone: '+20 123 456 7890',
       },
       carousels: [
@@ -1389,12 +1389,12 @@ For questions about shipping, please contact our customer service team.`,
       ],
       defaultCurrency: 'EGP',
       availablePaymentMethods: [
-        { name: 'فودافون كاش', commission: 0 },
-        { name: 'إنستا باي', commission: 0 },
-        { name: 'تيلدا', commission: 0 },
-        { name: 'حساب بنكي', commission: 0 },
+        { name: 'Vodafone Cash', commission: 0 },
+        { name: 'InstaPay', commission: 0 },
+        { name: 'Telda', commission: 0 },
+        { name: 'Bank Account', commission: 0 },
       ],
-      defaultPaymentMethod: 'فودافون كاش',
+      defaultPaymentMethod: 'Vodafone Cash',
       availableDeliveryDates: [
         {
           name: 'خلال 5 أيام',

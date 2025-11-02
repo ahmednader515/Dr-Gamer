@@ -91,7 +91,7 @@ export async function deleteCategory(id: string) {
     if (productsCount > 0) {
       return {
         success: false,
-        message: `لا يمكن حذف الفئة لأنها تحتوي على ${productsCount} منتج`
+        message: `لا يمكن Delete الفئة لأنها تحتوي على ${productsCount} منتج`
       }
     }
     
@@ -104,13 +104,13 @@ export async function deleteCategory(id: string) {
     
     return {
       success: true,
-      message: 'تم حذف الفئة بنجاح'
+      message: 'تم Delete الفئة بنجاح'
     }
   } catch (error) {
     console.error('Error deleting category:', error)
     return { 
       success: false, 
-      message: error instanceof Error ? error.message : 'حدث خطأ أثناء حذف الفئة' 
+      message: error instanceof Error ? error.message : 'حدث خطأ أثناء Delete الفئة' 
     }
   }
 }

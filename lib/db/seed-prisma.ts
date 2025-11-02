@@ -235,7 +235,7 @@ async function main() {
             },
             {
               question: 'ما هي طرق الدفع المتاحة؟',
-              answer: 'نقبل الدفع نقداً عند الاستلام، فودافون كاش، إنستا باي، وبطاقات الائتمان. جميع طرق الدفع آمنة ومحمية.',
+              answer: 'We accept cash on delivery, Vodafone Cash, InstaPay, and credit cards. All payment methods are safe and secure.',
               sortOrder: 2,
               isActive: true
             },
@@ -271,7 +271,7 @@ async function main() {
             },
             {
               question: 'هل يمكنني إرجاع أو استبدال المنتج؟',
-              answer: 'يمكنك إرجاع أو استبدال المنتج خلال 7 أيام من تاريخ الاستلام إذا كان في حالة جيدة وغير مستخدم.',
+              answer: 'يمكنك إرجاع أو استبدال المنتج خلال 7 أيام من تاريخ الاستلام إذا كان في حالة جيدة وغير User.',
               sortOrder: 2,
               isActive: true
             },
@@ -361,7 +361,7 @@ async function main() {
             },
             {
               question: 'كيف أغير بياناتي الشخصية؟',
-              answer: 'قم بتسجيل الدخول إلى حسابك واضغط على "حسابي" لتعديل معلوماتك الشخصية.',
+              answer: 'قم بتسجيل الدخول إلى حسابك واضغط على "حسابي" لedit معلوماتك الشخصية.',
               sortOrder: 2,
               isActive: true
             },

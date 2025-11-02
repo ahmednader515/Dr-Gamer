@@ -5,7 +5,7 @@ import Link from 'next/link'
 import FAQCategoryForm from '../../faq-category-form'
 
 export const metadata: Metadata = {
-  title: 'تعديل فئة الأسئلة الشائعة',
+  title: 'Edit FAQ Category',
 }
 
 type UpdateFAQCategoryProps = {
@@ -23,14 +23,14 @@ const UpdateFAQCategory = async (props: UpdateFAQCategoryProps) => {
   
   return (
     <main className='max-w-6xl mx-auto p-4'>
-      <div className='space-y-4 rtl text-right' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <div className='space-y-4 ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
         <div className='flex mb-4'>
-          <Link href='/admin/faq'>الأسئلة الشائعة</Link>
+          <Link href='/admin/faq'>FAQ</Link>
           <span className='mx-1'>›</span>
           <Link href={`/admin/faq/categories/${category.id}`}>{category.title}</Link>
         </div>
 
-        <h1 className='h1-bold'>تعديل فئة الأسئلة الشائعة</h1>
+        <h1 className='h1-bold'>Edit FAQ Category</h1>
 
         <div className='my-8'>
           <FAQCategoryForm type='Update' category={category} categoryId={category.id} />

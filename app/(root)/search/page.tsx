@@ -71,15 +71,62 @@ async function SearchHeader({ params, translations }: {
   const {
     q = '',
     category = '',
+    minPrice = '',
+    maxPrice = '',
+    tag = '',
   } = params
+
+  // Build the same where clause to get the count
+  const where: any = { isPublished: true }
+  
+  if (q && q !== 'all') {
+    where.name = { contains: q, mode: 'insensitive' }
+  }
+  
+  if (category && category !== 'all') {
+    const categoryRecord = await prisma.category.findFirst({
+      where: { name: category, isActive: true },
+      select: { id: true }
+    })
+    
+    if (categoryRecord) {
+      where.OR = [
+        { categoryId: categoryRecord.id },
+        { category: category }
+      ]
+    } else {
+      where.category = category
+    }
+  }
+  
+  if (tag && tag !== 'all') {
+    if (Array.isArray(tag)) {
+      where.tags = { hasSome: tag }
+    } else {
+      where.tags = { has: tag }
+    }
+  }
+  
+  if (minPrice || maxPrice) {
+    where.price = { }
+    if (minPrice) {
+      where.price.gte = parseFloat(minPrice)
+    }
+    if (maxPrice) {
+      where.price.lte = parseFloat(maxPrice)
+    }
+  }
+
+  // Get the total count
+  const totalProducts = await (prisma as any).product.count({ where })
 
   return (
     <div className='mb-6 sm:mb-8 bg-gray-900 rounded-xl p-4 sm:p-6 shadow-sm'>
-      <h1 className='text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-right text-white'>
+      <h1 className='text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-left text-white'>
         {q ? `${translations.searchResults} "${q}"` : `${translations.productsIn} ${category}`}
       </h1>
-      <p className='text-sm sm:text-base text-gray-300 text-right'>
-        {translations.found} {translations.loading} {translations.products}
+      <p className='text-sm sm:text-base text-gray-300 text-left'>
+        {translations.found} {totalProducts} {totalProducts === 1 ? translations.product : translations.products}
       </p>
     </div>
   )
@@ -195,7 +242,7 @@ async function ProductResults({ params, translations }: {
           sort={sort}
           params={params}
         />
-        <p className='text-xs sm:text-sm text-gray-300 text-right'>
+        <p className='text-xs sm:text-sm text-gray-300 text-left'>
           {translations.showing} {from}-{to} {translations.of} {totalProducts} {translations.products}
         </p>
       </div>

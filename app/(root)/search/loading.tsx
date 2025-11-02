@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card'
 
 export default function SearchLoading() {
   return (
-    <div className='container mx-auto px-4 py-8' dir="rtl">
+    <div className='container mx-auto px-4 py-8' dir="ltr">
       {/* Search Header Skeleton */}
       <div className='mb-8 bg-gray-900 rounded-xl p-6 shadow-sm'>
         <div className='h-8 bg-gray-700 rounded w-3/4 mb-3 animate-pulse'></div>
