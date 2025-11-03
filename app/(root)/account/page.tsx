@@ -5,7 +5,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
 
-const PAGE_TITLE = 'حسابك'
+const PAGE_TITLE = 'Your Account'
 export const metadata: Metadata = {
   title: PAGE_TITLE,
 }
@@ -61,9 +61,9 @@ async function AccountCards() {
               <PackageCheckIcon className='w-12 h-12' />
             </div>
             <div>
-              <h2 className='text-xl font-bold'>الطلبات</h2>
+              <h2 className='text-xl font-bold'>Orders</h2>
               <p className='text-muted-foreground'>
-                تتبع، إرجاع، cancel طلب، تحميل الفاتورة أو الشراء مرة أخرى
+                Track, return, cancel order, download invoice or buy again
               </p>
             </div>
           </CardContent>
@@ -77,7 +77,7 @@ async function AccountCards() {
               <User className='w-12 h-12' />
             </div>
             <div>
-              <h2 className='text-xl font-bold'>تسجيل الدخول والأمان</h2>
+              <h2 className='text-xl font-bold'>Login & Security</h2>
               <p className='text-muted-foreground'>
                 Manage password, email and phone number
               </p>
@@ -93,9 +93,9 @@ async function AccountCards() {
               <Home className='w-12 h-12' />
             </div>
             <div>
-              <h2 className='text-xl font-bold'>العناوين</h2>
+              <h2 className='text-xl font-bold'>Addresses</h2>
               <p className='text-muted-foreground'>
-                edit، إزالة أو تعيين العنوان الافتراضي
+                Edit, remove or set default address
               </p>
             </div>
           </CardContent>

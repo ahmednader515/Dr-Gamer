@@ -64,7 +64,7 @@ export const PhoneForm = () => {
     } catch (error) {
       toast({
         variant: 'destructive',
-        description: 'حدث خطأ أثناء تحديث رقم الهاتف',
+        description: 'An error occurred while updating phone number',
       })
     }
   }
@@ -81,12 +81,12 @@ export const PhoneForm = () => {
             name='phone'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='font-bold'>رقم الهاتف الجديد</FormLabel>
+                <FormLabel className='font-bold'>New phone number</FormLabel>
                 <FormControl>
                   <PhoneInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder='أدخل رقم الهاتف'
+                    placeholder='Enter phone number'
                     className='input-field'
                   />
                 </FormControl>
@@ -102,7 +102,7 @@ export const PhoneForm = () => {
           disabled={form.formState.isSubmitting}
           className='button col-span-2 w-full'
         >
-          {form.formState.isSubmitting ? 'جاري الإرسال...' : 'حفظ التغييرات'}
+          {form.formState.isSubmitting ? 'Submitting...' : 'Save Changes'}
         </Button>
       </form>
     </Form>

@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import data from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'إدارة الاسم',
+  title: 'Manage Name',
 }
 
 export default async function ManageNamePage() {
@@ -19,19 +19,17 @@ export default async function ManageNamePage() {
   return (
     <div className='mb-24'>
       <div className='flex gap-2 '>
-        <Link href='/account'>حسابك</Link>
+        <Link href='/account'>Your Account</Link>
         <span>›</span>
-        <Link href='/account/manage'>تسجيل الدخول والأمان</Link>
+        <Link href='/account/manage'>Login & Security</Link>
         <span>›</span>
-        <span>تغيير اسمك</span>
+        <span>Change your name</span>
       </div>
-      <h1 className='h1-bold py-4'>تغيير اسمك</h1>
+      <h1 className='h1-bold py-4'>Change your name</h1>
       <Card className='max-w-2xl'>
         <CardContent className='p-4 flex justify-between flex-wrap'>
           <p className='text-sm py-2'>
-            إذا كنت تريد تغيير الاسم المرتبط بحسابك في {site.name}،
-            يمكنك القيام بذلك أدناه. تأكد من النقر على زر حفظ
-            التغييرات عندما تنتهي.
+            If you want to change the name associated with your {site.name} customer account, you may do so below. Be sure to click the Save Changes button when you are done.
           </p>
           <ProfileForm />
         </CardContent>

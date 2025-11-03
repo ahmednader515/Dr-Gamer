@@ -64,7 +64,7 @@ export default function AddressList() {
     } catch (error) {
       toast({
         variant: 'destructive',
-        description: 'حدث خطأ أثناء Delete العنوان',
+        description: 'An error occurred while deleting the address',
       })
     }
   }
@@ -106,7 +106,7 @@ export default function AddressList() {
     } catch (error) {
       toast({
         variant: 'destructive',
-        description: 'حدث خطأ أثناء تعيين العنوان الافتراضي',
+        description: 'An error occurred while setting default address',
       })
     }
   }
@@ -129,14 +129,14 @@ export default function AddressList() {
       <Card>
         <CardContent className='p-8 text-center'>
           <MapPin className='h-16 w-16 text-muted-foreground mx-auto mb-4' />
-          <h3 className='text-lg font-semibold mb-2'>لا توجد عناوين</h3>
+          <h3 className='text-lg font-semibold mb-2'>No Addresses</h3>
           <p className='text-muted-foreground mb-4'>
-            لم تقم بإضافة أي عناوين شحن بعد. أضف عنوانك الأول للبدء.
+            You haven't added any shipping addresses yet. Add your first address to get started.
           </p>
           <Button asChild>
             <Link href='/account/addresses/create'>
-              <Plus className='h-4 w-4 ml-2' />
-              إضافة عنوان جديد
+              <Plus className='h-4 w-4 mr-2' />
+              Add New Address
             </Link>
           </Button>
         </CardContent>
@@ -157,7 +157,7 @@ export default function AddressList() {
                   {address.isDefault && (
                     <span className='inline-flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full'>
                       <Star className='h-3 w-3' />
-                      افتراضي
+                      Default
                     </span>
                   )}
                 </div>
@@ -175,14 +175,14 @@ export default function AddressList() {
                     size='sm'
                     onClick={() => handleSetDefault(index)}
                   >
-                    <Star className='h-4 w-4 ml-1' />
-                    تعيين كافتراضي
+                    <Star className='h-4 w-4 mr-1' />
+                    Set as Default
                   </Button>
                 )}
                 <Button asChild variant='outline' size='sm'>
                   <Link href={`/account/addresses/edit/${index}`}>
-                    <Edit className='h-4 w-4 ml-1' />
-                    edit
+                    <Edit className='h-4 w-4 mr-1' />
+                    Edit
                   </Link>
                 </Button>
                 <Button

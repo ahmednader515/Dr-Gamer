@@ -65,10 +65,10 @@ export const ProfileForm = () => {
             name='name'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='font-bold'>الاسم الجديد</FormLabel>
+                <FormLabel className='font-bold'>New name</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder='الاسم'
+                    placeholder='Name'
                     {...field}
                     className='input-field'
                   />
@@ -85,7 +85,7 @@ export const ProfileForm = () => {
           disabled={form.formState.isSubmitting}
           className='button col-span-2 w-full'
         >
-          {form.formState.isSubmitting ? 'جاري الإرسال...' : 'حفظ التغييرات'}
+          {form.formState.isSubmitting ? 'Submitting...' : 'Save Changes'}
         </Button>
       </form>
     </Form>

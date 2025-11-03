@@ -178,8 +178,8 @@ const ProductCard = ({
             image: product.images[0],
             price: Number(product.price),
             countInStock: product.countInStock,
-            color: product.colors[0] || '',
-            size: product.sizes[0] || '',
+            color: product.colors?.[0] || '',
+            size: product.sizes?.[0] || '',
             quantity: 1,
             // product type & game account fields
             productType: (product as any).productType || 'game_code',
@@ -209,8 +209,8 @@ const ProductCard = ({
             image: product.images[0],
             price: Number(product.price),
             countInStock: product.countInStock,
-            color: product.colors[0] || '',
-            size: product.sizes[0] || '',
+            color: product.colors?.[0] || '',
+            size: product.sizes?.[0] || '',
             quantity: 1,
             // product type & game account fields
             productType: (product as any).productType || 'game_code',

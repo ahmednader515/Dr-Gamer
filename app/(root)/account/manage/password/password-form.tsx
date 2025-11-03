@@ -140,7 +140,7 @@ export const PasswordForm = () => {
           disabled={form.formState.isSubmitting}
           className='button col-span-2 w-full'
         >
-          {form.formState.isSubmitting ? 'جاري الإرسال...' : 'حفظ التغييرات'}
+          {form.formState.isSubmitting ? 'Submitting...' : 'Save Changes'}
         </Button>
       </form>
     </Form>

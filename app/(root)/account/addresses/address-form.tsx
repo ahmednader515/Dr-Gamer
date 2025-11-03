@@ -26,58 +26,58 @@ interface AddressFormProps {
 }
 
 const countries = [
-  'مصر',
-  'السعودية',
-  'الإمارات',
-  'الكويت',
-  'قطر',
-  'البحرين',
-  'عمان',
-  'الأردن',
-  'لبنان',
-  'سوريا',
-  'العراق',
-  'فلسطين',
-  'اليمن',
-  'السودان',
-  'المغرب',
-  'الجزائر',
-  'تونس',
-  'ليبيا',
-  'موريتانيا',
-  'الصومال',
-  'جيبوتي',
-  'جزر القمر',
-  'أخرى'
+  'Egypt',
+  'Saudi Arabia',
+  'United Arab Emirates',
+  'Kuwait',
+  'Qatar',
+  'Bahrain',
+  'Oman',
+  'Jordan',
+  'Lebanon',
+  'Syria',
+  'Iraq',
+  'Palestine',
+  'Yemen',
+  'Sudan',
+  'Morocco',
+  'Algeria',
+  'Tunisia',
+  'Libya',
+  'Mauritania',
+  'Somalia',
+  'Djibouti',
+  'Comoros',
+  'Other'
 ]
 
 const provinces = [
-  'القاهرة',
-  'الجيزة',
-  'الإسكندرية',
-  'أسيوط',
-  'سوهاج',
-  'قنا',
-  'الأقصر',
-  'أسوان',
-  'بني سويف',
-  'المنيا',
-  'الفيوم',
-  'الوادي الجديد',
-  'البحر الأحمر',
-  'شمال سيناء',
-  'جنوب سيناء',
-  'مطروح',
-  'كفر الشيخ',
-  'الغربية',
-  'المنوفية',
-  'الشرقية',
-  'الدقهلية',
-  'دمياط',
-  'بورسعيد',
-  'الإسماعيلية',
-  'السويس',
-  'أخرى'
+  'Cairo',
+  'Giza',
+  'Alexandria',
+  'Asyut',
+  'Sohag',
+  'Qena',
+  'Luxor',
+  'Aswan',
+  'Beni Suef',
+  'Minya',
+  'Fayoum',
+  'New Valley',
+  'Red Sea',
+  'North Sinai',
+  'South Sinai',
+  'Matrouh',
+  'Kafr El Sheikh',
+  'Gharbia',
+  'Monufia',
+  'Sharqia',
+  'Dakahlia',
+  'Damietta',
+  'Port Said',
+  'Ismailia',
+  'Suez',
+  'Other'
 ]
 
 export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
@@ -94,7 +94,7 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
       city: '',
       province: '',
       postalCode: '',
-      country: 'مصر',
+      country: 'Egypt',
       phone: '',
     },
   })
@@ -158,7 +158,7 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
     } catch (error) {
       toast({
         variant: 'destructive',
-        description: 'حدث خطأ أثناء حفظ العنوان',
+        description: 'An error occurred while saving the address',
       })
     } finally {
       setLoading(false)
@@ -174,9 +174,9 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
             name='fullName'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>الاسم الكامل *</FormLabel>
+                <FormLabel>Full Name *</FormLabel>
                 <FormControl>
-                  <Input placeholder='أدخل الاسم الكامل' {...field} />
+                  <Input placeholder='Enter full name' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -188,9 +188,9 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
             name='phone'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>رقم الهاتف *</FormLabel>
+                <FormLabel>Phone Number *</FormLabel>
                 <FormControl>
-                  <Input placeholder='أدخل رقم الهاتف' {...field} />
+                  <Input placeholder='Enter phone number' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -203,9 +203,9 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
           name='street'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>العنوان *</FormLabel>
+              <FormLabel>Street Address *</FormLabel>
               <FormControl>
-                <Input placeholder='أدخل العنوان بالتفصيل' {...field} />
+                <Input placeholder='Enter detailed address' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -218,9 +218,9 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
             name='city'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>المدينة *</FormLabel>
+                <FormLabel>City *</FormLabel>
                 <FormControl>
-                  <Input placeholder='أدخل المدينة' {...field} />
+                  <Input placeholder='Enter city' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -232,13 +232,13 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
             name='province'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>المحافظة *</FormLabel>
+                <FormLabel>Province/State *</FormLabel>
                 <FormControl>
                   <select
                     {...field}
                     className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                   >
-                    <option value=''>اختر المحافظة</option>
+                    <option value=''>Select province</option>
                     {provinces.map((province) => (
                       <option key={province} value={province}>
                         {province}
@@ -256,9 +256,9 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
             name='postalCode'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>الرمز البريدي *</FormLabel>
+                <FormLabel>Postal Code *</FormLabel>
                 <FormControl>
-                  <Input placeholder='أدخل الرمز البريدي' {...field} />
+                  <Input placeholder='Enter postal code' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -271,7 +271,7 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
           name='country'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>البلد *</FormLabel>
+              <FormLabel>Country *</FormLabel>
               <FormControl>
                 <select
                   {...field}
@@ -295,7 +295,7 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
             disabled={loading}
             className='flex-1'
           >
-            {loading ? 'جاري الحفظ...' : mode === 'create' ? 'إضافة العنوان' : 'حفظ التغييرات'}
+            {loading ? 'Saving...' : mode === 'create' ? 'Add Address' : 'Save Changes'}
           </Button>
           
           <Button
@@ -304,7 +304,7 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
             onClick={() => router.push('/account/addresses')}
             className='flex-1'
           >
-            cancel
+            Cancel
           </Button>
         </div>
       </form>

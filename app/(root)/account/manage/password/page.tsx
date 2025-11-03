@@ -19,9 +19,9 @@ export default async function ManagePasswordPage() {
   return (
     <div className='mb-24'>
       <div className='flex gap-2 '>
-        <Link href='/account'>حسابك</Link>
+        <Link href='/account'>Your Account</Link>
         <span>›</span>
-        <Link href='/account/manage'>تسجيل الدخول والأمان</Link>
+        <Link href='/account/manage'>Login & Security</Link>
         <span>›</span>
         <span>Change Password</span>
       </div>
@@ -30,8 +30,7 @@ export default async function ManagePasswordPage() {
         <CardContent className='p-4 flex justify-between flex-wrap'>
           <p className='text-sm py-2'>
             If you want to change your password for your {site.name} account,
-            you can do so below. Make sure to click the save button
-            التغييرات عندما تنتهي.
+            you can do so below. Make sure to click the Save Changes button when you are done.
           </p>
           <PasswordForm />
         </CardContent>

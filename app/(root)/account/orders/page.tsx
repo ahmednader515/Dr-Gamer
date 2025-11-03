@@ -17,7 +17,7 @@ import { formatDateTime, formatId } from '@/lib/utils'
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import ProductPrice from '@/components/shared/product/product-price'
 
-const PAGE_TITLE = 'طلباتك'
+const PAGE_TITLE = 'Your Orders'
 export const metadata: Metadata = {
   title: PAGE_TITLE,
 }
@@ -66,18 +66,18 @@ async function OrdersTable({ page }: { page: number }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className='text-right'>التاريخ</TableHead>
-            <TableHead className='text-right'>المجموع</TableHead>
-            <TableHead className='text-right'>مدفوع</TableHead>
-            <TableHead className='text-right'>مُسلم</TableHead>
-            <TableHead className='text-right'>الإجراءات</TableHead>
+            <TableHead className='text-right'>Date</TableHead>
+            <TableHead className='text-right'>Total</TableHead>
+            <TableHead className='text-right'>Paid</TableHead>
+            <TableHead className='text-right'>Delivered</TableHead>
+            <TableHead className='text-right'>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {orders.data.length === 0 && (
             <TableRow>
               <TableCell colSpan={5} className=''>
-                ليس لديك طلبات.
+                You have no orders.
               </TableCell>
             </TableRow>
           )}
@@ -92,16 +92,16 @@ async function OrdersTable({ page }: { page: number }) {
               <TableCell>
                 {order.isPaid && order.paidAt
                   ? formatDateTime(order.paidAt).dateTime
-                  : 'لا'}
+                  : 'No'}
               </TableCell>
               <TableCell>
                 {order.isDelivered && order.deliveredAt
                   ? formatDateTime(order.deliveredAt).dateTime
-                  : 'لا'}
+                  : 'No'}
               </TableCell>
               <TableCell>
                 <Link href={`/account/orders/${order.id}`}>
-                  <span className='px-2'>التفاصيل</span>
+                  <span className='px-2'>Details</span>
                 </Link>
               </TableCell>
             </TableRow>
@@ -137,7 +137,7 @@ export default async function OrdersPage(props: {
   return (
     <div>
       <div className='flex gap-2'>
-        <Link href='/account'>حسابك</Link>
+        <Link href='/account'>Your Account</Link>
         <span>›</span>
         <span>{PAGE_TITLE}</span>
       </div>

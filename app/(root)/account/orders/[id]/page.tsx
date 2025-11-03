@@ -13,7 +13,7 @@ export async function generateMetadata(props: {
   const params = await props.params
 
   return {
-    title: `تفاصيل الطلب`,
+    title: `Order Details`,
   }
 }
 
@@ -34,13 +34,13 @@ export default async function OrderDetailsPage(props: {
   return (
     <>
       <div className='flex gap-2'>
-        <Link href='/account'>حسابك</Link>
+        <Link href='/account'>Your Account</Link>
         <span>›</span>
-        <Link href='/account/orders'>طلباتك</Link>
+        <Link href='/account/orders'>Your Orders</Link>
         <span>›</span>
-        <span>تفاصيل الطلب</span>
+        <span>Order Details</span>
       </div>
-      <h1 className='h1-bold py-4'>تفاصيل الطلب</h1>
+      <h1 className='h1-bold py-4'>Order Details</h1>
       <OrderDetailsForm
         order={order}
         isAdmin={session?.user?.role === 'Admin' || false}

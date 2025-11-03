@@ -243,6 +243,14 @@ export default function CheckoutForm() {
         })
         return
       }
+      
+      if (item.platformType === 'Playstation' && !details.twoStepDisabled) {
+        toast({
+          description: `Please confirm that you have disabled 2-step verification for PlayStation account (${item.name})`,
+          variant: 'destructive',
+        })
+        return
+      }
     }
 
     await withLoading(
@@ -332,6 +340,16 @@ export default function CheckoutForm() {
   const CheckoutSummary = memo(() => (
     <Card>
       <CardContent className='p-3 sm:p-4'>
+        {/* Promo Code Section - Desktop sidebar only */}
+        <div className='hidden lg:block mb-4 pb-4 border-b'>
+          <PromoCodeInput
+            onPromoApplied={setAppliedPromo}
+            onPromoRemoved={() => setAppliedPromo(null)}
+            appliedPromo={appliedPromo}
+            discountAmount={discountAmount}
+          />
+        </div>
+
         {!isEmailSelected && (
           <div className='border-b mb-3 sm:mb-4'>
             <Button
@@ -393,23 +411,18 @@ export default function CheckoutForm() {
               </span>
             </div>
 
-            {/* Promo Code Section */}
-            <div className='pt-3 border-t'>
-              <PromoCodeInput
-                onPromoApplied={setAppliedPromo}
-                onPromoRemoved={() => setAppliedPromo(null)}
-                appliedPromo={appliedPromo}
-                discountAmount={discountAmount}
-              />
-            </div>
-
             {/* New Account Tax */}
             {newAccountTax > 0 && (
-              <div className='flex justify-between text-sm sm:text-base pt-2'>
-                <span>New Account Fee:</span>
-                <span className='text-orange-400'>
-                  +<ProductPrice price={newAccountTax} plain />
-                </span>
+              <div className='pt-2 space-y-1'>
+                <div className='flex justify-between text-sm sm:text-base'>
+                  <span>New Account Fee:</span>
+                  <span className='text-orange-400'>
+                    +<ProductPrice price={newAccountTax} plain />
+                  </span>
+                </div>
+                <p className='text-xs text-gray-400'>
+                  Includes account creation, setup, and initial configuration (30 EGP per new account)
+                </p>
               </div>
             )}
 
@@ -436,6 +449,20 @@ export default function CheckoutForm() {
       <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6'>
         <div className='lg:col-span-3'>
           
+          {/* Promo Code Section - Mobile Only at Top */}
+          <div className='block lg:hidden mb-4'>
+            <Card>
+              <CardContent className='p-3 sm:p-4'>
+                <PromoCodeInput
+                  onPromoApplied={setAppliedPromo}
+                  onPromoRemoved={() => setAppliedPromo(null)}
+                  appliedPromo={appliedPromo}
+                  discountAmount={discountAmount}
+                />
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Email Section */}
           <div>
             {isEmailSelected && customerEmail && customerPhone ? (
@@ -544,24 +571,46 @@ export default function CheckoutForm() {
                             )}
                             
                             {isPlaystation && (
-                              <div>
-                                <Label className='text-white text-sm'>Backup Code (Required for PlayStation)</Label>
-                                <Input
-                                  value={personalAccountDetails[item.clientId]?.backupCode || ''}
-                                  onChange={(e) => setPersonalAccountDetails({
-                                    ...personalAccountDetails,
-                                    [item.clientId]: {
-                                      ...personalAccountDetails[item.clientId],
-                                      backupCode: e.target.value
-                                    }
-                                  })}
-                                  placeholder='Enter PlayStation backup code'
-                                  className='border-gray-700 bg-gray-800 text-gray-200'
-                                  required
-                                />
-                                <p className='text-xs text-gray-400 mt-1'>
-                                  You can find your backup codes in PlayStation account settings
-                                </p>
+                              <div className='space-y-3'>
+                                <div>
+                                  <Label className='text-white text-sm'>Backup Code (Required for PlayStation)</Label>
+                                  <Input
+                                    value={personalAccountDetails[item.clientId]?.backupCode || ''}
+                                    onChange={(e) => setPersonalAccountDetails({
+                                      ...personalAccountDetails,
+                                      [item.clientId]: {
+                                        ...personalAccountDetails[item.clientId],
+                                        backupCode: e.target.value
+                                      }
+                                    })}
+                                    placeholder='Enter PlayStation backup code'
+                                    className='border-gray-700 bg-gray-800 text-gray-200'
+                                    required
+                                  />
+                                  <p className='text-xs text-gray-400 mt-1'>
+                                    You can find your backup codes in PlayStation account settings
+                                  </p>
+                                </div>
+                                
+                                <div className='flex items-center gap-2'>
+                                  <Checkbox
+                                    id={`ps-2step-${item.clientId}`}
+                                    checked={personalAccountDetails[item.clientId]?.twoStepDisabled || false}
+                                    onCheckedChange={(checked) => setPersonalAccountDetails({
+                                      ...personalAccountDetails,
+                                      [item.clientId]: {
+                                        ...personalAccountDetails[item.clientId],
+                                        twoStepDisabled: checked === true
+                                      }
+                                    })}
+                                  />
+                                  <label 
+                                    htmlFor={`ps-2step-${item.clientId}`}
+                                    className='text-sm text-white cursor-pointer'
+                                  >
+                                    I confirm that I have disabled 2-step verification on my PlayStation account (Required)
+                                  </label>
+                                </div>
                               </div>
                             )}
                             

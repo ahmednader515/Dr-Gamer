@@ -8,7 +8,7 @@ import { ArrowLeft } from 'lucide-react'
 import AddressForm from '../../address-form'
 
 export const metadata: Metadata = {
-  title: 'edit العنوان',
+  title: 'Edit Address',
 }
 
 export default async function EditAddressPage({
@@ -29,26 +29,26 @@ export default async function EditAddressPage({
   return (
     <div className='mb-24'>
       <div className='flex gap-2 '>
-        <Link href='/account'>حسابك</Link>
+        <Link href='/account'>Your Account</Link>
         <span>›</span>
-        <Link href='/account/addresses'>العناوين</Link>
+        <Link href='/account/addresses'>Addresses</Link>
         <span>›</span>
-        <span>edit العنوان</span>
+        <span>Edit Address</span>
       </div>
       
       <div className='flex items-center gap-4 mb-6'>
         <Button asChild variant='ghost' size='sm'>
           <Link href='/account/addresses'>
-            <ArrowLeft className='h-4 w-4 ml-1' />
-            العودة للعناوين
+            <ArrowLeft className='h-4 w-4 mr-1' />
+            Back to Addresses
           </Link>
         </Button>
-        <h1 className='h1-bold'>edit العنوان</h1>
+        <h1 className='h1-bold'>Edit Address</h1>
       </div>
       
       <Card className='max-w-2xl'>
         <CardHeader>
-          <CardTitle>edit معلومات العنوان</CardTitle>
+          <CardTitle>Edit Address Information</CardTitle>
         </CardHeader>
         <CardContent>
           <AddressForm mode='edit' addressIndex={addressIndex} />

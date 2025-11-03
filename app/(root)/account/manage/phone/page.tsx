@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import data from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'إدارة رقم الهاتف',
+  title: 'Manage Phone Number',
 }
 
 export default async function ManagePhonePage() {
@@ -19,19 +19,17 @@ export default async function ManagePhonePage() {
   return (
     <div className='mb-24'>
       <div className='flex gap-2 '>
-        <Link href='/account'>حسابك</Link>
+        <Link href='/account'>Your Account</Link>
         <span>›</span>
-        <Link href='/account/manage'>تسجيل الدخول والأمان</Link>
+        <Link href='/account/manage'>Login & Security</Link>
         <span>›</span>
-        <span>تغيير رقم الهاتف</span>
+        <span>Change phone number</span>
       </div>
-      <h1 className='h1-bold py-4'>تغيير رقم الهاتف</h1>
+      <h1 className='h1-bold py-4'>Change phone number</h1>
       <Card className='max-w-2xl'>
         <CardContent className='p-4 flex justify-between flex-wrap'>
           <p className='text-sm py-2'>
-            إذا كنت تريد تغيير رقم الهاتف المرتبط بحسابك في {site.name}،
-            يمكنك القيام بذلك أدناه. تأكد من النقر على زر حفظ
-            التغييرات عندما تنتهي.
+            If you want to change the phone number associated with your {site.name} customer account, you may do so below. Be sure to click the Save Changes button when you are done.
           </p>
           <PhoneForm />
         </CardContent>
