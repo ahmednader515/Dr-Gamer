@@ -41,7 +41,7 @@ export default function DeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>إلغاء</AlertDialogCancel>
+          <AlertDialogCancel>cancel</AlertDialogCancel>
 
           <Button
             variant='destructive'

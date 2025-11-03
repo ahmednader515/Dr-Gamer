@@ -64,7 +64,7 @@ export const createOrder = async (clientSideCart: Cart) => {
       session.user.id!
     )
     return {
-      success: true, message: 'تم تأكيد الطلب بنجاح',
+      success: true, message: 'Order confirmed successfully',
       data: { orderId: createdOrder.id },
     }
   } catch (error) {
@@ -216,7 +216,7 @@ export async function updateOrderToPaid(orderId: string) {
     await updateProductStock(orderId)
     if (order.user.phone) await sendPurchaseReceipt({ order })
     revalidatePath(`/account/orders/${orderId}`)
-    return { success: true, message: 'تم دفع الطلب بنجاح' }
+    return { success: true, message: 'Order paid successfully' }
   } catch (err) {
     return { success: false, message: formatError(err) }
   }
@@ -271,7 +271,7 @@ export async function deliverOrder(orderId: string) {
     
     if (order.user.phone) await sendAskReviewOrderItems({ order })
     revalidatePath(`/account/orders/${orderId}`)
-    return { success: true, message: 'تم تسليم الطلب بنجاح' }
+    return { success: true, message: 'Order delivered successfully' }
   } catch (err) {
     return { success: false, message: formatError(err) }
   }
@@ -288,7 +288,7 @@ export async function deleteOrder(id: string) {
     revalidatePath('/admin/orders')
     return {
       success: true,
-      message: 'تم Delete الطلب بنجاح',
+      message: 'Order deleted successfully',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }

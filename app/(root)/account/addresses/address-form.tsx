@@ -304,7 +304,7 @@ export default function AddressForm({ mode, addressIndex }: AddressFormProps) {
             onClick={() => router.push('/account/addresses')}
             className='flex-1'
           >
-            إلغاء
+            cancel
           </Button>
         </div>
       </form>

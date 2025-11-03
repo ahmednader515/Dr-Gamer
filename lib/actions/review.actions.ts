@@ -77,7 +77,7 @@ export async function createUpdateReview({
     }
     return {
       success: true,
-      message: existingReview ? 'تم تحديث التقييم بنجاح' : 'تم إنشاء التقييم بنجاح',
+      message: existingReview ? 'Review updated successfully' : 'Review created successfully',
     }
   } catch (error) {
     console.error('Review creation error:', error)
@@ -265,7 +265,7 @@ export const deleteReview = async (reviewId: string, path: string) => {
     }
     return {
       success: true,
-      message: 'تم Delete التقييم بنجاح',
+      message: 'Review deleted successfully',
     }
   } catch (error) {
     return {

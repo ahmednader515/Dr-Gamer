@@ -10,7 +10,7 @@ interface LoadingOverlayProps {
 
 export default function LoadingOverlay({ 
   isLoading, 
-  text = 'جاري التحميل...',
+  text = 'Loading...',
   className = '' 
 }: LoadingOverlayProps) {
   if (!isLoading) return null
@@ -37,7 +37,7 @@ export default function LoadingOverlay({
 // Smaller inline loading component for buttons and small areas
 export function LoadingSpinner({ 
   size = 'md', 
-  text = 'جاري التحميل...',
+  text = 'Loading...',
   className = '' 
 }: { 
   size?: 'sm' | 'md' | 'lg'

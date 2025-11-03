@@ -106,9 +106,9 @@ export const OrderItemSchema = z.object({
   disableTwoStepVerified: z.boolean().optional(),
 })
 export const ShippingAddressSchema = z.object({
-  street: z.string().min(1, 'العنوان (الشارع، الشقة، الجناح، الوحدة، إلخ) مطلوب'),
-  province: z.string().min(1, 'المحافظة مطلوبة'),
-  area: z.string().min(1, 'المنطقة مطلوبة'),
+  street: z.string().min(1, 'Street address is required'),
+  province: z.string().min(1, 'Province is required'),
+  area: z.string().min(1, 'Area is required'),
   apartment: z.string().optional(),
   building: z.string().optional(),
   floor: z.string().optional(),
@@ -127,8 +127,8 @@ export const OrderInputSchema = z.object({
   items: z
     .array(OrderItemSchema)
     .min(1, 'Order must contain at least one item'),
-  customerEmail: z.string().min(1, 'البريد الإلكتروني مطلوب').email('البريد الإلكتروني غير صالح'),
-  customerPhone: z.string().min(1, 'رقم الهاتف مطلوب'),
+  customerEmail: z.string().min(1, 'Email is required').email('Email is invalid'),
+  customerPhone: z.string().min(1, 'Phone number is required'),
   shippingAddress: ShippingAddressSchema.optional(),
   paymentMethod: z.string().min(1, 'Payment method is required'),
   paymentNumber: z.string().optional(),
@@ -224,7 +224,7 @@ export const UserSignUpSchema = UserSignInSchema.extend({
   name: UserName,
   confirmPassword: Password,
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "كلمات المرور غير متطابقة",
+  message: "Passwords do not match",
   path: ['confirmPassword'],
 })
 export const UserNameSchema = z.object({

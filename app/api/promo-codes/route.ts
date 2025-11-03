@@ -22,7 +22,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching promo codes:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في جلب أكواد الخصم' },
+      { success: false, message: 'An error occurred while fetching promo codes' },
       { status: 500 }
     )
   }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     if (discountPercent < 1 || discountPercent > 100) {
       return NextResponse.json(
-        { success: false, message: 'نسبة الخصم يجب أن تكون بين 1% و 100%' },
+        { success: false, message: 'Discount percentage must be between 1% and 100%' },
         { status: 400 }
       )
     }
@@ -81,13 +81,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'تم إنشاء كود الخصم بنجاح',
+      message: 'Promo code created successfully',
       data: promoCode
     })
   } catch (error) {
     console.error('Error creating promo code:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في إنشاء كود الخصم' },
+      { success: false, message: 'An error occurred while creating promo code' },
       { status: 500 }
     )
   }

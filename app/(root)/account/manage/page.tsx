@@ -51,7 +51,7 @@ export default async function ProfilePage() {
           <CardContent className='p-4 flex justify-between flex-wrap'>
             <div>
               <h3 className='font-bold'>البريد الإلكتروني</h3>
-              <p>{session?.user.email || 'غير محدد'}</p>
+              <p>{session?.user.email || 'Not specified'}</p>
             </div>
             <div>
               <Link href='/account/manage/email'>
@@ -64,7 +64,7 @@ export default async function ProfilePage() {
           <Separator />
           <CardContent className='p-4 flex justify-between flex-wrap'>
             <div>
-              <h3 className='font-bold'>كلمة المرور</h3>
+              <h3 className='font-bold'>Password</h3>
               <p>************</p>
             </div>
             <div>

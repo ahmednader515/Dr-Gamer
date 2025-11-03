@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast'
 import { updateUserPhone } from '@/lib/actions/user.actions'
 
 const PhoneSchema = z.object({
-  phone: z.string().min(1, 'رقم الهاتف مطلوب').regex(/^\+?[1-9]\d{1,14}$/, 'رقم الهاتف غير صحيح'),
+  phone: z.string().min(1, 'Phone number is required').regex(/^\+?[1-9]\d{1,14}$/, 'Phone number is invalid'),
 })
 
 export const PhoneForm = () => {

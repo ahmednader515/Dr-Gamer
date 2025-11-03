@@ -53,12 +53,12 @@ export default function AddressList() {
         localStorage.setItem('userAddresses', JSON.stringify(newAddresses))
         
         toast({
-          description: 'تم Delete العنوان بنجاح',
+          description: 'Address deleted successfully',
         })
       } else {
         toast({
           variant: 'destructive',
-          description: res.message || 'حدث خطأ أثناء Delete العنوان',
+          description: res.message || 'An error occurred while deleting the address',
         })
       }
     } catch (error) {
@@ -95,12 +95,12 @@ export default function AddressList() {
         localStorage.setItem('userAddresses', JSON.stringify(newAddresses))
         
         toast({
-          description: 'تم تعيين العنوان كافتراضي بنجاح',
+          description: 'Default address set successfully',
         })
       } else {
         toast({
           variant: 'destructive',
-          description: res.message || 'حدث خطأ أثناء تعيين العنوان الافتراضي',
+          description: res.message || 'An error occurred while setting default address',
         })
       }
     } catch (error) {

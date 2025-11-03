@@ -12,7 +12,7 @@ export async function DELETE(
     
     if (!session || session.user.role !== 'Admin') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح' },
+        { success: false, message: 'Unauthorized' },
         { status: 401 }
       )
     }
@@ -25,12 +25,12 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'تم Delete كود الخصم بنجاح'
+      message: 'Promo code deleted successfully'
     })
   } catch (error) {
     console.error('Error deleting promo code:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في Delete كود الخصم' },
+      { success: false, message: 'An error occurred while deleting promo code' },
       { status: 500 }
     )
   }
@@ -46,7 +46,7 @@ export async function PATCH(
     
     if (!session || session.user.role !== 'Admin') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح' },
+        { success: false, message: 'Unauthorized' },
         { status: 401 }
       )
     }
@@ -61,13 +61,13 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
-      message: 'تم تحديث حالة الكود بنجاح',
+      message: 'Code status updated successfully',
       data: promoCode
     })
   } catch (error) {
     console.error('Error updating promo code:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في تحديث الكود' },
+      { success: false, message: 'An error occurred while updating the code' },
       { status: 500 }
     )
   }

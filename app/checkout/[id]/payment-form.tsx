@@ -86,9 +86,9 @@ export default function OrderDetailsForm({
             {!isPaid && paymentMethod && (
               <div className='space-y-3 pt-3 border-t'>
                 <div className='bg-yellow-900/30 border border-yellow-600 rounded-lg p-3 text-sm'>
-                  <p className='text-yellow-400 font-semibold mb-1'>⏳ في انتظار تأكيد الدفع</p>
+                  <p className='text-yellow-400 font-semibold mb-1'>⏳ Waiting for payment confirmation</p>
                   <p className='text-gray-300 text-xs'>
-                    سيتم مراجعة معاملتك وتأكيد الطلب في أقرب وقت. سيتم إرسال المنتج الرقمي إلى بريدك الإلكتروني بعد التأكيد.
+                    Your transaction will be reviewed and the order will be confirmed shortly. The digital product will be sent to your email after confirmation.
                   </p>
                 </div>
                 <Button
@@ -136,7 +136,7 @@ export default function OrderDetailsForm({
                 <div>
                   <p className='text-sm text-gray-400'>البريد الإلكتروني:</p>
                   <p className='text-base font-semibold'>
-                    {customerEmail || 'غير متوفر'}
+                    {customerEmail || 'Not available'}
                   </p>
                   <p className='text-xs text-gray-400 mt-1'>
                     سيتم إرسال المنتج الرقمي إلى هذا البريد بعد تأكيد الدفع
@@ -146,7 +146,7 @@ export default function OrderDetailsForm({
                 <div className='border-t border-gray-700 pt-3'>
                   <p className='text-sm text-gray-400'>رقم الهاتف:</p>
                   <p className='text-base font-semibold'>
-                    {customerPhone || 'غير متوفر'}
+                    {customerPhone || 'Not available'}
                   </p>
                   <p className='text-xs text-gray-400 mt-1'>
                     للتواصل في حالة عدم توفر البريد الإلكتروني
@@ -164,7 +164,7 @@ export default function OrderDetailsForm({
                   <span>طريقة الدفع</span>
                 </div>
                 <div className='col-span-2 space-y-3'>
-                  <p className='text-base font-semibold'>{paymentMethod || 'غير محدد'}</p>
+                  <p className='text-base font-semibold'>{paymentMethod || 'Not specified'}</p>
                   
                   {paymentNumber && (
                     <div>

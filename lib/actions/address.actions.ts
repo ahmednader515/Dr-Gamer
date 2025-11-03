@@ -17,7 +17,7 @@ export async function createAddress(address: ShippingAddress) {
     // Always use database
     
     // TODO: Implement database storage for addresses
-    return { success: true, message: 'تم إضافة العنوان بنجاح', data: address }
+    return { success: true, message: 'Address added successfully', data: address }
   } catch (error) {
     return { success: false, message: formatError(error) }
   }
@@ -34,7 +34,7 @@ export async function updateAddress(index: number, address: ShippingAddress) {
     // Always use database
     
     // TODO: Implement database update for addresses
-    return { success: true, message: 'تم تحديث العنوان بنجاح', data: address }
+    return { success: true, message: 'Address updated successfully', data: address }
   } catch (error) {
     return { success: false, message: formatError(error) }
   }
@@ -51,7 +51,7 @@ export async function deleteAddress(address: ShippingAddress) {
     // Always use database
     
     // TODO: Implement database deletion for addresses
-    return { success: true, message: 'تم Delete العنوان بنجاح' }
+    return { success: true, message: 'Address deleted successfully' }
   } catch (error) {
     return { success: false, message: formatError(error) }
   }
@@ -68,7 +68,7 @@ export async function setDefaultAddress(address: ShippingAddress) {
     // Always use database
     
     // TODO: Implement database update for default address
-    return { success: true, message: 'تم تعيين العنوان كافتراضي بنجاح' }
+    return { success: true, message: 'Default address set successfully' }
   } catch (error) {
     return { success: false, message: formatError(error) }
   }

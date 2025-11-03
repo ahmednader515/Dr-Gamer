@@ -1006,7 +1006,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     "Share your thoughts with other customers": "شارك أفكارك مع العملاء الآخرين",
     "Write a customer review": "اكتب مراجعة للعميل",
     "Write a review": "اكتب مراجعة",
-    "Cancel": "إلغاء",
+    "Cancel": "cancel",
     "Submit": "إرسال",
     "Sort by": "فرز حسب",
     "Price: Low to High": "السعر: من الأدنى إلى الأعلى",
@@ -1026,7 +1026,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     "sign in": "تسجيل الدخول",
     "to write a review": "لكتابة مراجعة",
     "See more reviews": "عرض المزيد من المراجعات",
-    "Loading": "جاري التحميل...",
+    "Loading": "Loading...",
     "Rating": "التقييم",
     "No reviews yet": "لا توجد مراجعات حتى الآن",
     "Submitting": "جاري الإرسال..."
@@ -1103,7 +1103,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     "Help": "مساعدة"
   },
   "Loading": {
-    "Loading": "جاري التحميل..."
+    "Loading": "Loading..."
   },
   "Error": {
     "Error": "خطأ",

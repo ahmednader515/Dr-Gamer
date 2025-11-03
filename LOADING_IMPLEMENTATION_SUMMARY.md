@@ -16,7 +16,7 @@ The website now includes comprehensive loading states for all actions that take 
 ### 1. Checkout Form (`app/checkout/checkout-form.tsx`)
 - **Loading State**: Full page overlay during order placement
 - **Implementation**: Uses `useLoading` hook with `LoadingOverlay`
-- **User Experience**: Shows "جاري معالجة الطلب..." (Processing order...) with backdrop blur
+- **User Experience**: Shows "processing order..." (Processing order...) with backdrop blur
 - **Button States**: Disabled during submission with loading text
 
 ### 2. Add to Cart (`components/shared/product/add-to-cart.tsx`)
@@ -78,7 +78,7 @@ The website now includes comprehensive loading states for all actions that take 
 ### 1. LoadingOverlay
 - **Usage**: Full page loading states (e.g., checkout processing)
 - **Features**: Backdrop blur, centered content, customizable text
-- **Example**: `جاري معالجة الطلب...` (Processing order...)
+- **Example**: `processing order...` (Processing order...)
 
 ### 2. LoadingSpinner
 - **Usage**: Button and small area loading states

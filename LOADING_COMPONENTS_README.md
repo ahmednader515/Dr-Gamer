@@ -18,7 +18,7 @@ function MyComponent() {
     <div>
       <LoadingOverlay 
         isLoading={isLoading} 
-        text="جاري معالجة الطلب..."
+        text="processing order..."
       />
       {/* محتوى الصفحة */}
     </div>
@@ -266,7 +266,7 @@ function ProductsPage() {
 ```tsx
 <LoadingOverlay 
   isLoading={isLoading} 
-  text="جاري التحميل..."
+  text="Loading..."
   className="custom-loading-overlay"
 />
 ```

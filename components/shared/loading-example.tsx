@@ -46,15 +46,15 @@ export default function LoadingExample() {
         <h2 className="text-xl font-semibold">مثال على شاشة التحميل المتراكبة</h2>
         <div className="flex gap-4">
           <Button onClick={handleManualLoading} disabled={isLoading}>
-            {isLoading ? 'جاري التحميل...' : 'بدء التحميل اليدوي'}
+            {isLoading ? 'Loading...' : 'بدء التحميل اليدوي'}
           </Button>
           <Button onClick={handleWithLoading} disabled={isLoading}>
-            {isLoading ? 'جاري التحميل...' : 'بدء التحميل التلقائي'}
+            {isLoading ? 'Loading...' : 'بدء التحميل التلقائي'}
           </Button>
         </div>
         <LoadingOverlay 
           isLoading={isLoading} 
-          text="جاري معالجة الطلب..."
+          text="processing order..."
         />
       </div>
 

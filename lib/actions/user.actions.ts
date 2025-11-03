@@ -29,7 +29,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
     })
 
     if (existingUser) {
-      return { success: false, error: 'يوجد حساب بهذا البريد الإلكتروني بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.' }
+      return { success: false, error: 'An account with this email already exists. Please log in instead.' }
     }
 
     await prisma.user.create({
@@ -40,18 +40,18 @@ export async function registerUser(userSignUp: IUserSignUp) {
         role: 'User',
       }
     })
-    return { success: true, message: 'تم إنشاء الUser بنجاح' }
+    return { success: true, message: 'User created successfully' }
   } catch (error) {
     // Handle specific validation errors
     if (error instanceof Error) {
       if (error.message.includes('validation')) {
-        return { success: false, error: 'يرجى التحقق من المدخلات والتأكد من ملء جميع الحقول بشكل صحيح.' }
+        return { success: false, error: 'Please check your inputs and make sure all fields are filled correctly.' }
       }
       if (error.message.includes('unique constraint')) {
-        return { success: false, error: 'يوجد حساب بهذا البريد الإلكتروني بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.' }
+        return { success: false, error: 'An account with this email already exists. Please log in instead.' }
       }
       if (error.message.includes('database')) {
-        return { success: false, error: 'خطأ في الاتصال بقاعدة البيانات. يرجى المحاولة مرة أخرى لاحقاً.' }
+        return { success: false, error: 'Database connection error. Please try again later.' }
       }
     }
     
@@ -70,7 +70,7 @@ export async function deleteUser(id: string) {
     revalidatePath('/admin/users')
     return {
       success: true,
-      message: 'تم Delete الUser بنجاح',
+      message: 'User deleted successfully',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }
@@ -91,7 +91,7 @@ export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
     revalidatePath('/admin/users')
     return {
       success: true,
-      message: 'تم تغير الأسم',
+      message: 'Name updated successfully',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
   } catch (error) {
@@ -115,7 +115,7 @@ export async function updateUserName(user: IUserName) {
     })
     return {
       success: true,
-      message: 'تم تغير الأسم',
+      message: 'Name updated successfully',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
   } catch (error) {
@@ -139,7 +139,7 @@ export async function updateUserEmail(user: { email: string }) {
     })
     return {
       success: true,
-      message: 'تم تحديث البريد الإلكتروني بنجاح',
+      message: 'Email updated successfully',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
   } catch (error) {
@@ -164,12 +164,12 @@ export async function updateUserPassword(user: {
     })
     
     if (!currentUser) {
-      return { success: false, message: 'الUser غير موجود' }
+      return { success: false, message: 'User not found' }
     }
     
     const isCurrentPasswordValid = await bcrypt.compare(user.currentPassword, currentUser.password)
     if (!isCurrentPasswordValid) {
-      return { success: false, message: 'كلمة المرور الحالية غير صحيحة' }
+      return { success: false, message: 'Current password is incorrect' }
     }
     
     // Hash the new password
@@ -184,7 +184,7 @@ export async function updateUserPassword(user: {
     })
     return {
       success: true,
-      message: 'تم تغيير كلمة المرور بنجاح',
+      message: 'Password changed successfully',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
   } catch (error) {
@@ -214,18 +214,18 @@ export async function signInWithCredentials(user: IUserSignIn) {
       console.log('❌ Sign in failed with error:', result.error)
       
       // Provide more specific error messages based on the error type
-      let errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
+      let errorMessage = 'Invalid email or password'
       
       if (result.error.includes('CredentialsSignin')) {
-        errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
+        errorMessage = 'Invalid email or password'
       } else if (result.error.includes('Callback')) {
-        errorMessage = 'خطأ في المصادقة. يرجى المحاولة مرة أخرى'
+        errorMessage = 'Authentication error. Please try again'
       } else if (result.error.includes('OAuth')) {
-        errorMessage = 'خطأ في تسجيل الدخول. يرجى المحاولة مرة أخرى'
+        errorMessage = 'Login error. Please try again'
       } else if (result.error.includes('Configuration')) {
-        errorMessage = 'خطأ في إعداد النظام. يرجى المحاولة مرة أخرى'
+        errorMessage = 'System configuration error. Please try again'
       } else if (result.error.includes('AccessDenied')) {
-        errorMessage = 'تم رفض الوصول. يرجى التحقق من بياناتك'
+        errorMessage = 'Access denied. Please check your credentials'
       }
       
       return { 
@@ -248,7 +248,7 @@ export async function signInWithCredentials(user: IUserSignIn) {
           console.log('✅ Session confirmed for user:', session.user.name)
           return { 
             success: true, 
-            message: 'تم تسجيل الدخول بنجاح' 
+            message: 'Logged in successfully' 
           }
         } else {
           console.log('⚠️ Sign in succeeded but no session found')
@@ -256,7 +256,7 @@ export async function signInWithCredentials(user: IUserSignIn) {
           // The session might take a moment to propagate
           return { 
             success: true, 
-            message: 'تم تسجيل الدخول بنجاح' 
+            message: 'Logged in successfully' 
           }
         }
       } catch (sessionError) {
@@ -284,7 +284,7 @@ export async function signInWithCredentials(user: IUserSignIn) {
           console.log('✅ Session found after URL redirect, sign in successful')
           return { 
             success: true, 
-            message: 'تم تسجيل الدخول بنجاح' 
+            message: 'Logged in successfully' 
           }
         } else {
           console.log('⚠️ No session found after URL redirect, but this might be normal')
@@ -298,7 +298,7 @@ export async function signInWithCredentials(user: IUserSignIn) {
               console.log('✅ Session found on second attempt after URL redirect')
               return { 
                 success: true, 
-                message: 'تم تسجيل الدخول بنجاح' 
+                message: 'Logged in successfully' 
               }
             }
           } catch (sessionError2) {
@@ -308,14 +308,14 @@ export async function signInWithCredentials(user: IUserSignIn) {
           // If we still can't get a session, assume it failed
           return { 
             success: false, 
-            message: 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى' 
+            message: 'Login failed. Please try again' 
           }
         }
       } catch (sessionError) {
         console.log('⚠️ Could not verify session after URL redirect')
         return { 
           success: false, 
-          message: 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى' 
+          message: 'Login failed. Please try again' 
         }
       }
     }
@@ -334,20 +334,20 @@ export async function signInWithCredentials(user: IUserSignIn) {
           console.log('✅ Session found after empty result, sign in successful')
           return { 
             success: true, 
-            message: 'تم تسجيل الدخول بنجاح' 
+            message: 'Logged in successfully' 
           }
         } else {
           console.log('⚠️ No session found after empty result')
           return { 
             success: false, 
-            message: 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى' 
+            message: 'Login failed. Please try again' 
           }
         }
       } catch (sessionError) {
         console.log('⚠️ Could not verify session after empty result')
         return { 
           success: false, 
-          message: 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى' 
+          message: 'Login failed. Please try again' 
         }
       }
     }
@@ -361,19 +361,19 @@ export async function signInWithCredentials(user: IUserSignIn) {
     console.log('💥 Sign in error caught:', error)
     
     // Provide more specific error messages based on the error type
-    let errorMessage = 'حدث خطأ غير متوقع أثناء تسجيل الدخول'
+    let errorMessage = 'An unexpected error occurred during login'
     
     if (error instanceof Error) {
       if (error.message.includes('fetch')) {
-        errorMessage = 'خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى'
+        errorMessage = 'Network error. Please check your connection and try again'
       } else if (error.message.includes('timeout')) {
-        errorMessage = 'انتهت مهلة الطلب. يرجى المحاولة مرة أخرى'
+        errorMessage = 'Request timeout. Please try again'
       } else if (error.message.includes('credentials')) {
-        errorMessage = 'بيانات غير صحيحة. يرجى التحقق من البريد الإلكتروني وكلمة المرور'
+        errorMessage = 'Invalid credentials. Please check your email and password'
       } else if (error.message.includes('network')) {
-        errorMessage = 'خطأ في الاتصال. يرجى التحقق من اتصالك بالإنترنت'
+        errorMessage = 'Connection error. Please check your internet connection'
       } else {
-        errorMessage = error.message || 'فشل في المصادقة. يرجى المحاولة مرة أخرى'
+        errorMessage = error.message || 'Authentication failed. Please try again'
       }
     } else if (typeof error === 'string') {
       errorMessage = error

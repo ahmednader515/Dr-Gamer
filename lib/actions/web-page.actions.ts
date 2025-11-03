@@ -21,7 +21,7 @@ export async function createWebPage(data: z.infer<typeof WebPageInputSchema>) {
     revalidatePath('/admin/web-pages')
     return {
       success: true,
-      message: 'تم إنشاء الصفحة بنجاح',
+      message: 'Page created successfully',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }
@@ -44,7 +44,7 @@ export async function updateWebPage(data: z.infer<typeof WebPageUpdateSchema>) {
     revalidatePath('/admin/web-pages')
     return {
       success: true,
-      message: 'تم تحديث الصفحة بنجاح',
+      message: 'Page updated successfully',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }

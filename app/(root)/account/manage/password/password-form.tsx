@@ -20,11 +20,11 @@ import { useToast } from '@/hooks/use-toast'
 import { updateUserPassword } from '@/lib/actions/user.actions'
 
 const PasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'كلمة المرور الحالية مطلوبة'),
-  newPassword: z.string().min(3, 'كلمة المرور الجديدة يجب أن تكون 3 أحرف على الأقل'),
-  confirmPassword: z.string().min(1, 'تأكيد كلمة المرور مطلوب'),
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(3, 'New password must be at least 3 characters'),
+  confirmPassword: z.string().min(1, 'Password confirmation is required'),
 }).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "كلمات المرور غير متطابقة",
+  message: "Passwords do not match",
   path: ['confirmPassword'],
 })
 
@@ -64,7 +64,7 @@ export const PasswordForm = () => {
     } catch (error) {
       toast({
         variant: 'destructive',
-        description: 'حدث خطأ أثناء تغيير كلمة المرور',
+        description: 'An error occurred while changing password',
       })
     }
   }
@@ -81,11 +81,11 @@ export const PasswordForm = () => {
             name='currentPassword'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='font-bold'>كلمة المرور الحالية</FormLabel>
+                <FormLabel className='font-bold'>Current Password</FormLabel>
                 <FormControl>
-                  <Input
+                  <Input 
                     type='password'
-                    placeholder='أدخل كلمة المرور الحالية'
+                    placeholder='Enter current password'
                     {...field}
                     className='input-field'
                   />
@@ -100,11 +100,11 @@ export const PasswordForm = () => {
             name='newPassword'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='font-bold'>كلمة المرور الجديدة</FormLabel>
+                <FormLabel className='font-bold'>New Password</FormLabel>
                 <FormControl>
-                  <Input
+                  <Input 
                     type='password'
-                    placeholder='أدخل كلمة المرور الجديدة'
+                    placeholder='Enter new password'
                     {...field}
                     className='input-field'
                   />
@@ -119,11 +119,11 @@ export const PasswordForm = () => {
             name='confirmPassword'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='font-bold'>تأكيد كلمة المرور الجديدة</FormLabel>
+                <FormLabel className='font-bold'>Confirm New Password</FormLabel>
                 <FormControl>
-                  <Input
+                  <Input 
                     type='password'
-                    placeholder='أعد إدخال كلمة المرور الجديدة'
+                    placeholder='Re-enter new password'
                     {...field}
                     className='input-field'
                   />

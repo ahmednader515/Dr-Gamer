@@ -63,7 +63,7 @@ async function AccountCards() {
             <div>
               <h2 className='text-xl font-bold'>الطلبات</h2>
               <p className='text-muted-foreground'>
-                تتبع، إرجاع، إلغاء طلب، تحميل الفاتورة أو الشراء مرة أخرى
+                تتبع، إرجاع، cancel طلب، تحميل الفاتورة أو الشراء مرة أخرى
               </p>
             </div>
           </CardContent>
@@ -79,7 +79,7 @@ async function AccountCards() {
             <div>
               <h2 className='text-xl font-bold'>تسجيل الدخول والأمان</h2>
               <p className='text-muted-foreground'>
-                إدارة كلمة المرور والبريد الإلكتروني ورقم الهاتف
+                Manage password, email and phone number
               </p>
             </div>
           </CardContent>

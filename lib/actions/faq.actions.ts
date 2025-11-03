@@ -93,7 +93,7 @@ export async function createFAQCategory(data: {
     revalidatePath('/admin/faq')
     return {
       success: true,
-      message: 'تم إنشاء فئة الأسئلة بنجاح',
+      message: 'FAQ category created successfully',
       categoryId: category.id,
     }
   } catch (error) {
@@ -117,7 +117,7 @@ export async function updateFAQCategory(id: string, data: {
     revalidatePath('/admin/faq')
     return {
       success: true,
-      message: 'تم تحديث فئة الأسئلة بنجاح',
+      message: 'FAQ category updated successfully',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }
@@ -134,7 +134,7 @@ export async function deleteFAQCategory(id: string) {
     revalidatePath('/admin/faq')
     return {
       success: true,
-      message: 'تم Delete فئة الأسئلة بنجاح',
+      message: 'FAQ category deleted successfully',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }
@@ -163,7 +163,7 @@ export async function createFAQQuestion(data: {
     revalidatePath('/admin/faq')
     return {
       success: true,
-      message: 'تم إنشاء السؤال بنجاح',
+      message: 'Question created successfully',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }
@@ -187,7 +187,7 @@ export async function updateFAQQuestion(id: string, data: {
     revalidatePath('/admin/faq')
     return {
       success: true,
-      message: 'تم تحديث السؤال بنجاح',
+      message: 'Question updated successfully',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }
@@ -204,7 +204,7 @@ export async function deleteFAQQuestion(id: string) {
     revalidatePath('/admin/faq')
     return {
       success: true,
-      message: 'تم Delete السؤال بنجاح',
+      message: 'Question deleted successfully',
     }
   } catch (error) {
     return { success: false, message: formatError(error) }

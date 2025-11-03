@@ -40,14 +40,14 @@ export async function createCategory(data: z.infer<typeof CategoryInputSchema>) 
     
     return {
       success: true,
-      message: 'تم إنشاء الفئة بنجاح',
+      message: 'Category created successfully',
       category
     }
   } catch (error) {
     console.error('Error creating category:', error)
     return { 
       success: false, 
-      message: error instanceof Error ? error.message : 'حدث خطأ أثناء إنشاء الفئة' 
+      message: error instanceof Error ? error.message : 'An error occurred while creating the category' 
     }
   }
 }
@@ -68,14 +68,14 @@ export async function updateCategory(data: z.infer<typeof CategoryUpdateSchema>)
     
     return {
       success: true,
-      message: 'تم تحديث الفئة بنجاح',
+      message: 'Category updated successfully',
       category
     }
   } catch (error) {
     console.error('Error updating category:', error)
     return { 
       success: false, 
-      message: error instanceof Error ? error.message : 'حدث خطأ أثناء تحديث الفئة' 
+      message: error instanceof Error ? error.message : 'An error occurred while updating the category' 
     }
   }
 }
@@ -104,13 +104,13 @@ export async function deleteCategory(id: string) {
     
     return {
       success: true,
-      message: 'تم Delete الفئة بنجاح'
+      message: 'Category deleted successfully'
     }
   } catch (error) {
     console.error('Error deleting category:', error)
     return { 
       success: false, 
-      message: error instanceof Error ? error.message : 'حدث خطأ أثناء Delete الفئة' 
+      message: error instanceof Error ? error.message : 'An error occurred while deleting the category' 
     }
   }
 }
@@ -157,13 +157,13 @@ export async function reorderCategories(data: z.infer<typeof ReorderCategoriesSc
     
     return {
       success: true,
-      message: 'تم تحديث ترتيب الفئات بنجاح',
+      message: 'Category order updated successfully',
     }
   } catch (error) {
     console.error('Error reordering categories:', error)
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'حدث خطأ أثناء تحديث ترتيب الفئات',
+      message: error instanceof Error ? error.message : 'An error occurred while updating category order',
     }
   }
 }
@@ -243,13 +243,13 @@ export async function migrateProductCategories() {
     
     return {
       success: true,
-      message: 'تم ترحيل الفئات بنجاح'
+      message: 'Categories migrated successfully'
     }
   } catch (error) {
     console.error('Error migrating categories:', error)
     return {
       success: false,
-      message: 'حدث خطأ أثناء ترحيل الفئات'
+      message: 'An error occurred while migrating categories'
     }
   }
 }

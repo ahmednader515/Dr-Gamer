@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     if (!promoCode) {
       return NextResponse.json(
-        { success: false, message: 'كود الخصم غير صحيح' },
+        { success: false, message: 'Invalid promo code' },
         { status: 404 }
       )
     }
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     // Check if active
     if (!promoCode.isActive) {
       return NextResponse.json(
-        { success: false, message: 'هذا الكود غير نشط' },
+        { success: false, message: 'This code is not active' },
         { status: 400 }
       )
     }
@@ -44,14 +44,14 @@ export async function POST(request: NextRequest) {
     // Check usage limit
     if (promoCode.usageLimit && promoCode.usageCount >= promoCode.usageLimit) {
       return NextResponse.json(
-        { success: false, message: 'تم استخدام هذا الكود بالكامل' },
+        { success: false, message: 'This code has been fully used' },
         { status: 400 }
       )
     }
 
     return NextResponse.json({
       success: true,
-      message: `تم تطبيق خصم ${promoCode.discountPercent}%`,
+      message: `${promoCode.discountPercent}% discount applied`,
       data: {
         code: promoCode.code,
         discountPercent: promoCode.discountPercent
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error validating promo code:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في التحقق من الكود' },
+      { success: false, message: 'An error occurred while validating the code' },
       { status: 500 }
     )
   }

@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import data from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'تغيير كلمة المرور',
+  title: 'Change Password',
 }
 
 export default async function ManagePasswordPage() {
@@ -23,14 +23,14 @@ export default async function ManagePasswordPage() {
         <span>›</span>
         <Link href='/account/manage'>تسجيل الدخول والأمان</Link>
         <span>›</span>
-        <span>تغيير كلمة المرور</span>
+        <span>Change Password</span>
       </div>
-      <h1 className='h1-bold py-4'>تغيير كلمة المرور</h1>
+      <h1 className='h1-bold py-4'>Change Password</h1>
       <Card className='max-w-2xl'>
         <CardContent className='p-4 flex justify-between flex-wrap'>
           <p className='text-sm py-2'>
-            إذا كنت تريد تغيير كلمة المرور لحسابك في {site.name}،
-            يمكنك القيام بذلك أدناه. تأكد من النقر على زر حفظ
+            If you want to change your password for your {site.name} account,
+            you can do so below. Make sure to click the save button
             التغييرات عندما تنتهي.
           </p>
           <PasswordForm />
