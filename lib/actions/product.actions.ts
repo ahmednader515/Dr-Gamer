@@ -112,7 +112,7 @@ export async function createProduct(data: IProductInput) {
     revalidatePath('/admin/products')
     return {
       success: true,
-      message: 'تم إنشاء المنتج بنجاح',
+      message: 'Product created successfully',
     }
   } catch (error) {
     console.error('Error creating product:', error)
