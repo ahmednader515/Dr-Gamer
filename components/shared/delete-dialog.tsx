@@ -35,9 +35,9 @@ export default function DeleteDialog({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>هل أنت متأكد تماماً؟</AlertDialogTitle>
+          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            لا يمكن التراجع عن هذا الإجراء.
+            This action cannot be undone
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

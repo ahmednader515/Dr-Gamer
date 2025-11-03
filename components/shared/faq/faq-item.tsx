@@ -19,7 +19,7 @@ export default function FAQItem({ question, answer, isLast }: FAQItemProps) {
     )}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-6 px-4 text-right hover:bg-gray-800 transition-colors"
+        className="w-full flex items-center justify-between py-6 px-4 text-left hover:bg-gray-800 transition-colors"
       >
         <span className="text-lg font-semibold text-white">{question}</span>
         {isOpen ? (
@@ -30,7 +30,7 @@ export default function FAQItem({ question, answer, isLast }: FAQItemProps) {
       </button>
       
       {isOpen && (
-        <div className="px-4 pb-6 text-gray-300 text-base leading-relaxed">
+        <div className="px-4 pb-6 text-gray-300 text-base leading-relaxed text-left">
           {answer}
         </div>
       )}

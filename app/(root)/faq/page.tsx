@@ -4,8 +4,8 @@ import FAQItem from '@/components/shared/faq/faq-item'
 import { getAllFAQs } from '@/lib/actions/faq.actions'
 
 export const metadata: Metadata = {
-  title: 'الأسئلة الشائعة - Xbox Store',
-  description: 'ابحث عن إجابات للأسئلة الأكثر شيوعاً حول Xbox Store، الطلبات، التوصيل، الدفع، والمزيد',
+  title: 'Frequently Asked Questions - Xbox Store',
+  description: 'Find answers to the most frequently asked questions about Xbox Store, orders, delivery, payment, and more',
 }
 
 export default async function FAQPage() {
@@ -15,17 +15,17 @@ export default async function FAQPage() {
       {/* Breadcrumb */}
       <div className="flex gap-2 text-sm mb-6">
         <Link href="/" className="text-gray-400 hover:text-white transition-colors">
-          الرئيسية
+          Home
         </Link>
         <span className="text-gray-400">›</span>
-        <span className="text-white">الأسئلة الشائعة</span>
+        <span className="text-white">FAQ</span>
       </div>
 
       {/* Page Header */}
       <div className="mb-12">
-        <h1 className="h1-bold text-white mb-4">الأسئلة الشائعة</h1>
+        <h1 className="h1-bold text-white mb-4">Frequently Asked Questions</h1>
         <p className="text-gray-300 text-lg">
-          هل لديك سؤال؟ ابحث عن إجابة من بين الأسئلة الأكثر شيوعاً أدناه
+          Have a question? Find an answer from the most frequently asked questions below
         </p>
       </div>
 
@@ -52,22 +52,22 @@ export default async function FAQPage() {
 
       {/* Contact Section */}
       <div className="mt-12 p-8 bg-gradient-to-r from-purple-600/20 to-purple-700/20 border border-purple-500/30 rounded-lg">
-        <h2 className="text-2xl font-bold text-white mb-4">لم تجد إجابتك؟</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">Didn't find your answer?</h2>
         <p className="text-gray-300 mb-6">
-          إذا كان لديك أي سؤال آخر لم نغطيه هنا، لا تتردد في التواصل معنا. نحن هنا لمساعدتك!
+          If you have any other questions we haven't covered here, don't hesitate to contact us. We're here to help!
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/page/contact-us"
             className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors"
           >
-            اتصل بنا
+            Contact Us
           </Link>
           <Link
             href="/page/help"
             className="inline-flex items-center justify-center px-6 py-3 border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white font-semibold rounded-lg transition-colors"
           >
-            مركز المساعدة
+            Help Center
           </Link>
         </div>
       </div>
