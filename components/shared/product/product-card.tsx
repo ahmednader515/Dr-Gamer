@@ -45,34 +45,11 @@ const ProductCard = ({
     return () => window.removeEventListener('favorites-updated', handleUpdate);
   }, [product.id, checkIsFavorited]);
   
-  // Helper function to get product type label
-  const getProductTypeLabel = (productType: string = 'game_code') => {
-    const typeMap: { [key: string]: string } = {
-      'game_code': 'Game Code',
-      'game_account': 'Game Account',
-      'subscription': 'Subscription',
-    };
-    return typeMap[productType] || 'Game Code';
-  };
-
-  const getProductTypeColor = (productType: string = 'game_code') => {
-    const colorMap: { [key: string]: string } = {
-      'game_code': 'bg-blue-600',
-      'game_account': 'bg-purple-600',
-      'subscription': 'bg-purple-600',
-    };
-    return colorMap[productType] || 'bg-blue-600';
-  };
 
   const ProductImage = () => (
     <div className="relative group">
       <Link href={`/product/${product.slug}`}>
         <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden" style={{ backgroundColor: '#351564' }}>
-          {/* Product Type Banner */}
-          <div className={`absolute top-2 right-2 ${getProductTypeColor(product.productType || 'game_code')} text-white text-center py-0.5 px-2 z-10 text-[10px] sm:text-xs font-semibold rounded`}>
-            {getProductTypeLabel(product.productType || 'game_code')}
-          </div>
-          
           {product.images && product.images.length > 0 && product.images[0] ? (
             product.images.length > 1 ? (
               <ImageHover

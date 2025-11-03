@@ -99,10 +99,16 @@ const ProductForm = ({
   const [selectedPlatform, setSelectedPlatform] = useState<string | undefined>(product?.platformType)
   const [selectedProductCategory, setSelectedProductCategory] = useState<string | undefined>(product?.productCategory)
   const [selectedVariations, setSelectedVariations] = useState<Set<string>>(
-    new Set(product?.variations?.map((v: any) => v.name) || [])
+    new Set(
+      product?.variations && Array.isArray(product.variations) 
+        ? product.variations.map((v: any) => v.name) 
+        : []
+    )
   )
   const [variationPrices, setVariationPrices] = useState<{ [key: string]: number }>(
-    product?.variations?.reduce((acc: any, v: any) => ({ ...acc, [v.name]: v.price }), {}) || {}
+    product?.variations && Array.isArray(product.variations)
+      ? product.variations.reduce((acc: any, v: any) => ({ ...acc, [v.name]: v.price }), {})
+      : {}
   )
 
   const form = useForm<IProductInput>({

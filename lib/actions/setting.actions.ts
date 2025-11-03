@@ -90,7 +90,7 @@ export async function updateSetting(newSetting: ISettingInput) {
     revalidatePath('/')
     revalidateTag('settings')
 
-    return { success: true, message: 'تم حفظ الإعدادات بنجاح' }
+    return { success: true, message: 'Settings updated successfully' }
   } catch (error) {
     console.error('Error in updateSetting:', error)
     return { success: false, message: formatError(error) }

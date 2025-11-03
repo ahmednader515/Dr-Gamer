@@ -93,6 +93,9 @@ export async function createProduct(data: IProductInput) {
         brand: productData.brand,
         description: productData.description,
         productType: product.productType || 'game_code',
+        platformType: productData.platformType || null,
+        productCategory: productData.productCategory || null,
+        variations: productData.variations ? JSON.stringify(productData.variations) : null,
         price: product.price,
         listPrice: productData.listPrice,
         countInStock: productData.countInStock,
@@ -146,6 +149,9 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
         brand: productData.brand,
         description: productData.description,
         productType: product.productType || 'game_code',
+        platformType: productData.platformType || null,
+        productCategory: productData.productCategory || null,
+        variations: productData.variations ? JSON.stringify(productData.variations) : null,
         price: product.price,
         listPrice: productData.listPrice,
         countInStock: productData.countInStock,
@@ -162,7 +168,7 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
     revalidatePath('/admin/products')
     return {
       success: true,
-      message: 'تم تحديث المنتج بنجاح',
+      message: 'Product updated successfully',
     }
   } catch (error) {
     console.error('Error updating product:', error)

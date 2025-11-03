@@ -2,12 +2,11 @@ import React, { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import ProductGallery from '@/components/shared/product/product-gallery'
-import ProductPrice from '@/components/shared/product/product-price'
-import AddToCart from '@/components/shared/product/add-to-cart'
 import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history'
 import Rating from '@/components/shared/product/rating'
 import ReviewList from './review-list'
 import { Separator } from '@/components/ui/separator'
+import ProductDetails from './product-details'
 
 interface ProductPageProps {
   params: Promise<{
@@ -91,12 +90,26 @@ async function ProductHeader({ slug }: { slug: string }) {
   }
 
   // Convert Decimal values to numbers for client components
+  // Parse variations if they're stored as JSON string
+  let variations = null
+  if (product.variations) {
+    try {
+      variations = typeof product.variations === 'string' 
+        ? JSON.parse(product.variations)
+        : product.variations
+    } catch (e) {
+      console.error('Error parsing variations:', e)
+      variations = null
+    }
+  }
+  
   const productData = {
     ...product,
     price: Number(product.price),
     listPrice: Number(product.listPrice),
     avgRating: Number(product.avgRating),
     numReviews: Number(product.numReviews),
+    variations: variations,
   }
 
   return (
@@ -117,60 +130,7 @@ async function ProductHeader({ slug }: { slug: string }) {
         </div>
 
         {/* Product Info */}
-        <div className='space-y-4 sm:space-y-6'>
-          <div>
-            <h1 className='text-2xl sm:text-3xl font-bold mb-2'>{productData.name}</h1>
-            <div className='flex items-center gap-2 mb-3 sm:mb-4'>
-              <Rating rating={productData.avgRating} />
-              <span className='text-xs sm:text-sm text-muted-foreground'>
-                ({productData.numReviews} reviews)
-              </span>
-            </div>
-            <ProductPrice 
-              price={productData.price} 
-              originalPrice={productData.listPrice}
-              className='text-xl sm:text-2xl'
-            />
-          </div>
-
-          <div>
-            <p className='text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4'>{productData.description}</p>
-          </div>
-
-          <div>
-            <AddToCart product={productData} />
-          </div>
-
-          <Separator />
-
-          <div className='space-y-3 sm:space-y-4'>
-            <div>
-              <h3 className='font-semibold mb-2 text-sm sm:text-base'>Product Details</h3>
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm'>
-                <div>
-                  <span className='text-muted-foreground'>Category:</span>
-                  <span className='ml-2'>{productData.category}</span>
-                </div>
-                <div>
-                  <span className='text-muted-foreground'>Brand:</span>
-                  <span className='ml-2'>{productData.brand}</span>
-                </div>
-                {productData.platformType && (
-                  <div>
-                    <span className='text-muted-foreground'>Platform:</span>
-                    <span className='ml-2'>{productData.platformType}</span>
-                  </div>
-                )}
-                {productData.productCategory && (
-                  <div>
-                    <span className='text-muted-foreground'>Type:</span>
-                    <span className='ml-2'>{productData.productCategory}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        <ProductDetails product={productData} />
       </div>
     </>
   )
