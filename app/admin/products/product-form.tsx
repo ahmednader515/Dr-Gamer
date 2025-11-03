@@ -43,6 +43,9 @@ const productDefaultValues: IProductInput = {
   brand: '',
   description: '',
   productType: 'game_code',
+  platformType: undefined,
+  productCategory: undefined,
+  variations: [],
   price: 0,
   listPrice: 0,
   countInStock: 0,
@@ -55,6 +58,29 @@ const productDefaultValues: IProductInput = {
   colors: [],
   ratingDistribution: [],
   reviews: [],
+}
+
+// Helper function to get variations based on platform and product category
+const getVariationOptions = (platformType?: string, productCategory?: string): string[] => {
+  if (!platformType || !productCategory) return []
+  
+  if (platformType === 'Xbox') {
+    if (productCategory === 'Game') {
+      return ['Home', 'Sign', 'New Account', 'Personal Account', 'Digital Code']
+    } else if (productCategory === 'Subscription') {
+      return ['Home', 'Sign', 'Full Account', 'Sign PC Without Call of Duty', 'Sign PC With Call of Duty']
+    }
+  } else if (platformType === 'Playstation') {
+    if (productCategory === 'Game') {
+      return ['Primary', 'Secondary', 'New Account', 'Personal Account', 'Digital Code']
+    } else if (productCategory === 'Subscription') {
+      return ['Primary', 'Secondary', 'New Account', 'Personal Account']
+    }
+  } else if (platformType === 'Steam') {
+    return ['Digital Code']
+  }
+  
+  return []
 }
 
 const ProductForm = ({
@@ -70,6 +96,14 @@ const ProductForm = ({
   const [categories, setCategories] = useState<string[]>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
   const { isLoading: isSubmitting, withLoading } = useLoading()
+  const [selectedPlatform, setSelectedPlatform] = useState<string | undefined>(product?.platformType)
+  const [selectedProductCategory, setSelectedProductCategory] = useState<string | undefined>(product?.productCategory)
+  const [selectedVariations, setSelectedVariations] = useState<Set<string>>(
+    new Set(product?.variations?.map((v: any) => v.name) || [])
+  )
+  const [variationPrices, setVariationPrices] = useState<{ [key: string]: number }>(
+    product?.variations?.reduce((acc: any, v: any) => ({ ...acc, [v.name]: v.price }), {}) || {}
+  )
 
   const form = useForm<IProductInput>({
     resolver:
@@ -272,22 +306,36 @@ const ProductForm = ({
                 </FormItem>
               )}
             />
+          </div>
 
+          {/* Platform Type Selection */}
+          <div className='flex flex-col gap-5 md:flex-row'>
             <FormField
               control={form.control}
-              name='productType'
+              name='platformType'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel className='text-white font-semibold block text-left w-full'>Product Type</FormLabel>
+                  <FormLabel className='text-white font-semibold block text-left w-full'>Platform Type</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value} dir="ltr">
+                    <Select 
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                        setSelectedPlatform(value)
+                        setSelectedProductCategory(undefined)
+                        form.setValue('productCategory', undefined)
+                        form.setValue('variations', [])
+                        setVariationPrices({})
+                      }} 
+                      value={field.value} 
+                      dir="ltr"
+                    >
                       <SelectTrigger className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'>
-                        <SelectValue placeholder="Select product type" />
+                        <SelectValue placeholder="Select platform type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="game_code">Game Code</SelectItem>
-                        <SelectItem value="game_account">Game Account</SelectItem>
-                        <SelectItem value="subscription">Subscription</SelectItem>
+                        <SelectItem value="Xbox">Xbox</SelectItem>
+                        <SelectItem value="Playstation">Playstation</SelectItem>
+                        <SelectItem value="Steam">Steam</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -295,7 +343,161 @@ const ProductForm = ({
                 </FormItem>
               )}
             />
+
+            {/* Product Category Selection */}
+            {selectedPlatform && (
+              <FormField
+                control={form.control}
+                name='productCategory'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel className='text-white font-semibold block text-left w-full'>Product Category</FormLabel>
+                    <FormControl>
+                      <Select 
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                          setSelectedProductCategory(value)
+                          form.setValue('variations', [])
+                          setVariationPrices({})
+                        }} 
+                        value={field.value} 
+                        dir="ltr"
+                      >
+                        <SelectTrigger className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'>
+                          <SelectValue placeholder="Select product category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Game">Game</SelectItem>
+                          <SelectItem value="Subscription">Subscription</SelectItem>
+                          <SelectItem value="Digital Code">Digital Code</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </div>
+
+          {/* Variations with Checkboxes and Prices */}
+          {selectedPlatform && selectedProductCategory && (
+            <div className='border border-gray-700 rounded-lg p-4'>
+              <h3 className='text-white font-semibold mb-4'>Product Variations & Prices</h3>
+              <p className='text-gray-400 text-sm mb-4'>
+                Select the variations you want to offer and set their prices. The lowest and highest prices will be displayed as a range on product cards.
+              </p>
+              <div className='space-y-4'>
+                {getVariationOptions(selectedPlatform, selectedProductCategory).map((variation) => {
+                  const isSelected = selectedVariations.has(variation)
+                  
+                  return (
+                    <div key={variation} className='border border-gray-600 rounded-lg p-4'>
+                      <div className='flex items-center gap-3 mb-3'>
+                        <Checkbox
+                          id={`variation-${variation}`}
+                          checked={isSelected}
+                          onCheckedChange={(checked) => {
+                            const newSelected = new Set(selectedVariations)
+                            if (checked) {
+                              newSelected.add(variation)
+                            } else {
+                              newSelected.delete(variation)
+                              // Remove price when unchecked
+                              const newPrices = { ...variationPrices }
+                              delete newPrices[variation]
+                              setVariationPrices(newPrices)
+                            }
+                            setSelectedVariations(newSelected)
+                            
+                            // Update form variations
+                            const variations = Array.from(newSelected)
+                              .map(name => ({
+                                name,
+                                price: variationPrices[name] || 0
+                              }))
+                              .filter(v => v.price > 0)
+                            form.setValue('variations', variations)
+                            
+                            // Update main price fields with min/max
+                            if (variations.length > 0) {
+                              const prices = variations.map(v => v.price)
+                              const minPrice = Math.min(...prices)
+                              const maxPrice = Math.max(...prices)
+                              form.setValue('price', minPrice)
+                              form.setValue('listPrice', maxPrice)
+                            }
+                          }}
+                        />
+                        <label 
+                          htmlFor={`variation-${variation}`}
+                          className='text-white text-base font-medium cursor-pointer flex-1'
+                        >
+                          {variation}
+                        </label>
+                      </div>
+                      
+                      {isSelected && (
+                        <div className='ml-6'>
+                          <label className='text-gray-400 text-sm mb-2 block'>Price (EGP)</label>
+                          <Input
+                            type='number'
+                            step='0.01'
+                            placeholder='Enter price'
+                            value={variationPrices[variation] || ''}
+                            onChange={(e) => {
+                              const price = parseFloat(e.target.value) || 0
+                              const newPrices = { ...variationPrices, [variation]: price }
+                              setVariationPrices(newPrices)
+                              
+                              // Update form variations
+                              const variations = Array.from(selectedVariations)
+                                .map(name => ({
+                                  name,
+                                  price: newPrices[name] || 0
+                                }))
+                                .filter(v => v.price > 0)
+                              form.setValue('variations', variations)
+                              
+                              // Update main price fields with min/max
+                              if (variations.length > 0) {
+                                const prices = variations.map(v => v.price)
+                                const minPrice = Math.min(...prices)
+                                const maxPrice = Math.max(...prices)
+                                form.setValue('price', minPrice)
+                                form.setValue('listPrice', maxPrice)
+                              }
+                            }}
+                            className='border-gray-700 bg-gray-800 text-gray-200'
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+              {selectedVariations.size > 0 && Array.from(selectedVariations).some(v => variationPrices[v] > 0) && (
+                <div className='mt-4 p-3 bg-gray-800 rounded-lg'>
+                  <p className='text-sm text-gray-300'>
+                    <span className='font-semibold'>Selected Variations:</span> {Array.from(selectedVariations).filter(v => variationPrices[v] > 0).length}
+                  </p>
+                  <p className='text-sm text-gray-300 mt-1'>
+                    <span className='font-semibold'>Price Range:</span> {
+                      (() => {
+                        const prices = Array.from(selectedVariations)
+                          .map(v => variationPrices[v])
+                          .filter(p => p > 0)
+                        if (prices.length === 0) return 'No prices set'
+                        const min = Math.min(...prices)
+                        const max = Math.max(...prices)
+                        return min === max ? `${min.toFixed(2)} EGP` : `${min.toFixed(2)} - ${max.toFixed(2)} EGP`
+                      })()
+                    }
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
           <div className='flex flex-col gap-5 md:flex-row'>
             <FormField
               control={form.control}
@@ -318,42 +520,6 @@ const ProductForm = ({
 
             <FormField
               control={form.control}
-              name='listPrice'
-              render={({ field }) => (
-                <FormItem className='w-full'>
-                  <FormLabel className='text-white font-semibold block text-left w-full'>List Price</FormLabel>
-                  <FormControl>
-                    <Input 
-                      {...field}
-                      dir="ltr"
-                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className='flex flex-col gap-5 md:flex-row'>
-            <FormField
-              control={form.control}
-              name='price'
-              render={({ field }) => (
-                <FormItem className='w-full'>
-                  <FormLabel className='text-white font-semibold block text-left w-full'>Net Price</FormLabel>
-                  <FormControl>
-                    <Input 
-                      {...field}
-                      dir="ltr"
-                      className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name='countInStock'
               render={({ field }) => (
                 <FormItem className='w-full'>
@@ -371,6 +537,50 @@ const ProductForm = ({
               )}
             />
           </div>
+          
+          {/* Price fields - only show when no variations are selected */}
+          {(!selectedPlatform || !selectedProductCategory || selectedVariations.size === 0) && (
+            <div className='flex flex-col gap-5 md:flex-row'>
+              <FormField
+                control={form.control}
+                name='price'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel className='text-white font-semibold block text-left w-full'>Price</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field}
+                        type='number'
+                        step='0.01'
+                        dir="ltr"
+                        className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='listPrice'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel className='text-white font-semibold block text-left w-full'>List Price (Optional)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field}
+                        type='number'
+                        step='0.01'
+                        dir="ltr"
+                        className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
 
           <div className='flex flex-col gap-5 md:flex-row'>
             <FormField

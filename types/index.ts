@@ -6,6 +6,7 @@ import {
   OrderItemSchema,
   PaymentMethodSchema,
   ProductInputSchema,
+  ProductVariationSchema,
   ReviewInputSchema,
   SettingInputSchema,
   ShippingAddressSchema,
@@ -18,6 +19,8 @@ import {
   WebPageInputSchema,
 } from '@/lib/validator'
 import { z } from 'zod'
+
+export type IProductVariation = z.infer<typeof ProductVariationSchema>
 
 export type IReviewInput = z.infer<typeof ReviewInputSchema>
 export type IReviewDetails = Omit<IReviewInput, 'user'> & {

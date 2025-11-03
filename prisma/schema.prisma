@@ -54,6 +54,9 @@ model Product {
   brand              String
   description        String
   productType        String      @default("game_code") // game_account, subscription, game_code
+  platformType       String?     // Xbox, Playstation, Steam
+  productCategory    String?     // Game, Subscription, Digital Code
+  variations         Json?       // Array of variation objects with name and price
   price              Decimal     @db.Decimal(10, 2)
   listPrice          Decimal     @db.Decimal(10, 2)
   countInStock       Int
@@ -137,27 +140,32 @@ model Order {
 }
 
 model OrderItem {
-  id                String   @id @default(cuid())
-  orderId           String
-  productId         String
-  clientId          String
-  name              String
-  slug              String
-  category          String
-  quantity          Int
-  countInStock      Int
-  image             String
-  price             Decimal  @db.Decimal(10, 2)
-  size              String?
-  color             String?
-  productType       String?  // game_account, subscription, game_code
-  isAddToOwnAccount Boolean  @default(false)
-  accountUsername   String?
-  accountPassword   String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product           Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id                      String   @id @default(cuid())
+  orderId                 String
+  productId               String
+  clientId                String
+  name                    String
+  slug                    String
+  category                String
+  quantity                Int
+  countInStock            Int
+  image                   String
+  price                   Decimal  @db.Decimal(10, 2)
+  size                    String?
+  color                   String?
+  productType             String?  // game_account, subscription, game_code
+  platformType            String?  // Xbox, Playstation, Steam
+  productCategory         String?  // Game, Subscription, Digital Code
+  selectedVariation       String?  // The selected variation name
+  isAddToOwnAccount       Boolean  @default(false)
+  accountUsername         String?
+  accountPassword         String?
+  accountBackupCode       String?  // For PlayStation personal accounts
+  disableTwoStepVerified  Boolean  @default(false) // For Xbox personal accounts
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  order                   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product                 Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("order_items")
 }

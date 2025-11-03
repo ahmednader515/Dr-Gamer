@@ -179,6 +179,7 @@ const ProductCard = ({
           price={product.price}
           originalPrice={product.listPrice}
           className="items-start"
+          isRange={true}
         />
       </div>
     </div>

@@ -155,6 +155,18 @@ async function ProductHeader({ slug }: { slug: string }) {
                   <span className='text-muted-foreground'>Brand:</span>
                   <span className='ml-2'>{productData.brand}</span>
                 </div>
+                {productData.platformType && (
+                  <div>
+                    <span className='text-muted-foreground'>Platform:</span>
+                    <span className='ml-2'>{productData.platformType}</span>
+                  </div>
+                )}
+                {productData.productCategory && (
+                  <div>
+                    <span className='text-muted-foreground'>Type:</span>
+                    <span className='ml-2'>{productData.productCategory}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

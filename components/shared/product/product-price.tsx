@@ -9,6 +9,7 @@ interface ProductPriceProps {
   currency?: string
   className?: string
   plain?: boolean
+  isRange?: boolean
 }
 
 export default function ProductPrice({
@@ -17,6 +18,7 @@ export default function ProductPrice({
   currency = 'EGP',
   className,
   plain = false,
+  isRange = false,
 }: ProductPriceProps) {
   const formatPrice = (price: number) => {
     // Ensure price is a valid number
@@ -40,6 +42,9 @@ export default function ProductPrice({
   const hasDiscount = Number(originalPrice) > 0 && Number(price) > 0 && Number(originalPrice) > Number(price)
 
   if (plain) {
+    if (isRange && originalPrice && originalPrice !== price) {
+      return <span>{formatPrice(price)} - {formatPrice(originalPrice)}</span>
+    }
     return <span>{formatPrice(price)}</span>
   }
 
@@ -51,9 +56,12 @@ export default function ProductPrice({
   return (
     <div className={cn('flex flex-col gap-1 items-start text-left', className)} dir="ltr">
       <span className='text-2xl font-bold text-white text-left'>
-        {formatPrice(price)}
+        {isRange && originalPrice && originalPrice !== price 
+          ? `${formatPrice(price)} - ${formatPrice(originalPrice)}`
+          : formatPrice(price)
+        }
       </span>
-      {hasDiscount && (
+      {hasDiscount && !isRange && (
         <>
           <span className='text-sm text-muted-foreground line-through text-left'>
             {formatPrice(originalPrice)}

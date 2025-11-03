@@ -154,12 +154,41 @@ export default function CheckoutForm() {
   const [accountUsername, setAccountUsername] = useState('')
   const [accountPassword, setAccountPassword] = useState('')
   
+  // Calculate new account tax (30 EGP per item with "New Account" variation)
+  const newAccountTax = Array.isArray(items) 
+    ? items.reduce((total: number, item: any) => {
+        const variation = item.selectedVariation?.toLowerCase() || ''
+        if (variation.includes('new account')) {
+          return total + 30
+        }
+        return total
+      }, 0)
+    : 0
+  
+  // Track personal account details for each item
+  const [personalAccountDetails, setPersonalAccountDetails] = useState<{
+    [itemId: string]: {
+      username: string
+      password: string
+      backupCode?: string
+      twoStepDisabled?: boolean
+    }
+  }>({})
+  
+  // Check if any item requires personal account input
+  const itemsRequiringPersonalAccount = Array.isArray(items)
+    ? items.filter((item: any) => {
+        const variation = item.selectedVariation?.toLowerCase() || ''
+        return variation.includes('personal account')
+      })
+    : []
+  
   // Promo code state
   const [appliedPromo, setAppliedPromo] = useState<{code: string, discountPercent: number} | null>(null)
   
   // Calculate discounted total - discount is applied to itemsPrice only (no tax/shipping for digital products)
   const discountAmount = appliedPromo ? (itemsPrice * appliedPromo.discountPercent / 100) : 0
-  const finalTotal = itemsPrice - discountAmount
+  const finalTotal = itemsPrice - discountAmount + newAccountTax
 
   const handlePlaceOrder = async () => {
     if (!customerEmail || !customerPhone) {
@@ -186,13 +215,57 @@ export default function CheckoutForm() {
       return
     }
 
+    // Validate personal account details
+    for (const item of itemsRequiringPersonalAccount) {
+      const details = personalAccountDetails[item.clientId]
+      if (!details || !details.username || !details.password) {
+        toast({
+          description: `Please provide account credentials for ${item.name}`,
+          variant: 'destructive',
+        })
+        return
+      }
+      
+      // Xbox specific validation
+      if (item.platformType === 'Xbox' && !details.twoStepDisabled) {
+        toast({
+          description: `Please confirm that you have disabled 2-step verification for Xbox account (${item.name})`,
+          variant: 'destructive',
+        })
+        return
+      }
+      
+      // PlayStation specific validation
+      if (item.platformType === 'Playstation' && !details.backupCode) {
+        toast({
+          description: `Please provide backup code for PlayStation account (${item.name})`,
+          variant: 'destructive',
+        })
+        return
+      }
+    }
+
     await withLoading(
       async () => {
         // Ensure all items have valid clientIds before placing order
         regenerateClientIds()
         
-        // Get the current cart state and add promo code info
+        // Get the current cart state and add promo code info and personal account details
         const updatedItems = (useCartStore.getState().cart.items || []).map((it: any) => {
+          // Check if this item requires personal account details
+          const requiresPersonalAccount = it.selectedVariation?.toLowerCase().includes('personal account')
+          const details = personalAccountDetails[it.clientId]
+          
+          if (requiresPersonalAccount && details) {
+            return {
+              ...it,
+              accountUsername: details.username,
+              accountPassword: details.password,
+              accountBackupCode: details.backupCode,
+              disableTwoStepVerified: details.twoStepDisabled || false,
+            }
+          }
+          
           if (it.productType === 'game_account') {
             return {
               ...it,
@@ -330,7 +403,17 @@ export default function CheckoutForm() {
               />
             </div>
 
-            <div className='flex justify-between pt-3 sm:pt-4 font-bold text-base sm:text-lg'>
+            {/* New Account Tax */}
+            {newAccountTax > 0 && (
+              <div className='flex justify-between text-sm sm:text-base pt-2'>
+                <span>New Account Fee:</span>
+                <span className='text-orange-400'>
+                  +<ProductPrice price={newAccountTax} plain />
+                </span>
+              </div>
+            )}
+
+            <div className='flex justify-between pt-3 sm:pt-4 font-bold text-base sm:text-lg border-t'>
               <span>Total:</span>
               <span className={appliedPromo ? 'text-purple-400' : ''}>
                 <ProductPrice price={finalTotal} plain />
@@ -386,57 +469,108 @@ export default function CheckoutForm() {
                   <span>Enter Contact Information</span>
                 </div>
                 
-                {/* Game Account Options */}
-                {hasGameAccountItem && (
+                {/* Personal Account Inputs */}
+                {itemsRequiringPersonalAccount.length > 0 && (
                   <Card className='lg:ml-8 my-3 sm:my-4'>
-                    <CardContent className='p-3 sm:p-4 space-y-3 sm:space-y-4'>
-                      <div className='text-base sm:text-lg font-bold mb-2'>Game Account Options</div>
-                      <div className='space-y-2'>
-                        <label className='flex items-center gap-2 text-sm sm:text-base'>
-                          <input
-                            type='radio'
-                            name='gameAccountOption'
-                            checked={gameAccountOption === 'new'}
-                            onChange={() => setGameAccountOption('new')}
-                          />
-                          Get a new game account (no account credentials needed)
-                        </label>
-                        <label className='flex items-center gap-2 text-sm sm:text-base'>
-                          <input
-                            type='radio'
-                            name='gameAccountOption'
-                            checked={gameAccountOption === 'own'}
-                            onChange={() => setGameAccountOption('own')}
-                          />
-                          Add the game to my existing account
-                        </label>
-                      </div>
-                      {gameAccountOption === 'own' && (
-                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3'>
-                          <div>
-                            <Label className='text-white text-sm sm:text-base'>Account Username</Label>
-                            <Input
-                              value={accountUsername}
-                              onChange={(e) => setAccountUsername(e.target.value)}
-                              placeholder='Enter username'
-                              className='border-gray-700 bg-gray-800 text-gray-200'
-                            />
+                    <CardContent className='p-3 sm:p-4 space-y-4'>
+                      <div className='text-base sm:text-lg font-bold mb-2'>Personal Account Details</div>
+                      <p className='text-sm text-gray-400 mb-4'>
+                        Please provide your account credentials for personal account items:
+                      </p>
+                      {itemsRequiringPersonalAccount.map((item: any) => {
+                        const isXbox = item.platformType === 'Xbox'
+                        const isPlaystation = item.platformType === 'Playstation'
+                        
+                        return (
+                          <div key={item.clientId} className='border border-gray-700 rounded-lg p-4 space-y-3'>
+                            <h4 className='font-semibold text-white'>{item.name} - {item.selectedVariation}</h4>
+                            
+                            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                              <div>
+                                <Label className='text-white text-sm'>Email/Username</Label>
+                                <Input
+                                  value={personalAccountDetails[item.clientId]?.username || ''}
+                                  onChange={(e) => setPersonalAccountDetails({
+                                    ...personalAccountDetails,
+                                    [item.clientId]: {
+                                      ...personalAccountDetails[item.clientId],
+                                      username: e.target.value
+                                    }
+                                  })}
+                                  placeholder='Enter account email/username'
+                                  className='border-gray-700 bg-gray-800 text-gray-200'
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <Label className='text-white text-sm'>Password</Label>
+                                <Input
+                                  type='password'
+                                  value={personalAccountDetails[item.clientId]?.password || ''}
+                                  onChange={(e) => setPersonalAccountDetails({
+                                    ...personalAccountDetails,
+                                    [item.clientId]: {
+                                      ...personalAccountDetails[item.clientId],
+                                      password: e.target.value
+                                    }
+                                  })}
+                                  placeholder='Enter account password'
+                                  className='border-gray-700 bg-gray-800 text-gray-200'
+                                  required
+                                />
+                              </div>
+                            </div>
+                            
+                            {isXbox && (
+                              <div className='flex items-center gap-2'>
+                                <Checkbox
+                                  id={`xbox-2step-${item.clientId}`}
+                                  checked={personalAccountDetails[item.clientId]?.twoStepDisabled || false}
+                                  onCheckedChange={(checked) => setPersonalAccountDetails({
+                                    ...personalAccountDetails,
+                                    [item.clientId]: {
+                                      ...personalAccountDetails[item.clientId],
+                                      twoStepDisabled: checked === true
+                                    }
+                                  })}
+                                />
+                                <label 
+                                  htmlFor={`xbox-2step-${item.clientId}`}
+                                  className='text-sm text-white cursor-pointer'
+                                >
+                                  I confirm that I have disabled 2-step verification on my Xbox account (Required)
+                                </label>
+                              </div>
+                            )}
+                            
+                            {isPlaystation && (
+                              <div>
+                                <Label className='text-white text-sm'>Backup Code (Required for PlayStation)</Label>
+                                <Input
+                                  value={personalAccountDetails[item.clientId]?.backupCode || ''}
+                                  onChange={(e) => setPersonalAccountDetails({
+                                    ...personalAccountDetails,
+                                    [item.clientId]: {
+                                      ...personalAccountDetails[item.clientId],
+                                      backupCode: e.target.value
+                                    }
+                                  })}
+                                  placeholder='Enter PlayStation backup code'
+                                  className='border-gray-700 bg-gray-800 text-gray-200'
+                                  required
+                                />
+                                <p className='text-xs text-gray-400 mt-1'>
+                                  You can find your backup codes in PlayStation account settings
+                                </p>
+                              </div>
+                            )}
+                            
+                            <p className='text-xs text-gray-400 italic'>
+                              ⚠️ These credentials will only be used to add the game to your account and will be securely deleted immediately after completion.
+                            </p>
                           </div>
-                          <div>
-                            <Label className='text-white text-sm sm:text-base'>Account Password</Label>
-                            <Input
-                              type='password'
-                              value={accountPassword}
-                              onChange={(e) => setAccountPassword(e.target.value)}
-                              placeholder='Enter password'
-                              className='border-gray-700 bg-gray-800 text-gray-200'
-                            />
-                          </div>
-                          <p className='col-span-1 sm:col-span-2 text-xs text-gray-400'>
-                            Note: These credentials will only be used to add the game to your account and will be deleted immediately after completion.
-                          </p>
-                        </div>
-                      )}
+                        )
+                      })}
                     </CardContent>
                   </Card>
                 )}

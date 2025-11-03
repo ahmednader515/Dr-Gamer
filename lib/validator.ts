@@ -27,6 +27,12 @@ export const ReviewInputSchema = z.object({
     .max(5, 'Rating must be at most 5'),
 })
 
+// Product Variation Schema
+export const ProductVariationSchema = z.object({
+  name: z.string().min(1, 'Variation name is required'),
+  price: Price('Variation price'),
+})
+
 export const ProductInputSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
   slug: z.string().min(3, 'Slug must be at least 3 characters'),
@@ -35,6 +41,9 @@ export const ProductInputSchema = z.object({
   brand: z.string().min(1, 'Brand is required'),
   description: z.string().min(1, 'Description is required'),
   productType: z.enum(['game_account', 'subscription', 'game_code']).default('game_code'),
+  platformType: z.enum(['Xbox', 'Playstation', 'Steam']).optional(),
+  productCategory: z.enum(['Game', 'Subscription', 'Digital Code']).optional(),
+  variations: z.array(ProductVariationSchema).optional().default([]),
   isPublished: z.boolean(),
   price: Price('Price'),
   listPrice: Price('List price'),
@@ -87,9 +96,14 @@ export const OrderItemSchema = z.object({
   size: z.string().optional(),
   color: z.string().optional(),
   productType: z.enum(['game_account', 'subscription', 'game_code']).optional(),
+  platformType: z.enum(['Xbox', 'Playstation', 'Steam']).optional(),
+  productCategory: z.enum(['Game', 'Subscription', 'Digital Code']).optional(),
+  selectedVariation: z.string().optional(),
   isAddToOwnAccount: z.boolean().optional(),
   accountUsername: z.string().optional(),
   accountPassword: z.string().optional(),
+  accountBackupCode: z.string().optional(),
+  disableTwoStepVerified: z.boolean().optional(),
 })
 export const ShippingAddressSchema = z.object({
   street: z.string().min(1, 'العنوان (الشارع، الشقة، الجناح، الوحدة، إلخ) مطلوب'),
