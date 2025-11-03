@@ -33,6 +33,9 @@ export async function GET(request: NextRequest) {
         category: true,
         brand: true,
         productType: true,
+        platformType: true,
+        productCategory: true,
+        variations: true,
         countInStock: true,
       },
       orderBy: {
@@ -40,8 +43,23 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    // Reorder to match the input order
-    const productMap = new Map(products.map(p => [p.id, p]))
+    // Reorder to match the input order and parse variations
+    const productMap = new Map(products.map(p => {
+      // Parse variations if they're stored as JSON string
+      let variations = null
+      if (p.variations) {
+        try {
+          variations = typeof p.variations === 'string' 
+            ? JSON.parse(p.variations as string)
+            : p.variations
+        } catch (e) {
+          console.error('Error parsing variations:', e)
+          variations = null
+        }
+      }
+      
+      return [p.id, { ...p, variations }]
+    }))
     const orderedProducts = ids.map(id => productMap.get(id)).filter(Boolean)
 
     return NextResponse.json(orderedProducts)

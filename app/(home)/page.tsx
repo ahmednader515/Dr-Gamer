@@ -97,6 +97,12 @@ async function MostPurchasedSection() {
       listPrice: Number(product.listPrice),
       avgRating: Number(product.avgRating),
       numReviews: Number(product.numReviews),
+      productType: product.productType,
+      platformType: product.platformType,
+      productCategory: product.productCategory,
+      variations: product.variations,
+      countInStock: product.countInStock,
+      brand: product.brand,
     }))
 
     if (formattedProducts.length === 0) return null
@@ -153,25 +159,46 @@ async function FirstCategorySection({ categories }: { categories: string[] }) {
         category: true,
         categoryId: true,
         productType: true,
+        platformType: true,
+        productCategory: true,
+        variations: true,
         countInStock: true,
         brand: true,
       }
     })
 
-    const products = allProducts.slice(0, 8).map(product => ({
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
-      images: Array.isArray(product.images) ? product.images : [],
-      price: Number(product.price),
-      listPrice: Number(product.listPrice),
-      avgRating: Number(product.avgRating),
-      numReviews: Number(product.numReviews),
-      productType: (product as any).productType || 'game_code',
-      countInStock: (product as any).countInStock,
-      brand: (product as any).brand,
-    }))
+    const products = allProducts.slice(0, 8).map(product => {
+      // Parse variations if they're stored as JSON string
+      let variations = null
+      if (product.variations) {
+        try {
+          variations = typeof product.variations === 'string' 
+            ? JSON.parse(product.variations)
+            : product.variations
+        } catch (e) {
+          console.error('Error parsing variations:', e)
+          variations = null
+        }
+      }
+      
+      return {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
+        images: Array.isArray(product.images) ? product.images : [],
+        price: Number(product.price),
+        listPrice: Number(product.listPrice),
+        avgRating: Number(product.avgRating),
+        numReviews: Number(product.numReviews),
+        productType: (product as any).productType || 'game_code',
+        platformType: (product as any).platformType,
+        productCategory: (product as any).productCategory,
+        variations: variations,
+        countInStock: (product as any).countInStock,
+        brand: (product as any).brand,
+      }
+    })
 
     if (products.length === 0) return null
 
@@ -219,6 +246,9 @@ async function RemainingCategoriesSection({ categories }: { categories: string[]
         category: true,
         categoryId: true,
         productType: true,
+        platformType: true,
+        productCategory: true,
+        variations: true,
         countInStock: true,
         brand: true,
       }
@@ -231,20 +261,38 @@ async function RemainingCategoriesSection({ categories }: { categories: string[]
           return categoryName === category
         })
         .slice(0, 8)
-        .map(product => ({
-          id: product.id,
-          name: product.name,
-          slug: product.slug,
-          image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
-          images: Array.isArray(product.images) ? product.images : [],
-          price: Number(product.price),
-          listPrice: Number(product.listPrice),
-          avgRating: Number(product.avgRating),
-          numReviews: Number(product.numReviews),
-          productType: (product as any).productType || 'game_code',
-          countInStock: (product as any).countInStock,
-          brand: (product as any).brand,
-        }))
+        .map(product => {
+          // Parse variations if they're stored as JSON string
+          let variations = null
+          if (product.variations) {
+            try {
+              variations = typeof product.variations === 'string' 
+                ? JSON.parse(product.variations)
+                : product.variations
+            } catch (e) {
+              console.error('Error parsing variations:', e)
+              variations = null
+            }
+          }
+          
+          return {
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
+            images: Array.isArray(product.images) ? product.images : [],
+            price: Number(product.price),
+            listPrice: Number(product.listPrice),
+            avgRating: Number(product.avgRating),
+            numReviews: Number(product.numReviews),
+            productType: (product as any).productType || 'game_code',
+            platformType: (product as any).platformType,
+            productCategory: (product as any).productCategory,
+            variations: variations,
+            countInStock: (product as any).countInStock,
+            brand: (product as any).brand,
+          }
+        })
       return acc
     }, {} as Record<string, any[]>)
     

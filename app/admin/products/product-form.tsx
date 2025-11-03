@@ -136,7 +136,7 @@ const ProductForm = ({
         
         // If this is an update and the product has a category not in the list, add it
         if (type === 'Update' && product?.category && !categoryNames.includes(product.category)) {
-          setCategories(prev => [...prev, product.category])
+          setCategories(prev => [...prev, product.category!])
         }
       } catch (error) {
         console.error('Error fetching categories:', error)
@@ -286,11 +286,11 @@ const ProductForm = ({
               name='category'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel className='text-white font-semibold block text-left w-full'>Category</FormLabel>
+                  <FormLabel className='text-white font-semibold block text-left w-full'>Category (Optional)</FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange} value={field.value} disabled={isLoadingCategories} dir="ltr">
                       <SelectTrigger className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'>
-                        <SelectValue placeholder={isLoadingCategories ? "Loading..." : "Select category"} />
+                        <SelectValue placeholder={isLoadingCategories ? "Loading..." : "Select category (optional)"} />
                       </SelectTrigger>
                       <SelectContent>
                         {isLoadingCategories ? (
@@ -321,7 +321,7 @@ const ProductForm = ({
               name='platformType'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel className='text-white font-semibold block text-left w-full'>Platform Type</FormLabel>
+                  <FormLabel className='text-white font-semibold block text-left w-full'>Platform Type (Optional)</FormLabel>
                   <FormControl>
                     <Select 
                       onValueChange={(value) => {
@@ -336,7 +336,7 @@ const ProductForm = ({
                       dir="ltr"
                     >
                       <SelectTrigger className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'>
-                        <SelectValue placeholder="Select platform type" />
+                        <SelectValue placeholder="Select platform type (optional)" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Xbox">Xbox</SelectItem>
@@ -357,7 +357,7 @@ const ProductForm = ({
                 name='productCategory'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel className='text-white font-semibold block text-left w-full'>Product Category</FormLabel>
+                    <FormLabel className='text-white font-semibold block text-left w-full'>Product Category (Optional)</FormLabel>
                     <FormControl>
                       <Select 
                         onValueChange={(value) => {
@@ -370,7 +370,7 @@ const ProductForm = ({
                         dir="ltr"
                       >
                         <SelectTrigger className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'>
-                          <SelectValue placeholder="Select product category" />
+                          <SelectValue placeholder="Select product category (optional)" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Game">Game</SelectItem>

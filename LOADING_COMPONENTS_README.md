@@ -183,9 +183,9 @@ function SubmitButton() {
   return (
     <button disabled={isLoading}>
       {isLoading ? (
-        <LoadingSpinner size="sm" text="جاري الإرسال..." />
+        <LoadingSpinner size="sm" text="Sending..." />
       ) : (
-        'إرسال'
+        'Send'
       )}
     </button>
   )

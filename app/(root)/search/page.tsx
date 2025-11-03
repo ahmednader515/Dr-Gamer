@@ -215,14 +215,30 @@ async function ProductResults({ params, translations }: {
   
   const totalProducts = await (prisma as any).product.count({ where })
 
-  // Convert Decimal values to numbers for client components
-  const normalizedProducts = products.map((product: any) => ({
-    ...product,
-    price: Number(product.price),
-    listPrice: Number(product.listPrice),
-    avgRating: Number(product.avgRating),
-    numReviews: Number(product.numReviews),
-  }))
+  // Convert Decimal values to numbers for client components and parse variations
+  const normalizedProducts = products.map((product: any) => {
+    // Parse variations if they're stored as JSON string
+    let variations = null
+    if (product.variations) {
+      try {
+        variations = typeof product.variations === 'string' 
+          ? JSON.parse(product.variations)
+          : product.variations
+      } catch (e) {
+        console.error('Error parsing variations:', e)
+        variations = null
+      }
+    }
+    
+    return {
+      ...product,
+      price: Number(product.price),
+      listPrice: Number(product.listPrice),
+      avgRating: Number(product.avgRating),
+      numReviews: Number(product.numReviews),
+      variations: variations,
+    }
+  })
 
   const totalPages = Math.ceil(totalProducts / limit)
   const from = skip + 1

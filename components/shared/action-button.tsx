@@ -37,7 +37,7 @@ export default function ActionButton({
         })
       }
     >
-      {isPending ? 'جاري المعالجة...' : caption}
+      {isPending ? 'Processing...' : caption}
     </Button>
   )
 }

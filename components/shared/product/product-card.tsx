@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { IProductInput } from "@/types";
@@ -17,6 +17,7 @@ import { useLoading } from "@/hooks/use-loading";
 import { LoadingSpinner } from "@/components/shared/loading-overlay";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useRouter } from "next/navigation";
+import VariationSelectionDialog from "./variation-selection-dialog";
 
 const ProductCard = ({
   product,
@@ -166,8 +167,18 @@ const ProductCard = ({
     const { addItem } = useCartStore();
     const { toast } = useToast();
     const { isLoading: isAddingToCart, withLoading } = useLoading();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [dialogActionType, setDialogActionType] = useState<'add' | 'buy'>('add');
+    
+    // Check if product has variations
+    const hasVariations = product.variations && Array.isArray(product.variations) && product.variations.length > 0;
 
-    const handleAddToCart = async () => {
+    const addToCartWithVariation = async (selectedVariation: string) => {
+      // Calculate the price based on selected variation
+      const selectedPrice = selectedVariation && hasVariations
+        ? product.variations.find((v: any) => v.name === selectedVariation)?.price || Number(product.price)
+        : Number(product.price);
+
       await withLoading(
         async () => {
           await addItem({
@@ -176,16 +187,21 @@ const ProductCard = ({
             slug: product.slug,
             category: product.category,
             image: product.images[0],
-            price: Number(product.price),
+            price: selectedPrice,
             countInStock: product.countInStock,
             color: product.colors?.[0] || '',
             size: product.sizes?.[0] || '',
             quantity: 1,
             // product type & game account fields
             productType: (product as any).productType || 'game_code',
+            platformType: (product as any).platformType,
+            productCategory: (product as any).productCategory,
+            selectedVariation: selectedVariation || undefined,
             isAddToOwnAccount: false,
             accountUsername: undefined,
             accountPassword: undefined,
+            accountBackupCode: undefined,
+            disableTwoStepVerified: false,
             clientId: `${product.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           }, 1);
 
@@ -198,7 +214,12 @@ const ProductCard = ({
       );
     };
 
-    const handleBuyNow = async () => {
+    const buyNowWithVariation = async (selectedVariation: string) => {
+      // Calculate the price based on selected variation
+      const selectedPrice = selectedVariation && hasVariations
+        ? product.variations.find((v: any) => v.name === selectedVariation)?.price || Number(product.price)
+        : Number(product.price);
+
       await withLoading(
         async () => {
           await addItem({
@@ -207,16 +228,21 @@ const ProductCard = ({
             slug: product.slug,
             category: product.category,
             image: product.images[0],
-            price: Number(product.price),
+            price: selectedPrice,
             countInStock: product.countInStock,
             color: product.colors?.[0] || '',
             size: product.sizes?.[0] || '',
             quantity: 1,
             // product type & game account fields
             productType: (product as any).productType || 'game_code',
+            platformType: (product as any).platformType,
+            productCategory: (product as any).productCategory,
+            selectedVariation: selectedVariation || undefined,
             isAddToOwnAccount: false,
             accountUsername: undefined,
             accountPassword: undefined,
+            accountBackupCode: undefined,
+            disableTwoStepVerified: false,
             clientId: `${product.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           }, 1);
 
@@ -230,6 +256,32 @@ const ProductCard = ({
           router.push('/checkout');
         }
       );
+    };
+
+    const handleAddToCart = () => {
+      if (hasVariations) {
+        setDialogActionType('add');
+        setIsDialogOpen(true);
+      } else {
+        addToCartWithVariation('');
+      }
+    };
+
+    const handleBuyNow = () => {
+      if (hasVariations) {
+        setDialogActionType('buy');
+        setIsDialogOpen(true);
+      } else {
+        buyNowWithVariation('');
+      }
+    };
+
+    const handleDialogConfirm = (selectedVariation: string) => {
+      if (dialogActionType === 'add') {
+        addToCartWithVariation(selectedVariation);
+      } else {
+        buyNowWithVariation(selectedVariation);
+      }
     };
 
     return (
@@ -282,6 +334,15 @@ const ProductCard = ({
             </>
           )}
         </button>
+        
+        {/* Variation Selection Dialog */}
+        <VariationSelectionDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          product={product}
+          onConfirm={handleDialogConfirm}
+          actionType={dialogActionType}
+        />
       </div>
     );
   };

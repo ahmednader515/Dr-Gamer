@@ -822,6 +822,7 @@ export async function getBestSellingProducts() {
         ],
         take: 10,
         select: {
+          id: true,
           name: true,
           slug: true,
           images: true,
@@ -829,22 +830,50 @@ export async function getBestSellingProducts() {
           listPrice: true,
           avgRating: true,
           numReviews: true,
+          productType: true,
+          platformType: true,
+          productCategory: true,
+          variations: true,
+          countInStock: true,
+          brand: true,
         }
       }),
       ['bestSellingProducts'],
       { revalidate: 300, tags: ['products'] }
     )()
     
-    const result = products.map((product: any) => ({
-      name: product.name,
-      slug: product.slug,
-      image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
-      images: Array.isArray(product.images) ? product.images : [],
-      price: Number(product.price),
-      listPrice: Number(product.listPrice),
-      avgRating: Number(product.avgRating),
-      numReviews: Number(product.numReviews),
-    }))
+    const result = products.map((product: any) => {
+      // Parse variations if they're stored as JSON string
+      let variations = null
+      if (product.variations) {
+        try {
+          variations = typeof product.variations === 'string' 
+            ? JSON.parse(product.variations)
+            : product.variations
+        } catch (e) {
+          console.error('Error parsing variations:', e)
+          variations = null
+        }
+      }
+      
+      return {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
+        images: Array.isArray(product.images) ? product.images : [],
+        price: Number(product.price),
+        listPrice: Number(product.listPrice),
+        avgRating: Number(product.avgRating),
+        numReviews: Number(product.numReviews),
+        productType: product.productType || 'game_code',
+        platformType: product.platformType,
+        productCategory: product.productCategory,
+        variations: variations,
+        countInStock: product.countInStock,
+        brand: product.brand,
+      }
+    })
     
     return result
   } catch (error) {

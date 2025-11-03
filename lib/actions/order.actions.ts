@@ -214,7 +214,7 @@ export async function updateOrderToPaid(orderId: string) {
     })
     
     await updateProductStock(orderId)
-    if (order.user.phone) await sendPurchaseReceipt({ order })
+    if (order.user.email) await sendPurchaseReceipt({ order })
     revalidatePath(`/account/orders/${orderId}`)
     return { success: true, message: 'Order paid successfully' }
   } catch (err) {
@@ -269,7 +269,7 @@ export async function deliverOrder(orderId: string) {
       }
     })
     
-    if (order.user.phone) await sendAskReviewOrderItems({ order })
+    if (order.user.email) await sendAskReviewOrderItems({ order })
     revalidatePath(`/account/orders/${orderId}`)
     return { success: true, message: 'Order delivered successfully' }
   } catch (err) {
@@ -381,7 +381,7 @@ export async function getOrderById(orderId: string) {
         }
       },
       user: {
-        select: { name: true, phone: true }
+        select: { name: true, email: true }
       }
     }
   })
