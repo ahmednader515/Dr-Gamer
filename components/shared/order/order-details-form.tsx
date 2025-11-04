@@ -227,6 +227,52 @@ export default function OrderDetailsForm({
                 ))}
               </TableBody>
             </Table>
+            
+            {/* Account Credentials Section */}
+            {orderItemsList.some((item: any) => item.accountUsername || item.accountPassword) && (
+              <div className='mt-6 pt-6 border-t border-gray-700'>
+                <h3 className='text-lg font-semibold mb-4'>Account Credentials</h3>
+                <div className='space-y-4'>
+                  {orderItemsList.map((item: any, index: number) => {
+                    if (!item.accountUsername && !item.accountPassword) return null
+                    
+                    return (
+                      <div key={`creds-${index}`} className='bg-gray-800 border border-gray-700 rounded-lg p-4'>
+                        <h4 className='font-semibold text-purple-400 mb-3'>{item.name}</h4>
+                        <div className='space-y-2 text-sm'>
+                          {item.accountUsername && (
+                            <div>
+                              <span className='text-gray-400'>Email/Username: </span>
+                              <span className='text-white font-medium'>{item.accountUsername}</span>
+                            </div>
+                          )}
+                          {item.accountPassword && (
+                            <div>
+                              <span className='text-gray-400'>Password: </span>
+                              <span className='text-white font-medium'>{item.accountPassword}</span>
+                            </div>
+                          )}
+                          {item.accountBackupCode && (
+                            <div>
+                              <span className='text-gray-400'>Backup Code: </span>
+                              <span className='text-white font-medium'>{item.accountBackupCode}</span>
+                            </div>
+                          )}
+                          {item.disableTwoStepVerified && (
+                            <div className='flex items-center gap-2 text-green-400'>
+                              <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+                                <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clipRule='evenodd' />
+                              </svg>
+                              <span>2-Step Verification Disabled</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

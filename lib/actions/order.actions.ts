@@ -198,7 +198,7 @@ export async function updateOrderToPaid(orderId: string) {
       where: { id: orderId },
       include: {
         user: {
-          select: { phone: true, name: true }
+          select: { email: true, name: true }
         }
       }
     })
@@ -254,7 +254,7 @@ export async function deliverOrder(orderId: string) {
       where: { id: orderId },
       include: {
         user: {
-          select: { phone: true, name: true }
+          select: { email: true, name: true }
         }
       }
     })
