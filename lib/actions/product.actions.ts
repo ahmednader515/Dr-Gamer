@@ -260,11 +260,28 @@ export async function getAllProductsForAdmin({
       prisma.product.count({ where })
     ])
 
-    const normalizedProducts = products.map((p: any) => ({
-      ...p,
-      price: Number(p.price),
-      listPrice: Number(p.listPrice),
-    }))
+    const normalizedProducts = products.map((p: any) => {
+      // Parse variations if they're stored as JSON string
+      let variations = null
+      if (p.variations) {
+        try {
+          variations = typeof p.variations === 'string' 
+            ? JSON.parse(p.variations)
+            : p.variations
+        } catch (e) {
+          variations = null
+        }
+      }
+      
+      return {
+        ...p,
+        price: Number(p.price),
+        listPrice: Number(p.listPrice),
+        originalPrice: Number(p.originalPrice),
+        avgRating: Number(p.avgRating),
+        variations: variations,
+      }
+    })
 
     // If no products in database, fall back to mock data
     if (products.length === 0) {
@@ -529,14 +546,31 @@ export async function getAllProducts({
       prisma.product.count({ where })
     ])
 
-    const normalizedProducts = products.map((p: any) => ({
-      ...p,
-      price: Number(p.price),
-      listPrice: Number(p.listPrice),
-    }))
+    const normalizedProducts = products.map((p: any) => {
+      // Parse variations if they're stored as JSON string
+      let variations = null
+      if (p.variations) {
+        try {
+          variations = typeof p.variations === 'string' 
+            ? JSON.parse(p.variations)
+            : p.variations
+        } catch (e) {
+          variations = null
+        }
+      }
+      
+      return {
+        ...p,
+        price: Number(p.price),
+        listPrice: Number(p.listPrice),
+        originalPrice: Number(p.originalPrice),
+        avgRating: Number(p.avgRating),
+        variations: variations,
+      }
+    })
 
     return {
-      products: JSON.parse(JSON.stringify(normalizedProducts)),
+      products: normalizedProducts,
       totalPages: Math.ceil(countProducts / pageSize),
       totalProducts: countProducts,
       from: pageSize * (Number(page) - 1) + 1,
@@ -639,9 +673,11 @@ export async function getHomePageData() {
           images: true,
           price: true,
           listPrice: true,
+          originalPrice: true,
           avgRating: true,
           numReviews: true,
           productType: true,
+          variations: true,
           category: true,
           countInStock: true,
           brand: true,
@@ -662,9 +698,11 @@ export async function getHomePageData() {
           images: true,
           price: true,
           listPrice: true,
+          originalPrice: true,
           avgRating: true,
           numReviews: true,
           productType: true,
+          variations: true,
           category: true,
           countInStock: true,
           brand: true,
@@ -685,9 +723,11 @@ export async function getHomePageData() {
           images: true,
           price: true,
           listPrice: true,
+          originalPrice: true,
           avgRating: true,
           numReviews: true,
           productType: true,
+          variations: true,
           category: true,
           countInStock: true,
           brand: true,
@@ -698,21 +738,37 @@ export async function getHomePageData() {
       const categoryList = categories.map((c: any) => c.category).slice(0, 4)
       
       // Process product data for cards
-      const processProductForCard = (product: any) => ({
-        id: product.id,
-        name: product.name,
-        slug: product.slug,
-        image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
-        images: Array.isArray(product.images) ? product.images : [],
-        price: Number(product.price),
-        listPrice: Number(product.listPrice),
-        avgRating: Number(product.avgRating),
-        numReviews: Number(product.numReviews),
-        productType: product.productType || 'game_code',
-        category: product.category,
-        countInStock: product.countInStock,
-        brand: product.brand,
-      })
+      const processProductForCard = (product: any) => {
+        // Parse variations if they're stored as JSON string
+        let variations = null
+        if (product.variations) {
+          try {
+            variations = typeof product.variations === 'string' 
+              ? JSON.parse(product.variations)
+              : product.variations
+          } catch (e) {
+            variations = null
+          }
+        }
+        
+        return {
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
+          images: Array.isArray(product.images) ? product.images : [],
+          price: Number(product.price),
+          listPrice: Number(product.listPrice),
+          originalPrice: Number(product.originalPrice),
+          avgRating: Number(product.avgRating),
+          numReviews: Number(product.numReviews),
+          productType: product.productType || 'game_code',
+          category: product.category,
+          countInStock: product.countInStock,
+          brand: product.brand,
+          variations: variations,
+        }
+      }
       
       const processedNewArrivals = newArrivals.map(processProductForCard)
       const processedFeatureds = featureds.map(processProductForCard)
@@ -782,24 +838,42 @@ export async function getTodaysDeals() {
           images: true,
           price: true,
           listPrice: true,
+          originalPrice: true,
           avgRating: true,
           numReviews: true,
+          variations: true,
         }
       }),
       ['todaysDeals'],
       { revalidate: 300, tags: ['products'] }
     )()
     
-    const result = products.map((product: any) => ({
-      name: product.name,
-      slug: product.slug,
-      image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
-      images: Array.isArray(product.images) ? product.images : [],
-      price: Number(product.price),
-      listPrice: Number(product.listPrice),
-      avgRating: Number(product.avgRating),
-      numReviews: Number(product.numReviews),
-    }))
+    const result = products.map((product: any) => {
+      // Parse variations if they're stored as JSON string
+      let variations = null
+      if (product.variations) {
+        try {
+          variations = typeof product.variations === 'string' 
+            ? JSON.parse(product.variations)
+            : product.variations
+        } catch (e) {
+          variations = null
+        }
+      }
+      
+      return {
+        name: product.name,
+        slug: product.slug,
+        image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
+        images: Array.isArray(product.images) ? product.images : [],
+        price: Number(product.price),
+        listPrice: Number(product.listPrice),
+        originalPrice: Number(product.originalPrice),
+        avgRating: Number(product.avgRating),
+        numReviews: Number(product.numReviews),
+        variations: variations,
+      }
+    })
     
     return result
   } catch (error) {
@@ -828,6 +902,7 @@ export async function getBestSellingProducts() {
           images: true,
           price: true,
           listPrice: true,
+          originalPrice: true,
           avgRating: true,
           numReviews: true,
           productType: true,
@@ -864,6 +939,7 @@ export async function getBestSellingProducts() {
         images: Array.isArray(product.images) ? product.images : [],
         price: Number(product.price),
         listPrice: Number(product.listPrice),
+        originalPrice: Number(product.originalPrice),
         avgRating: Number(product.avgRating),
         numReviews: Number(product.numReviews),
         productType: product.productType || 'game_code',
@@ -906,21 +982,39 @@ export async function getProductsByCategory(category: string) {
         images: true,
         price: true,
         listPrice: true,
+        originalPrice: true,
         avgRating: true,
         numReviews: true,
+        variations: true,
       }
     })
     
-    const result = products.map((product: any) => ({
-      name: product.name,
-      slug: product.slug,
-      image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
-      images: Array.isArray(product.images) ? product.images : [],
-      price: Number(product.price),
-      listPrice: Number(product.listPrice),
-      avgRating: Number(product.avgRating),
-      numReviews: Number(product.numReviews),
-    }))
+    const result = products.map((product: any) => {
+      // Parse variations if they're stored as JSON string
+      let variations = null
+      if (product.variations) {
+        try {
+          variations = typeof product.variations === 'string' 
+            ? JSON.parse(product.variations)
+            : product.variations
+        } catch (e) {
+          variations = null
+        }
+      }
+      
+      return {
+        name: product.name,
+        slug: product.slug,
+        image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
+        images: Array.isArray(product.images) ? product.images : [],
+        price: Number(product.price),
+        listPrice: Number(product.listPrice),
+        originalPrice: Number(product.originalPrice),
+        avgRating: Number(product.avgRating),
+        numReviews: Number(product.numReviews),
+        variations: variations,
+      }
+    })
     
     // Cache the result
     setCachedData(cacheKey, result)

@@ -109,19 +109,6 @@ export default function OrderDetailsForm({
                   For contact if email is unavailable
                 </p>
               </div>
-              
-              {!isModerator && (
-                <>
-                  <div className='border-t border-gray-700 pt-3'>
-                    <p className='text-sm text-gray-400'>Customer Name:</p>
-                    <p className='text-base'>{order.user?.name || 'Not available'}</p>
-                  </div>
-                  <div>
-                    <p className='text-sm text-gray-400'>Account Email:</p>
-                    <p className='text-base'>{order.user?.email || 'Not available'}</p>
-                  </div>
-                </>
-              )}
             </div>
 
             {isDelivered ? (

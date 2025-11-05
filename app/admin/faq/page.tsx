@@ -74,9 +74,9 @@ export default async function FAQAdminPage() {
       {/* Mobile Cards - Visible only on mobile */}
       <div className='md:hidden space-y-4'>
         {categories.map((category: any) => (
-          <div key={category.id} className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 space-y-3">
+          <div key={category.id} className="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <div className="font-medium text-gray-900">{category.title}</div>
+              <div className="font-medium text-white">{category.title}</div>
               <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                 category.isActive ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
               }`}>
@@ -84,11 +84,11 @@ export default async function FAQAdminPage() {
               </span>
             </div>
 
-            <div className="border-t border-gray-100 pt-3">
-              <div className="text-sm text-gray-600 mb-1">Number of questions: {category.questions?.length || 0}</div>
+            <div className="border-t border-gray-700 pt-3">
+              <div className="text-sm text-gray-400 mb-1">Number of questions: {category.questions?.length || 0}</div>
             </div>
 
-            <div className="border-t border-gray-100 pt-3 flex gap-2">
+            <div className="border-t border-gray-700 pt-3 flex gap-2">
               <Button asChild size='sm' className="flex-1 bg-purple-600 hover:bg-purple-700">
                 <Link href={`/admin/faq/categories/${category.id}`}>
                   Edit

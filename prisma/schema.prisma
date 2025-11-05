@@ -59,6 +59,7 @@ model Product {
   variations         Json?       // Array of variation objects with name and price
   price              Decimal     @db.Decimal(10, 2)
   listPrice          Decimal     @db.Decimal(10, 2)
+  originalPrice      Decimal     @default(0) @db.Decimal(10, 2)
   countInStock       Int
   tags               String[]    @default([])
   colors             String[]    @default(["White", "Red", "Black"])

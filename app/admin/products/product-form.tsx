@@ -64,6 +64,9 @@ const productDefaultValues: IProductInput = {
 const getVariationOptions = (platformType?: string, productCategory?: string): string[] => {
   if (!platformType || !productCategory) return []
   
+  // If Digital Code is selected, don't show any variations
+  if (productCategory === 'Digital Code') return []
+  
   if (platformType === 'Xbox') {
     if (productCategory === 'Game') {
       return ['Home', 'Sign', 'New Account', 'Personal Account', 'Digital Code']
@@ -72,12 +75,12 @@ const getVariationOptions = (platformType?: string, productCategory?: string): s
     }
   } else if (platformType === 'Playstation') {
     if (productCategory === 'Game') {
-      return ['Primary', 'Secondary', 'New Account', 'Personal Account', 'Digital Code']
+      return ['Full Account', 'Primary PS5', 'Primary PS4', 'Secondary']
     } else if (productCategory === 'Subscription') {
-      return ['Primary', 'Secondary', 'New Account', 'Personal Account']
+      return ['Full Account', 'Primary PS5', 'Primary PS4', 'Secondary']
     }
   } else if (platformType === 'Steam') {
-    return ['Digital Code']
+    return []
   }
   
   return []
@@ -110,6 +113,17 @@ const ProductForm = ({
       ? product.variations.reduce((acc: any, v: any) => ({ ...acc, [v.name]: v.price }), {})
       : {}
   )
+  
+  const [variationOriginalPrices, setVariationOriginalPrices] = useState<{ [key: string]: number }>(
+    product?.variations && Array.isArray(product.variations)
+      ? product.variations.reduce((acc: any, v: any) => ({ ...acc, [v.name]: v.originalPrice || 0 }), {})
+      : {}
+  )
+  
+  // Check if a variation should have dual pricing (original + discounted)
+  const shouldHaveDualPricing = (variationName: string) => {
+    return variationName === 'Full Account' || variationName === 'Personal Account'
+  }
 
   const form = useForm<IProductInput>({
     resolver:
@@ -387,7 +401,7 @@ const ProductForm = ({
           </div>
 
           {/* Variations with Checkboxes and Prices */}
-          {selectedPlatform && selectedProductCategory && (
+          {selectedPlatform && selectedProductCategory && getVariationOptions(selectedPlatform, selectedProductCategory).length > 0 && (
             <div className='border border-gray-700 rounded-lg p-4'>
               <h3 className='text-white font-semibold mb-4'>Product Variations & Prices</h3>
               <p className='text-gray-400 text-sm mb-4'>
@@ -409,19 +423,29 @@ const ProductForm = ({
                               newSelected.add(variation)
                             } else {
                               newSelected.delete(variation)
-                              // Remove price when unchecked
+                              // Remove prices when unchecked
                               const newPrices = { ...variationPrices }
+                              const newOriginalPrices = { ...variationOriginalPrices }
                               delete newPrices[variation]
+                              delete newOriginalPrices[variation]
                               setVariationPrices(newPrices)
+                              setVariationOriginalPrices(newOriginalPrices)
                             }
                             setSelectedVariations(newSelected)
                             
                             // Update form variations
                             const variations = Array.from(newSelected)
-                              .map(name => ({
-                                name,
-                                price: variationPrices[name] || 0
-                              }))
+                              .map(name => {
+                                const variation: any = {
+                                  name,
+                                  price: variationPrices[name] || 0,
+                                }
+                                // Only add originalPrice for variations that should have dual pricing
+                                if (shouldHaveDualPricing(name) && variationOriginalPrices[name]) {
+                                  variation.originalPrice = variationOriginalPrices[name]
+                                }
+                                return variation
+                              })
                               .filter(v => v.price > 0)
                             form.setValue('variations', variations)
                             
@@ -444,38 +468,137 @@ const ProductForm = ({
                       </div>
                       
                       {isSelected && (
-                        <div className='ml-6'>
-                          <label className='text-gray-400 text-sm mb-2 block'>Price (EGP)</label>
-                          <Input
-                            type='number'
-                            step='0.01'
-                            placeholder='Enter price'
-                            value={variationPrices[variation] || ''}
-                            onChange={(e) => {
-                              const price = parseFloat(e.target.value) || 0
-                              const newPrices = { ...variationPrices, [variation]: price }
-                              setVariationPrices(newPrices)
-                              
-                              // Update form variations
-                              const variations = Array.from(selectedVariations)
-                                .map(name => ({
-                                  name,
-                                  price: newPrices[name] || 0
-                                }))
-                                .filter(v => v.price > 0)
-                              form.setValue('variations', variations)
-                              
-                              // Update main price fields with min/max
-                              if (variations.length > 0) {
-                                const prices = variations.map(v => v.price)
-                                const minPrice = Math.min(...prices)
-                                const maxPrice = Math.max(...prices)
-                                form.setValue('price', minPrice)
-                                form.setValue('listPrice', maxPrice)
-                              }
-                            }}
-                            className='border-gray-700 bg-gray-800 text-gray-200'
-                          />
+                        <div className='ml-6 space-y-3'>
+                          {shouldHaveDualPricing(variation) ? (
+                            <>
+                              <div>
+                                <label className='text-gray-400 text-sm mb-2 block'>Original Price (EGP)</label>
+                                <Input
+                                  type='number'
+                                  step='0.01'
+                                  placeholder='Enter original price'
+                                  value={variationOriginalPrices[variation] || ''}
+                                  onChange={(e) => {
+                                    const originalPrice = parseFloat(e.target.value) || 0
+                                    const newOriginalPrices = { ...variationOriginalPrices, [variation]: originalPrice }
+                                    setVariationOriginalPrices(newOriginalPrices)
+                                    
+                                    // Update form variations
+                                    const variations = Array.from(selectedVariations)
+                                      .map(name => {
+                                        const variation: any = {
+                                          name,
+                                          price: variationPrices[name] || 0,
+                                        }
+                                        // Only add originalPrice for variations that should have dual pricing
+                                        if (shouldHaveDualPricing(name) && newOriginalPrices[name]) {
+                                          variation.originalPrice = newOriginalPrices[name]
+                                        }
+                                        return variation
+                                      })
+                                      .filter(v => v.price > 0)
+                                    form.setValue('variations', variations)
+                                    
+                                    // Update main price fields with min/max
+                                    if (variations.length > 0) {
+                                      const prices = variations.map(v => v.price)
+                                      const minPrice = Math.min(...prices)
+                                      const maxPrice = Math.max(...prices)
+                                      form.setValue('price', minPrice)
+                                      form.setValue('listPrice', maxPrice)
+                                    }
+                                  }}
+                                  className='border-gray-700 bg-gray-800 text-gray-200'
+                                />
+                              </div>
+                              <div>
+                                <label className='text-gray-400 text-sm mb-2 block'>Discounted Price (EGP)</label>
+                                <Input
+                                  type='number'
+                                  step='0.01'
+                                  placeholder='Enter discounted price'
+                                  value={variationPrices[variation] || ''}
+                                  onChange={(e) => {
+                                    const price = parseFloat(e.target.value) || 0
+                                    const newPrices = { ...variationPrices, [variation]: price }
+                                    setVariationPrices(newPrices)
+                                    
+                                    // Update form variations
+                                    const variations = Array.from(selectedVariations)
+                                      .map(name => {
+                                        const variation: any = {
+                                          name,
+                                          price: newPrices[name] || 0,
+                                        }
+                                        // Only add originalPrice for variations that should have dual pricing
+                                        if (shouldHaveDualPricing(name) && variationOriginalPrices[name]) {
+                                          variation.originalPrice = variationOriginalPrices[name]
+                                        }
+                                        return variation
+                                      })
+                                      .filter(v => v.price > 0)
+                                    form.setValue('variations', variations)
+                                    
+                                    // Update main price fields with min/max
+                                    if (variations.length > 0) {
+                                      const prices = variations.map(v => v.price)
+                                      const minPrice = Math.min(...prices)
+                                      const maxPrice = Math.max(...prices)
+                                      form.setValue('price', minPrice)
+                                      form.setValue('listPrice', maxPrice)
+                                    }
+                                  }}
+                                  className='border-gray-700 bg-gray-800 text-gray-200'
+                                />
+                                {variationOriginalPrices[variation] > 0 && variationPrices[variation] > 0 && variationPrices[variation] < variationOriginalPrices[variation] && (
+                                  <p className='text-xs text-green-400 mt-1'>
+                                    {Math.round(((variationOriginalPrices[variation] - variationPrices[variation]) / variationOriginalPrices[variation]) * 100)}% discount
+                                  </p>
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <div>
+                              <label className='text-gray-400 text-sm mb-2 block'>Price (EGP)</label>
+                              <Input
+                                type='number'
+                                step='0.01'
+                                placeholder='Enter price'
+                                value={variationPrices[variation] || ''}
+                                onChange={(e) => {
+                                  const price = parseFloat(e.target.value) || 0
+                                  const newPrices = { ...variationPrices, [variation]: price }
+                                  setVariationPrices(newPrices)
+                                  
+                                  // Update form variations
+                                  const variations = Array.from(selectedVariations)
+                                    .map(name => {
+                                      const variation: any = {
+                                        name,
+                                        price: newPrices[name] || 0,
+                                      }
+                                      // Only add originalPrice for variations that should have dual pricing
+                                      if (shouldHaveDualPricing(name) && variationOriginalPrices[name]) {
+                                        variation.originalPrice = variationOriginalPrices[name]
+                                      }
+                                      return variation
+                                    })
+                                    .filter(v => v.price > 0)
+                                  form.setValue('variations', variations)
+                                  
+                                  // Update main price fields with min/max
+                                  if (variations.length > 0) {
+                                    const prices = variations.map(v => v.price)
+                                    const minPrice = Math.min(...prices)
+                                    const maxPrice = Math.max(...prices)
+                                    form.setValue('price', minPrice)
+                                    form.setValue('listPrice', maxPrice)
+                                  }
+                                }}
+                                className='border-gray-700 bg-gray-800 text-gray-200'
+                              />
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

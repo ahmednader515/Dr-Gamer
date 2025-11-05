@@ -415,9 +415,9 @@ export const calcDeliveryDateAndPrice = async ({
         : deliveryDateIndex
     ]
   
-  // Calculate expected delivery date (immediate for digital products - within 2 hours after payment confirmation)
+  // Calculate expected delivery date (immediate for digital products - within 24 hours after payment confirmation)
   const expectedDeliveryDate = new Date()
-  expectedDeliveryDate.setHours(expectedDeliveryDate.getHours() + 2)
+  expectedDeliveryDate.setHours(expectedDeliveryDate.getHours() + 24)
   
   // Digital products have no shipping or tax
   const shippingPrice = 0

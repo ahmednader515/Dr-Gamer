@@ -55,7 +55,7 @@ export default async function Header() {
         <div className="container mx-auto px-4 pt-2 pb-3">
           {/* Header Row */}
           <div className="flex items-center justify-between gap-4">
-            {/* Left Side - Menu on desktop, Menu + Logo + Dr.GAMER on mobile */}
+            {/* Left Side - Logo + Dr.GAMER on desktop, Menu + Logo + Dr.GAMER on mobile */}
             <div className="flex items-center gap-3 sm:gap-4">
               {/* Mobile: Menu button + Logo + Dr.GAMER */}
               <div className="flex items-center gap-2 sm:gap-3 md:hidden">
@@ -80,19 +80,6 @@ export default async function Header() {
                 </div>
               </div>
               
-              {/* Desktop: Menu */}
-              <div className="hidden md:block">
-                <Menu />
-              </div>
-            </div>
-            
-            {/* Center - Search on desktop */}
-            <div className="hidden md:flex items-center justify-center flex-1">
-              <Search />
-            </div>
-            
-            {/* Right Side - Logo + Dr.GAMER on desktop, Navigation Icons on mobile */}
-            <div className="flex items-center gap-3 sm:gap-4">
               {/* Desktop: Logo + Dr.GAMER */}
               <div className="hidden md:flex items-center gap-3">
                 <Link href="/" className="flex items-center gap-3">
@@ -113,6 +100,19 @@ export default async function Header() {
                     </span>
                   </div>
                 </Link>
+              </div>
+            </div>
+            
+            {/* Center - Search on desktop */}
+            <div className="hidden md:flex items-center justify-center flex-1">
+              <Search />
+            </div>
+            
+            {/* Right Side - Menu on desktop, Navigation Icons on mobile */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Desktop: Menu */}
+              <div className="hidden md:block">
+                <Menu />
               </div>
               
               {/* Mobile Navigation Links - All on one line */}

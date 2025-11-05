@@ -72,24 +72,47 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         <div className='border border-gray-700 rounded-lg p-4 bg-gray-900/50'>
           <h3 className='text-lg font-semibold mb-3'>Select Your Option:</h3>
           <div className='space-y-2'>
-            {product.variations.map((variation: any) => (
-              <button
-                key={variation.name}
-                className={`w-full px-4 py-3 border rounded-lg text-sm sm:text-base transition-all text-left ${
-                  selectedVariation === variation.name 
-                    ? 'border-purple-500 bg-purple-500/20 text-white ring-2 ring-purple-500' 
-                    : 'border-gray-600 bg-gray-800/50 hover:border-purple-400 hover:bg-gray-800'
-                }`}
-                onClick={() => setSelectedVariation(variation.name)}
-              >
-                <div className='flex justify-between items-center'>
-                  <span className='font-medium'>{variation.name}</span>
-                  <span className={`font-bold ${selectedVariation === variation.name ? 'text-purple-300' : 'text-purple-400'}`}>
-                    {Number(variation.price).toFixed(2)} EGP
-                  </span>
-                </div>
-              </button>
-            ))}
+            {product.variations.map((variation: any) => {
+              const originalPrice = Number(variation.originalPrice) || 0
+              const currentPrice = Number(variation.price) || 0
+              const hasDiscount = originalPrice > 0 && currentPrice > 0 && currentPrice < originalPrice
+              const discountPercentage = hasDiscount 
+                ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
+                : 0
+              
+              return (
+                <button
+                  key={variation.name}
+                  className={`w-full px-4 py-3 border rounded-lg text-sm sm:text-base transition-all text-left ${
+                    selectedVariation === variation.name 
+                      ? 'border-purple-500 bg-purple-500/20 text-white ring-2 ring-purple-500' 
+                      : 'border-gray-600 bg-gray-800/50 hover:border-purple-400 hover:bg-gray-800'
+                  }`}
+                  onClick={() => setSelectedVariation(variation.name)}
+                >
+                  <div className='flex justify-between items-center'>
+                    <div className='flex-1'>
+                      <span className='font-medium'>{variation.name}</span>
+                      {hasDiscount && (
+                        <span className='ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-md font-bold'>
+                          -{discountPercentage}%
+                        </span>
+                      )}
+                    </div>
+                    <div className='text-right'>
+                      {hasDiscount && (
+                        <div className='text-xs text-gray-400 line-through'>
+                          {originalPrice.toFixed(2)} EGP
+                        </div>
+                      )}
+                      <div className={`font-bold ${selectedVariation === variation.name ? 'text-purple-300' : 'text-purple-400'}`}>
+                        {currentPrice.toFixed(2)} EGP
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
           </div>
         </div>
       )}

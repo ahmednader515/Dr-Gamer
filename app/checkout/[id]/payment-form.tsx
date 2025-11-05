@@ -45,10 +45,10 @@ export default function OrderDetailsForm({
     <Card>
       <CardContent className='p-4'>
         <div>
-          <div className='text-lg font-bold'>ملخص الطلب</div>
+          <div className='text-lg font-bold'>Order Summary</div>
           <div className='space-y-2'>
             <div className='flex justify-between'>
-              <span>المنتجات:</span>
+              <span>Products:</span>
               <span>
                 {' '}
                 <ProductPrice price={itemsPrice} plain />
@@ -70,7 +70,7 @@ export default function OrderDetailsForm({
             )}
 
             <div className='flex justify-between pt-3 font-bold text-lg border-t'>
-              <span>المجموع الكلي:</span>
+              <span>Total:</span>
               <span className='text-purple-400'>
                 {' '}
                 <ProductPrice price={totalPrice} plain />
@@ -95,7 +95,7 @@ export default function OrderDetailsForm({
                   className='w-full rounded-full'
                   onClick={() => router.push(`/account/orders/${order.id}`)}
                 >
-                  عرض تفاصيل الطلب
+                  View Order Details
                 </Button>
               </div>
             )}
@@ -118,10 +118,10 @@ export default function OrderDetailsForm({
     <main className='max-w-6xl mx-auto px-4 py-6' dir='ltr'>
       <div className='mb-6'>
         <h1 className='text-2xl sm:text-3xl font-bold text-purple-400 mb-2'>
-          ✓ تم استلام طلبك بنجاح
+          ✓ Your Order Has Been Received Successfully
         </h1>
         <p className='text-gray-400 text-sm sm:text-base'>
-          رقم الطلب: <span className='font-mono text-white'>{order.id}</span>
+          Order Number: <span className='font-mono text-white'>{order.id}</span>
         </p>
       </div>
 
@@ -131,25 +131,25 @@ export default function OrderDetailsForm({
           {/* Customer Contact Info */}
           <Card>
             <CardContent className='p-4'>
-              <div className='text-lg font-bold mb-3'>معلومات التواصل</div>
+              <div className='text-lg font-bold mb-3'>Contact Information</div>
               <div className='space-y-3'>
                 <div>
-                  <p className='text-sm text-gray-400'>البريد الإلكتروني:</p>
+                  <p className='text-sm text-gray-400'>Email:</p>
                   <p className='text-base font-semibold'>
                     {customerEmail || 'Not available'}
                   </p>
                   <p className='text-xs text-gray-400 mt-1'>
-                    سيتم إرسال المنتج الرقمي إلى هذا البريد بعد تأكيد الدفع
+                    The digital product will be sent to this email after payment confirmation
                   </p>
                 </div>
                 
                 <div className='border-t border-gray-700 pt-3'>
-                  <p className='text-sm text-gray-400'>رقم الهاتف:</p>
+                  <p className='text-sm text-gray-400'>Phone Number:</p>
                   <p className='text-base font-semibold'>
                     {customerPhone || 'Not available'}
                   </p>
                   <p className='text-xs text-gray-400 mt-1'>
-                    للتواصل في حالة عدم توفر البريد الإلكتروني
+                    For contact if email is unavailable
                   </p>
                 </div>
               </div>
@@ -161,21 +161,21 @@ export default function OrderDetailsForm({
             <CardContent className='p-4'>
               <div className='grid md:grid-cols-3 gap-3'>
                 <div className='text-lg font-bold'>
-                  <span>طريقة الدفع</span>
+                  <span>Payment Method</span>
                 </div>
                 <div className='col-span-2 space-y-3'>
                   <p className='text-base font-semibold'>{paymentMethod || 'Not specified'}</p>
                   
                   {paymentNumber && (
                     <div>
-                      <p className='text-xs text-gray-400'>رقم الدفع الخاص بك:</p>
+                      <p className='text-xs text-gray-400'>Your Payment Number:</p>
                       <p className='text-sm font-mono'>{paymentNumber}</p>
                     </div>
                   )}
 
                   {transactionImage && (
                     <div>
-                      <p className='text-xs text-gray-400 mb-2'>صورة المعاملة:</p>
+                      <p className='text-xs text-gray-400 mb-2'>Transaction Screenshot:</p>
                       <a 
                         href={transactionImage} 
                         target='_blank' 
@@ -190,18 +190,18 @@ export default function OrderDetailsForm({
                           />
                         </div>
                       </a>
-                      <p className='text-xs text-gray-500 mt-1'>اضغط لعرض الصورة بالحجم الكامل</p>
+                      <p className='text-xs text-gray-500 mt-1'>Click to view full size image</p>
                     </div>
                   )}
 
                   {!isPaid && (
                     <div className='bg-blue-900/30 border border-blue-600 rounded-lg p-3 text-sm'>
-                      <p className='text-blue-400 font-semibold mb-1'>ℹ️ خطوات التأكيد</p>
+                      <p className='text-blue-400 font-semibold mb-1'>ℹ️ Confirmation Steps</p>
                       <ol className='text-gray-300 text-xs list-decimal list-inside space-y-1'>
-                        <li>سيقوم فريقنا بمراجعة معاملتك</li>
-                        <li>سيتم تأكيد الدفع خلال 24 ساعة</li>
-                        <li>ستتلقى المنتج الرقمي على بريدك الإلكتروني</li>
-                        <li>يمكنك متابعة حالة الطلب من صفحة طلباتي</li>
+                        <li>Our team will review your transaction</li>
+                        <li>Payment will be confirmed within 24 hours</li>
+                        <li>You will receive the digital product via email</li>
+                        <li>You can track the order status from My Orders page</li>
                       </ol>
                     </div>
                   )}
@@ -216,14 +216,17 @@ export default function OrderDetailsForm({
               <CardContent className='p-4'>
                 <div className='grid md:grid-cols-3 gap-3'>
                   <div className='text-lg font-bold'>
-                    <span>التسليم المتوقع</span>
+                    <span>Expected Delivery</span>
                   </div>
                   <div className='col-span-2'>
                     <p className='text-base'>
                       {formatDateTime(expectedDeliveryDate).dateTime}
                     </p>
                     <p className='text-xs text-gray-400 mt-1'>
-                      سيتم إرسال المنتج الرقمي إلى بريدك خلال ساعتين من تأكيد الدفع
+                      The digital product will be sent to your email within 24 hours of payment confirmation
+                    </p>
+                    <p className='text-xs text-purple-400 mt-2 font-medium'>
+                      Your order will be delivered soon based on the order processing sequence
                     </p>
                   </div>
                 </div>

@@ -70,10 +70,10 @@ export default async function WebPageAdminPage() {
       {/* Mobile Cards - Visible only on mobile */}
       <div className='md:hidden space-y-4'>
         {webPages.map((webPage: IWebPageInput & { id: string }) => (
-          <div key={webPage.id} className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 space-y-3">
+          <div key={webPage.id} className="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4 space-y-3">
             {/* Web Page Header */}
             <div className="flex items-center justify-between">
-              <div className="font-medium text-gray-900">{webPage.title}</div>
+              <div className="font-medium text-white">{webPage.title}</div>
               <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                 webPage.isPublished ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
               }`}>
@@ -82,15 +82,15 @@ export default async function WebPageAdminPage() {
             </div>
 
             {/* Web Page Slug */}
-            <div className="border-t border-gray-100 pt-3">
-              <div className="text-sm text-gray-600 mb-1">Slug:</div>
-              <div className="text-sm text-gray-700 font-mono bg-gray-50 px-2 py-1 rounded">
+            <div className="border-t border-gray-700 pt-3">
+              <div className="text-sm text-gray-400 mb-1">Slug:</div>
+              <div className="text-sm text-gray-300 font-mono bg-gray-900 px-2 py-1 rounded">
                 {webPage.slug}
               </div>
             </div>
 
             {/* Actions */}
-            <div className="border-t border-gray-100 pt-3 flex gap-2">
+            <div className="border-t border-gray-700 pt-3 flex gap-2">
               <Button asChild size='sm' className="flex-1 bg-purple-600 hover:bg-purple-700">
                 <Link href={`/admin/web-pages/${webPage.id}`}>
                   Edit

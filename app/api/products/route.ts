@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
         images: true,
         price: true,
         listPrice: true,
+        originalPrice: true,
         avgRating: true,
         numReviews: true,
         category: true,
@@ -58,7 +59,14 @@ export async function GET(request: NextRequest) {
         }
       }
       
-      return [p.id, { ...p, variations }]
+      return [p.id, { 
+        ...p, 
+        price: Number(p.price),
+        listPrice: Number(p.listPrice),
+        originalPrice: Number(p.originalPrice),
+        avgRating: Number(p.avgRating),
+        variations 
+      }]
     }))
     const orderedProducts = ids.map(id => productMap.get(id)).filter(Boolean)
 

@@ -31,6 +31,7 @@ export const ReviewInputSchema = z.object({
 export const ProductVariationSchema = z.object({
   name: z.string().min(1, 'Variation name is required'),
   price: Price('Variation price'),
+  originalPrice: z.coerce.number().nonnegative('Original price must be non-negative').optional().default(0),
 })
 
 export const ProductInputSchema = z.object({

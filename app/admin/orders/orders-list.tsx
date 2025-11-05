@@ -151,7 +151,7 @@ export default function OrdersList({ orders, totalPages, currentPage, userRole }
           <div key={order.id} className="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4 space-y-3">
             {/* Order Header */}
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-gray-400">
                 {formatDateTime(order.createdAt).dateTime}
               </div>
               <div className="flex gap-2">
@@ -200,7 +200,7 @@ export default function OrdersList({ orders, totalPages, currentPage, userRole }
             </div>
 
             {/* Actions */}
-            <div className="border-t border-gray-100 pt-3 flex gap-2">
+            <div className="border-t border-gray-700 pt-3 flex gap-2">
               <Button asChild size='sm' className="flex-1">
                 <Link href={`/admin/orders/${order.id}`}>
                   View Details

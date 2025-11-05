@@ -53,6 +53,19 @@ export default function CartPage() {
   }
 
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0)
+  
+  // Calculate new account tax (30 EGP per item with "New Account" variation)
+  const newAccountTax = Array.isArray(items) 
+    ? items.reduce((total: number, item: any) => {
+        const variation = item.selectedVariation?.toLowerCase() || ''
+        if (variation.includes('new account')) {
+          return total + 30
+        }
+        return total
+      }, 0)
+    : 0
+  
+  const finalTotal = itemsPrice + newAccountTax
 
   if (items.length === 0) {
     return (
@@ -100,6 +113,15 @@ export default function CartPage() {
                   <div className='flex-1 min-w-0'>
                     <h3 className='font-semibold text-sm sm:text-base mb-1'>{item.name}</h3>
                     <p className='text-xs sm:text-sm text-muted-foreground mb-2'>
+                      {item.selectedVariation && (
+                        <>
+                          <span>{item.selectedVariation}</span>
+                          {item.selectedVariation?.toLowerCase().includes('new account') && (
+                            <span className='text-orange-400 font-semibold'> (+30 EGP setup fee)</span>
+                          )}
+                          {(item.color || item.size) && ` | `}
+                        </>
+                      )}
                       {item.color && `Color: ${item.color}`}
                       {item.color && item.size && ` | `}
                       {item.size && `Size: ${item.size}`}
@@ -158,10 +180,25 @@ export default function CartPage() {
                 <span>Products ({items.length})</span>
                 <span>{formatPrice(itemsPrice)}</span>
               </div>
+              
+              {newAccountTax > 0 && (
+                <div className='pt-2 space-y-1'>
+                  <div className='flex justify-between text-sm sm:text-base'>
+                    <span>New Account Fee:</span>
+                    <span className='text-orange-400'>
+                      +{formatPrice(newAccountTax)}
+                    </span>
+                  </div>
+                  <p className='text-xs text-gray-400'>
+                    Includes account creation and setup (30 EGP per new account)
+                  </p>
+                </div>
+              )}
+              
               <Separator />
               <div className='flex justify-between font-semibold text-base sm:text-lg'>
                 <span>Total</span>
-                <span>{formatPrice(itemsPrice)}</span>
+                <span>{formatPrice(finalTotal)}</span>
               </div>
             </CardContent>
           </Card>

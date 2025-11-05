@@ -441,11 +441,55 @@ export default function CheckoutForm() {
   const currentPaymentInfo = paymentMethod && PAYMENT_INFO[paymentMethod as keyof typeof PAYMENT_INFO]
 
   return (
-    <main className='max-w-6xl mx-auto highlight-link px-4 py-6 sm:py-8' dir='ltr'>
+    <main className='max-w-6xl mx-auto highlight-link px-4 py-6 sm:py-8 pb-32 lg:pb-8' dir='ltr'>
       <LoadingOverlay 
         isLoading={isPlacingOrder} 
         text="Processing order..."
       />
+      
+      {/* Mobile Bottom Banner - Always Visible */}
+      <div className='lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-900 border-t-2 border-purple-500 shadow-lg'>
+        <div className='p-4 space-y-2'>
+          <div className='flex justify-between items-center text-sm'>
+            <span className='text-gray-300'>Products:</span>
+            <span className='font-semibold'>
+              <ProductPrice price={itemsPrice} plain />
+            </span>
+          </div>
+          
+          {newAccountTax > 0 && (
+            <div className='flex justify-between items-center text-sm'>
+              <span className='text-gray-300'>New Account Fee:</span>
+              <span className='font-semibold text-orange-400'>
+                +<ProductPrice price={newAccountTax} plain />
+              </span>
+            </div>
+          )}
+          
+          {appliedPromo && discountAmount > 0 && (
+            <div className='flex justify-between items-center text-sm'>
+              <span className='text-gray-300'>Discount ({appliedPromo.discountPercent}%):</span>
+              <span className='font-semibold text-purple-400'>
+                -<ProductPrice price={discountAmount} plain />
+              </span>
+            </div>
+          )}
+          
+          <div className='flex justify-between items-center pt-2 border-t border-gray-700'>
+            <span className='font-bold text-base'>Total:</span>
+            <span className='font-bold text-lg text-purple-400'>
+              <ProductPrice price={finalTotal} plain />
+            </span>
+          </div>
+          
+          {newAccountTax > 0 && (
+            <p className='text-xs text-gray-400 text-center'>
+              Includes 30 EGP setup fee per new account
+            </p>
+          )}
+        </div>
+      </div>
+      
       <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6'>
         <div className='lg:col-span-3'>
           

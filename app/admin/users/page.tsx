@@ -93,13 +93,13 @@ export default async function AdminUser(props: {
       {/* Mobile Cards - Visible only on mobile */}
       <div className='md:hidden space-y-4'>
         {users?.data.map((user) => (
-          <div key={user.id} className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 space-y-3">
+          <div key={user.id} className="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4 space-y-3">
             {/* User Header */}
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <div className="font-medium text-lg text-gray-900">{user.name}</div>
+                <div className="font-medium text-lg text-white">{user.name}</div>
                 {user.email && (
-                  <div className="text-sm text-gray-500">{user.email}</div>
+                  <div className="text-sm text-gray-400">{user.email}</div>
                 )}
               </div>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -114,18 +114,18 @@ export default async function AdminUser(props: {
             </div>
 
             {/* Registration Date */}
-            <div className="border-t border-gray-100 pt-3">
-              <div className="text-sm text-gray-600 mb-1">Registered:</div>
-              <div className="text-sm text-gray-900">
+            <div className="border-t border-gray-700 pt-3">
+              <div className="text-sm text-gray-400 mb-1">Registered:</div>
+              <div className="text-sm text-white">
                 {formatDateTime(user.createdAt).dateTime}
               </div>
             </div>
 
             {/* Actions */}
-            <div className="border-t border-gray-100 pt-3">
+            <div className="border-t border-gray-700 pt-3">
               <Button asChild size='sm' className="w-full">
                 <Link href={`/admin/users/${user.id}`}>
-                  edit
+                  Edit
                 </Link>
               </Button>
             </div>

@@ -14,6 +14,13 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { formatDateTime } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { deleteProduct } from '@/lib/actions/product.actions'
@@ -76,23 +83,23 @@ const TableRowSkeleton = () => (
 
 // Loading skeleton component for mobile cards
 const MobileCardSkeleton = () => (
-  <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 space-y-3 animate-pulse">
+  <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4 space-y-3 animate-pulse">
     <div className="flex items-center gap-3">
-      <div className="w-16 h-16 bg-gray-200 rounded-md"></div>
+      <div className="w-16 h-16 bg-gray-700 rounded-md"></div>
       <div className="flex-1 space-y-2">
-        <div className="h-4 bg-gray-200 rounded w-32"></div>
-        <div className="h-3 bg-gray-200 rounded w-20"></div>
+        <div className="h-4 bg-gray-700 rounded w-32"></div>
+        <div className="h-3 bg-gray-700 rounded w-20"></div>
       </div>
     </div>
     <div className="space-y-2">
-      <div className="h-3 bg-gray-200 rounded w-24"></div>
-      <div className="h-3 bg-gray-200 rounded w-16"></div>
-      <div className="h-3 bg-gray-200 rounded w-20"></div>
+      <div className="h-3 bg-gray-700 rounded w-24"></div>
+      <div className="h-3 bg-gray-700 rounded w-16"></div>
+      <div className="h-3 bg-gray-700 rounded w-20"></div>
     </div>
     <div className="flex gap-2">
-      <div className="h-8 bg-gray-200 rounded w-16"></div>
-      <div className="h-8 bg-gray-200 rounded w-16"></div>
-      <div className="h-8 bg-gray-200 rounded w-16"></div>
+      <div className="h-8 bg-gray-700 rounded w-16"></div>
+      <div className="h-8 bg-gray-700 rounded w-16"></div>
+      <div className="h-8 bg-gray-700 rounded w-16"></div>
     </div>
   </div>
 )
@@ -100,18 +107,43 @@ const MobileCardSkeleton = () => (
 const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
   const [page, setPage] = useState<number>(1)
   const [searchQuery, setSearchQuery] = useState<string>('')
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
+  const [sortOrder, setSortOrder] = useState<string>('default')
   const [products, setProducts] = useState<Product[]>(initialProducts)
   const { toast } = useToast()
   
-  // Client-side search and filtering
+  // Get unique categories
+  const categories = useMemo(() => {
+    const uniqueCategories = Array.from(new Set(products.map(p => p.category)))
+    return uniqueCategories.sort()
+  }, [products])
+  
+  // Client-side search, filtering, and sorting
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products
+    let result = products
     
-    return products.filter(product =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }, [products, searchQuery])
+    // Apply search filter
+    if (searchQuery.trim()) {
+      result = result.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+    
+    // Apply category filter
+    if (categoryFilter !== 'all') {
+      result = result.filter(product => product.category === categoryFilter)
+    }
+    
+    // Apply alphabetical sorting
+    if (sortOrder === 'a-z') {
+      result = [...result].sort((a, b) => a.name.localeCompare(b.name))
+    } else if (sortOrder === 'z-a') {
+      result = [...result].sort((a, b) => b.name.localeCompare(a.name))
+    }
+    
+    return result
+  }, [products, searchQuery, categoryFilter, sortOrder])
 
   // Pagination
   const itemsPerPage = 10
@@ -184,17 +216,48 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
           </Button>
         </div>
 
-        {/* Search and Results Row */}
+        {/* Search and Filters Row */}
         <div className='flex flex-wrap items-center gap-2'>
           <Input
-            className='w-auto'
+            className='w-full sm:w-auto min-w-[200px]'
             type='text'
             value={searchQuery}
             onChange={handleSearch}
-            placeholder='Filter by name or category...'
+            placeholder='Search by name...'
           />
+          
+          <Select value={categoryFilter} onValueChange={(value) => {
+            setCategoryFilter(value)
+            setPage(1)
+          }}>
+            <SelectTrigger className='w-full sm:w-[180px]'>
+              <SelectValue placeholder='All Categories' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Categories</SelectItem>
+              {categories.map(category => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={sortOrder} onValueChange={(value) => {
+            setSortOrder(value)
+            setPage(1)
+          }}>
+            <SelectTrigger className='w-full sm:w-[180px]'>
+              <SelectValue placeholder='Sort by' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='default'>Default Order</SelectItem>
+              <SelectItem value='a-z'>A-Z (Alphabetical)</SelectItem>
+              <SelectItem value='z-a'>Z-A (Reverse)</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <p>
+          <p className='text-sm'>
             {filteredProducts.length === 0
               ? 'No'
               : `${startIndex + 1}-${Math.min(endIndex, filteredProducts.length)} of ${filteredProducts.length}`}
@@ -302,7 +365,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
         <div className='md:hidden space-y-4'>
           {currentProducts.length > 0 ? (
             currentProducts.map((product) => (
-              <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 space-y-3">
+              <div key={product.id} className="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4 space-y-3">
                 {/* Product Header with Image and Name */}
                 <div className="flex items-center gap-3">
                   <div className="w-16 h-16 rounded-md overflow-hidden border border-gray-200 flex-shrink-0">
@@ -318,18 +381,18 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                     <Link href={`/admin/products/${product.id}`} className="text-white hover:text-gray-300 hover:underline font-medium text-lg block">
                       {product.name}
                     </Link>
-                    <div className="text-sm text-gray-500">{product.category}</div>
+                    <div className="text-sm text-gray-400">{product.category}</div>
                   </div>
                 </div>
 
                 {/* Product Details */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">Price:</span>
-                    <span className="font-semibold text-purple-700">{product.price.toFixed(2)} EGP</span>
+                    <span className="text-sm text-gray-400">Price:</span>
+                    <span className="font-semibold text-purple-400">{product.price.toFixed(2)} EGP</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">Stock:</span>
+                    <span className="text-sm text-gray-400">Stock:</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
                       product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
@@ -339,14 +402,14 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">Rating:</span>
+                    <span className="text-sm text-gray-400">Rating:</span>
                     <span className="flex items-center gap-1">
                       <span className="text-yellow-500">★</span>
-                      <span className="font-medium">{product.avgRating}</span>
+                      <span className="font-medium text-white">{product.avgRating}</span>
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">Published:</span>
+                    <span className="text-sm text-gray-400">Published:</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       product.isPublished ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
                     }`}>
@@ -354,15 +417,15 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">Last Updated:</span>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-400">Last Updated:</span>
+                    <span className="text-sm text-gray-400">
                       {formatDateTime(product.updatedAt)?.dateTime || 'Not available'}
                     </span>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="border-t border-gray-100 pt-3 flex gap-2">
+                <div className="border-t border-gray-700 pt-3 flex gap-2">
                   <Button asChild variant='default' size='sm' className="flex-1">
                     <Link href={`/admin/products/${product.id}`}>
                       Edit
@@ -381,7 +444,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
               </div>
             ))
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-400">
               No products
             </div>
           )}
