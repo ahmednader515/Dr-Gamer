@@ -1,5 +1,3 @@
-'use server'
-
 /**
  * Trustpilot Service (Free Version - No API Required)
  * Uses Trustpilot's free invitation script and direct review links
