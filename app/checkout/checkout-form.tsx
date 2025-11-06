@@ -490,7 +490,7 @@ export default function CheckoutForm() {
         </div>
       </div>
       
-      <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6'>
+      <div className='grid grid-cols-1 md:grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6'>
         <div className='lg:col-span-3'>
           
           {/* Promo Code Section - Mobile Only at Top */}

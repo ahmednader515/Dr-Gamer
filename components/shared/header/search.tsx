@@ -31,15 +31,15 @@ export default function Search() {
     <>
       {/* Desktop Search Bar */}
       <form onSubmit={handleSubmit} className="hidden md:block">
-        <div className="relative w-96 lg:w-[550px] xl:w-[600px]">
+        <div className="relative w-full md:w-80 lg:w-[550px] xl:w-[600px]">
           <Input
             type="text"
             placeholder="Search for products..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-12 pr-6 py-4 sm:py-5 text-lg sm:text-xl border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder:text-gray-500"
+            className="w-full pl-10 md:pl-12 pr-4 md:pr-6 py-3 md:py-4 lg:py-5 text-base md:text-lg lg:text-xl border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder:text-gray-500"
           />
-          <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-500 pointer-events-none" />
+          <SearchIcon className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-5 md:h-6 w-5 md:w-6 text-gray-500 pointer-events-none" />
         </div>
       </form>
 

@@ -122,7 +122,7 @@ const ProductForm = ({
   
   // Check if a variation should have dual pricing (original + discounted)
   const shouldHaveDualPricing = (variationName: string) => {
-    return variationName === 'Full Account' || variationName === 'Personal Account'
+    return variationName === 'Full Account' || variationName === 'Personal Account' || variationName === 'New Account'
   }
 
   const form = useForm<IProductInput>({

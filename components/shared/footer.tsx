@@ -1,11 +1,36 @@
-"use client";
 import React from "react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import data from '@/lib/data'
+import { prisma } from '@/lib/prisma'
 
-export default function Footer() {
+export default async function Footer() {
   const { site } = data.settings[0];
+
+  // Fetch published web pages from database
+  const webPages = await prisma.webPage.findMany({
+    where: { isPublished: true },
+    orderBy: { createdAt: 'asc' },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+    }
+  })
+
+  // Group pages by category for better organization
+  const customerServicePages = webPages.filter(page => 
+    ['contact-us', 'help', 'support'].some(keyword => page.slug.includes(keyword))
+  )
+  
+  const legalPages = webPages.filter(page => 
+    ['privacy', 'terms', 'conditions', 'policy'].some(keyword => page.slug.includes(keyword))
+  )
+  
+  const otherPages = webPages.filter(page => 
+    !customerServicePages.find(p => p.id === page.id) && 
+    !legalPages.find(p => p.id === page.id)
+  )
 
   return (
     <footer className="bg-gray-800 text-white border-t font-cairo" dir="ltr">
@@ -27,8 +52,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-300 hover:text-white transition-colors duration-200">
-                  Products
+                <Link href="/search?category=all" className="text-gray-300 hover:text-white transition-colors duration-200">
+                  All Products
                 </Link>
               </li>
               <li>
@@ -36,44 +61,82 @@ export default function Footer() {
                   Cart
                 </Link>
               </li>
+              <li>
+                <Link href="/faq" className="text-gray-300 hover:text-white transition-colors duration-200">
+                  FAQ
+                </Link>
+              </li>
+              {/* Dynamic other pages */}
+              {otherPages.slice(0, 3).map(page => (
+                <li key={page.id}>
+                  <Link href={`/page/${page.slug}`} className="text-gray-300 hover:text-white transition-colors duration-200">
+                    {page.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div className="space-y-3 sm:space-y-4">
             <h3 className="text-base sm:text-lg font-semibold text-left">Customer Service</h3>
             <ul className="space-y-2 text-xs sm:text-sm text-left">
-              <li>
-                <Link href="/page/contact-us" className="text-gray-300 hover:text-white transition-colors duration-200">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/page/help" className="text-gray-300 hover:text-white transition-colors duration-200">
-                  Help
-                </Link>
-              </li>
+              {/* Dynamic customer service pages */}
+              {customerServicePages.map(page => (
+                <li key={page.id}>
+                  <Link href={`/page/${page.slug}`} className="text-gray-300 hover:text-white transition-colors duration-200">
+                    {page.title}
+                  </Link>
+                </li>
+              ))}
+              {/* Fallback if no customer service pages */}
+              {customerServicePages.length === 0 && (
+                <>
+                  <li>
+                    <Link href="/page/contact-us" className="text-gray-300 hover:text-white transition-colors duration-200">
+                      Contact Us
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/page/help" className="text-gray-300 hover:text-white transition-colors duration-200">
+                      Help
+                    </Link>
+                  </li>
+                </>
+              )}
               <li>
                 <Link href="/faq" className="text-gray-300 hover:text-white transition-colors duration-200">
                   FAQ
                 </Link>
               </li>
-
             </ul>
           </div>
 
           <div className="space-y-3 sm:space-y-4">
             <h3 className="text-base sm:text-lg font-semibold text-left">Legal</h3>
             <ul className="space-y-2 text-xs sm:text-sm text-left">
-              <li>
-                <Link href="/page/privacy-policy" className="text-gray-300 hover:text-white transition-colors duration-200">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/page/conditions-of-use" className="text-gray-300 hover:text-white transition-colors duration-200">
-                  Terms of Service
-                </Link>
-              </li>
+              {/* Dynamic legal pages */}
+              {legalPages.map(page => (
+                <li key={page.id}>
+                  <Link href={`/page/${page.slug}`} className="text-gray-300 hover:text-white transition-colors duration-200">
+                    {page.title}
+                  </Link>
+                </li>
+              ))}
+              {/* Fallback if no legal pages */}
+              {legalPages.length === 0 && (
+                <>
+                  <li>
+                    <Link href="/page/privacy-policy" className="text-gray-300 hover:text-white transition-colors duration-200">
+                      Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/page/conditions-of-use" className="text-gray-300 hover:text-white transition-colors duration-200">
+                      Terms of Service
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>

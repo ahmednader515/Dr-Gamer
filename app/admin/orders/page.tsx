@@ -9,9 +9,19 @@ export const metadata: Metadata = {
 }
 
 export default async function OrdersPage(props: {
-  searchParams: Promise<{ page: string }>
+  searchParams: Promise<{ 
+    page: string
+    search?: string
+    isPaid?: string
+    isDelivered?: string
+  }>
 }) {
-  const { page = '1' } = await props.searchParams
+  const { 
+    page = '1',
+    search = '',
+    isPaid = '',
+    isDelivered = ''
+  } = await props.searchParams
 
   const session = await auth()
   const userRole = session?.user.role
@@ -21,12 +31,58 @@ export default async function OrdersPage(props: {
     redirect('/')
   }
 
+  // Build where clause for filtering
+  const where: any = {}
+  
+  // Search filter - search by customer name, email, or order ID
+  if (search && search.trim() !== '') {
+    where.OR = [
+      {
+        user: {
+          name: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        }
+      },
+      {
+        user: {
+          email: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        }
+      },
+      {
+        id: {
+          contains: search,
+          mode: 'insensitive'
+        }
+      }
+    ]
+  }
+  
+  // Payment status filter
+  if (isPaid === 'true') {
+    where.isPaid = true
+  } else if (isPaid === 'false') {
+    where.isPaid = false
+  }
+  
+  // Delivery status filter
+  if (isDelivered === 'true') {
+    where.isDelivered = true
+  } else if (isDelivered === 'false') {
+    where.isDelivered = false
+  }
+
   // Direct database query for orders
   const pageSize = 10
   const skip = (Number(page) - 1) * pageSize
   
   const [orders, totalOrders] = await Promise.all([
     prisma.order.findMany({
+      where,
       skip,
       take: pageSize,
       orderBy: { createdAt: 'desc' },
@@ -39,7 +95,7 @@ export default async function OrdersPage(props: {
         }
       }
     }),
-    prisma.order.count()
+    prisma.order.count({ where })
   ])
 
   // Convert Decimal values to numbers for client components
@@ -60,6 +116,9 @@ export default async function OrdersPage(props: {
       totalPages={totalPages} 
       currentPage={Number(page)}
       userRole={userRole as string}
+      currentSearch={search}
+      currentIsPaid={isPaid}
+      currentIsDelivered={isDelivered}
     />
   )
 }

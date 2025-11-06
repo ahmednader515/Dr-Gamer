@@ -351,7 +351,7 @@ export default async function HomePage() {
       {/* --- HERO SECTION --- */}
       <div className='relative pt-4 md:pt-6 pb-8'>
         <div className='max-w-[80%] mx-auto'>
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 items-start'>
+          <div className='grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4 items-start'>
             {/* Left: Categories beside carousel */}
             <div className='lg:col-span-1 order-2 lg:order-1'>
               <Suspense fallback={<CategoriesSkeleton />}>
@@ -368,7 +368,7 @@ export default async function HomePage() {
           {/* Categories below carousel in a horizontal grid */}
           {categoriesBelow.length > 0 && (
             <div className='mt-4'>
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3'>
                 {categoriesBelow.map((category) => (
                   <Link
                     key={category.id}

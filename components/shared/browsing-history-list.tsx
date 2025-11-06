@@ -44,7 +44,7 @@ export default function BrowsingHistoryList() {
   return (
     <div className='space-y-4 font-cairo' dir="ltr">
       <div className='flex items-center justify-between'>
-        <h2 className='text-2xl font-bold text-gray-800'>Browsing History</h2>
+        <h2 className='text-2xl font-bold text-white'>Browsing History</h2>
         <Button variant='outline' onClick={clear}>
           Clear All
         </Button>

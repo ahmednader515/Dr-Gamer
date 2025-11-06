@@ -5,7 +5,7 @@ import Header from '@/components/shared/header'
 import Footer from '@/components/shared/footer'
 import data from '@/lib/data'
 
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode

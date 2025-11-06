@@ -20,20 +20,24 @@ interface SearchFiltersProps {
 export default function SearchFilters({ categories, tags, maxPrice }: SearchFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  // Default to collapsed on mobile (screen width < 1024px which is lg breakpoint)
-  const [isOpen, setIsOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth >= 1024 // lg breakpoint
-    }
-    return false // Default to collapsed for SSR
-  })
+  // Start with false for both server and client to avoid hydration mismatch
+  const [isOpen, setIsOpen] = useState(false)
   const [priceRange, setPriceRange] = useState([0, maxPrice])
   
-  // Update isOpen state on window resize
+  // Set initial state and handle window resize after component mounts
   useEffect(() => {
+    // Set initial state based on screen size after hydration
+    const setInitialState = () => {
+      if (window.innerWidth >= 1024) {
+        setIsOpen(true)
+      }
+    }
+    
+    setInitialState()
+    
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
-        setIsOpen(true) // Always open on desktop
+        setIsOpen(true)
       }
     }
     
@@ -41,8 +45,22 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
     return () => window.removeEventListener('resize', handleResize)
   }, [])
   
-  // Get current filter values
-  const currentCategory = searchParams.get('category') || ''
+  // Get current filter values - support multiple categories
+  // Handle both formats: multiple params and comma-separated
+  let currentCategories: string[] = []
+  const categoryParams = searchParams.getAll('category')
+  
+  categoryParams.forEach(param => {
+    if (param && param !== '' && param !== 'all') {
+      // Check if it's comma-separated (old format)
+      if (param.includes(',')) {
+        currentCategories.push(...param.split(',').map(c => c.trim()).filter(c => c !== ''))
+      } else {
+        currentCategories.push(param)
+      }
+    }
+  })
+  
   const currentMinPrice = searchParams.get('minPrice') || '0'
   const currentMaxPrice = searchParams.get('maxPrice') || maxPrice.toString()
 
@@ -68,13 +86,25 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
   }
 
   const updateFilters = (newParams: Record<string, string | string[]>) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams()
     
+    // Preserve existing params except the ones we're updating
+    searchParams.forEach((value, key) => {
+      if (!Object.keys(newParams).includes(key) && key !== 'page') {
+        params.append(key, value)
+      }
+    })
+    
+    // Add new params
     Object.entries(newParams).forEach(([key, value]) => {
       if (Array.isArray(value)) {
-        params.delete(key)
-        value.forEach(v => params.append(key, v))
-      } else {
+        // For arrays, add each value separately
+        value.forEach(v => {
+          if (v && v !== '') {
+            params.append(key, v)
+          }
+        })
+      } else if (value && value !== '') {
         params.set(key, value)
       }
     })
@@ -84,16 +114,32 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
   }
 
   const clearFilters = () => {
-    const params = new URLSearchParams()
-    if (currentCategory) params.set('category', currentCategory)
-    router.push(`/search?${params.toString()}`)
+    router.push('/search?category=all')
   }
 
   const handleCategoryChange = (category: string) => {
-    if (category === currentCategory) {
-      updateFilters({ category: '' })
+    let newCategories: string[]
+    
+    if (category === '') {
+      // "All Categories" selected - clear all categories
+      router.push('/search?category=all')
+      return
     } else {
-      updateFilters({ category })
+      // Toggle category selection
+      if (currentCategories.includes(category)) {
+        // Remove category if already selected
+        newCategories = currentCategories.filter(c => c !== category)
+      } else {
+        // Add category to selection
+        newCategories = [...currentCategories, category]
+      }
+    }
+    
+    // Update URL with multiple categories
+    if (newCategories.length > 0) {
+      updateFilters({ category: newCategories })
+    } else {
+      router.push('/search?category=all')
     }
   }
 
@@ -109,8 +155,17 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
   }
 
   const removeFilter = (key: string, value?: string) => {
-    if (key === 'category') {
-      updateFilters({ category: '' })
+    if (key === 'category' && value) {
+      // Remove specific category
+      const newCategories = currentCategories.filter(c => c !== value)
+      if (newCategories.length > 0) {
+        updateFilters({ category: newCategories })
+      } else {
+        router.push('/search?category=all')
+      }
+    } else if (key === 'category') {
+      // Remove all categories
+      router.push('/search?category=all')
     } else if (key === 'price') {
       updateFilters({ minPrice: '', maxPrice: '' })
       setPriceRange([0, maxPrice])
@@ -118,7 +173,7 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
   }
 
   const activeFilters = [
-    ...(currentCategory ? [{ key: 'category', value: currentCategory, label: currentCategory }] : []),
+    ...currentCategories.map(cat => ({ key: 'category', value: cat, label: cat })),
     ...(currentMinPrice !== '0' || currentMaxPrice !== maxPrice.toString() ? [{ key: 'price', value: '', label: `${currentMinPrice} - ${currentMaxPrice} ${translations.egp}` }] : [])
   ]
 
@@ -181,16 +236,21 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
 
           {/* Category Filter */}
           <div className="mb-4 sm:mb-6">
-            <Label className="text-sm font-semibold mb-3 sm:mb-4 block text-white">{translations.category}</Label>
+            <Label className="text-sm font-semibold mb-3 sm:mb-4 block text-white">
+              {translations.category}
+              {currentCategories.length > 0 && (
+                <span className="ml-2 text-xs text-purple-400">({currentCategories.length} selected)</span>
+              )}
+            </Label>
             <div className="space-y-2 sm:space-y-3">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="all-categories"
-                  checked={!currentCategory}
+                  checked={currentCategories.length === 0}
                   onCheckedChange={() => handleCategoryChange('')}
                   className="text-purple-500"
                 />
-                <Label htmlFor="all-categories" className="text-xs sm:text-sm text-gray-300 cursor-pointer">
+                <Label htmlFor="all-categories" className="text-xs sm:text-sm text-gray-300 cursor-pointer font-semibold">
                   {translations.allCategories}
                 </Label>
               </div>
@@ -198,7 +258,7 @@ export default function SearchFilters({ categories, tags, maxPrice }: SearchFilt
                 <div key={category} className="flex items-center space-x-2">
                   <Checkbox
                     id={category}
-                    checked={currentCategory === category}
+                    checked={currentCategories.includes(category)}
                     onCheckedChange={() => handleCategoryChange(category)}
                     className="text-purple-500"
                   />

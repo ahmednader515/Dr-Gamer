@@ -31,7 +31,7 @@ function SearchHeaderSkeleton() {
 
 function ProductGridSkeleton() {
   return (
-    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8'>
+    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 mb-6 sm:mb-8'>
       {Array.from({ length: 8 }).map((_, i) => (
         <Card key={i} className='overflow-hidden'>
           <CardContent className='p-3 sm:p-4'>
@@ -85,19 +85,35 @@ async function SearchHeader({ params, translations }: {
     where.name = { contains: q, mode: 'insensitive' }
   }
   
-  if (category && category !== 'all') {
-    const categoryRecord = await prisma.category.findFirst({
-      where: { name: category, isActive: true },
-      select: { id: true }
+  // Handle multiple categories in SearchHeader too - support both formats
+  let categories: string[] = []
+  if (Array.isArray(category)) {
+    categories = category
+  } else if (category) {
+    // Check if it's comma-separated
+    categories = category.includes(',') ? category.split(',').map(c => c.trim()) : [category]
+  }
+  const validCategories = categories.filter(c => c && c !== 'all' && c !== '')
+  
+  if (validCategories.length > 0) {
+    const categoryRecords = await prisma.category.findMany({
+      where: { 
+        name: { in: validCategories },
+        isActive: true 
+      },
+      select: { id: true, name: true }
     })
     
-    if (categoryRecord) {
+    if (categoryRecords.length > 0) {
+      const categoryIds = categoryRecords.map(c => c.id)
+      const categoryNames = categoryRecords.map(c => c.name)
+      
       where.OR = [
-        { categoryId: categoryRecord.id },
-        { category: category }
+        { categoryId: { in: categoryIds } },
+        { category: { in: categoryNames } }
       ]
     } else {
-      where.category = category
+      where.category = { in: validCategories }
     }
   }
   
@@ -134,8 +150,13 @@ async function SearchHeader({ params, translations }: {
   let displayTitle = ''
   if (q) {
     displayTitle = `${translations.searchResults} "${q}"`
-  } else if (category) {
-    displayTitle = `${translations.productsIn} ${category}`
+  } else if (validCategories.length > 0) {
+    // Show multiple categories
+    if (validCategories.length === 1) {
+      displayTitle = `${translations.productsIn} ${validCategories[0]}`
+    } else {
+      displayTitle = `${translations.productsIn} ${validCategories.length} Categories`
+    }
   } else if (platformType) {
     displayTitle = `${translations.productsIn} ${platformType}`
   } else if (productCategory) {
@@ -183,21 +204,37 @@ async function ProductResults({ params, translations }: {
     where.name = { contains: q, mode: 'insensitive' }
   }
   
-  if (category && category !== 'all') {
-    // Look up category by name to get ID
-    const categoryRecord = await prisma.category.findFirst({
-      where: { name: category, isActive: true },
-      select: { id: true }
+  // Handle multiple categories - support both array and comma-separated formats
+  let categories: string[] = []
+  if (Array.isArray(category)) {
+    categories = category
+  } else if (category) {
+    // Check if it's comma-separated
+    categories = category.includes(',') ? category.split(',').map(c => c.trim()) : [category]
+  }
+  const validCategories = categories.filter(c => c && c !== 'all' && c !== '')
+  
+  if (validCategories.length > 0) {
+    // Look up categories by name to get IDs
+    const categoryRecords = await prisma.category.findMany({
+      where: { 
+        name: { in: validCategories },
+        isActive: true 
+      },
+      select: { id: true, name: true }
     })
     
-    if (categoryRecord) {
+    if (categoryRecords.length > 0) {
+      const categoryIds = categoryRecords.map(c => c.id)
+      const categoryNames = categoryRecords.map(c => c.name)
+      
       where.OR = [
-        { categoryId: categoryRecord.id },
-        { category: category } // Fallback for products not yet migrated
+        { categoryId: { in: categoryIds } },
+        { category: { in: categoryNames } } // Fallback for products not yet migrated
       ]
     } else {
-      // Fallback to old system if category not found in new system
-      where.category = category
+      // Fallback to old system if categories not found in new system
+      where.category = { in: validCategories }
     }
   }
   
@@ -309,7 +346,7 @@ async function ProductResults({ params, translations }: {
         </div>
       ) : (
         <>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10 mb-6 sm:mb-8 items-stretch'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 mb-6 sm:mb-8 items-stretch'>
             {normalizedProducts.map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -381,7 +418,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     productCategory = '',
   } = params
 
-  if (!q && !category && !platformType && !productCategory) {
+  // Check if we have any valid search criteria
+  let hasCategory = false
+  if (Array.isArray(category)) {
+    hasCategory = category.some(c => c && c !== '' && c !== 'all')
+  } else if (category) {
+    // Handle comma-separated or single category
+    const cats = category.includes(',') ? category.split(',') : [category]
+    hasCategory = cats.some(c => c.trim() !== '' && c.trim() !== 'all')
+  }
+  
+  // Allow "all" as a valid search to show all products
+  if (!q && !hasCategory && !platformType && !productCategory && category !== 'all') {
     notFound()
   }
 

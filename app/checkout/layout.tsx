@@ -5,7 +5,7 @@ import React from 'react'
 import Header from '@/components/shared/header'
 import Footer from '@/components/shared/footer'
 
-export default function CheckoutLayout({
+export default async function CheckoutLayout({
   children,
 }: {
   children: React.ReactNode

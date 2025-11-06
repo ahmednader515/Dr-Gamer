@@ -8,7 +8,7 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
 
   return (
     <div className='flex justify-end'>
-      <nav className='md:flex gap-3 hidden w-full'>
+      <nav className='md:flex gap-2 md:gap-3 lg:gap-4 hidden w-full'>
         <UserButton 
           session={session} 
           translations={{

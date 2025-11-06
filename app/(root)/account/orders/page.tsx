@@ -62,15 +62,15 @@ async function OrdersTable({ page }: { page: number }) {
   const orders = await getMyOrders({ page })
 
   return (
-    <div className='overflow-x-auto'>
+    <div className='overflow-x-auto bg-gray-900 rounded-lg p-4 border border-gray-800'>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className='text-right'>Date</TableHead>
-            <TableHead className='text-right'>Total</TableHead>
-            <TableHead className='text-right'>Paid</TableHead>
-            <TableHead className='text-right'>Delivered</TableHead>
-            <TableHead className='text-right'>Actions</TableHead>
+            <TableHead className='text-left'>Date</TableHead>
+            <TableHead className='text-left'>Total</TableHead>
+            <TableHead className='text-left'>Paid</TableHead>
+            <TableHead className='text-left'>Delivered</TableHead>
+            <TableHead className='text-left'>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
