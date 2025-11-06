@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { auth } from "@/auth";
 import data from "@/lib/data";
+import TrustpilotScript from "@/components/shared/trustpilot-script";
 
 const cairo = Cairo({
   variable: "--font-cairo",
@@ -65,6 +66,9 @@ export default async function AppLayout({
         className={`min-h-screen ${cairo.variable} font-cairo antialiased`}
         suppressHydrationWarning
       >
+        {/* Trustpilot Invitation Script for Free Plan */}
+        <TrustpilotScript businessKey="pe8fdssimHJlnGNA" />
+        
         <ClientProviders>
           {children}
         </ClientProviders>

@@ -5,10 +5,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 const platforms = [
-  { name: 'Steam', image: '/images/steam.avif', href: '/search?tag=steam' },
-  { name: 'Xbox', image: '/images/xbox.png', href: '/search?tag=xbox' },
-  { name: 'PlayStation', image: '/images/playstation.jpg', href: '/search?tag=playstation' },
-  { name: 'Epic Games', image: '/images/epic.jpg', href: '/search?tag=epic-games' },
+  { name: 'Steam', image: '/images/steam.avif', href: '/search?platformType=Steam' },
+  { name: 'Xbox', image: '/images/xbox.png', href: '/search?platformType=Xbox' },
+  { name: 'PlayStation', image: '/images/playstation.jpg', href: '/search?platformType=PlayStation' },
+  { name: 'Epic Games', image: '/images/epic.jpg', href: '/search?platformType=Epic Games' },
 ]
 
 export default function PlatformsSection() {

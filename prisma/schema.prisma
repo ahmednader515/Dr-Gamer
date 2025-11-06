@@ -11,20 +11,32 @@ datasource db {
 }
 
 model User {
-  id            String       @id @default(cuid())
-  email         String       @unique
+  id            String              @id @default(cuid())
+  email         String              @unique
   name          String
-  role          String       @default("User")
+  role          String              @default("User")
   password      String?
   image         String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
   orders        Order[]
   reviews       Review[]
   address       UserAddress?
   favorites     Favorite[]
+  resetTokens   PasswordResetToken[]
 
   @@map("users")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
 }
 
 model UserAddress {

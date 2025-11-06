@@ -207,7 +207,11 @@ async function FirstCategorySection({ categories }: { categories: string[] }) {
     return (
       <Card className='w-full rounded-xl bg-transparent border-0 shadow-none'>
         <CardContent className='card-mobile p-0'>
-          <ProductSlider title={firstCategory} products={products} />
+          <ProductSlider 
+            title={firstCategory} 
+            products={products}
+            categoryLink={`/search?category=${encodeURIComponent(firstCategory)}`}
+          />
         </CardContent>
       </Card>
     )
@@ -310,7 +314,11 @@ async function RemainingCategoriesSection({ categories }: { categories: string[]
             <React.Fragment key={category}>
               <Card className='w-full rounded-xl bg-transparent border-0 shadow-none'>
                 <CardContent className='card-mobile p-0'>
-                  <ProductSlider title={category} products={products} />
+                  <ProductSlider 
+                    title={category} 
+                    products={products}
+                    categoryLink={`/search?category=${encodeURIComponent(category)}`}
+                  />
                 </CardContent>
               </Card>
             </React.Fragment>

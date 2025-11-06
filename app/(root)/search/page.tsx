@@ -74,6 +74,8 @@ async function SearchHeader({ params, translations }: {
     minPrice = '',
     maxPrice = '',
     tag = '',
+    platformType = '',
+    productCategory = '',
   } = params
 
   // Build the same where clause to get the count
@@ -107,6 +109,14 @@ async function SearchHeader({ params, translations }: {
     }
   }
   
+  if (platformType && platformType !== 'all') {
+    where.platformType = { equals: platformType, mode: 'insensitive' }
+  }
+  
+  if (productCategory && productCategory !== 'all') {
+    where.productCategory = { equals: productCategory, mode: 'insensitive' }
+  }
+  
   if (minPrice || maxPrice) {
     where.price = { }
     if (minPrice) {
@@ -120,10 +130,24 @@ async function SearchHeader({ params, translations }: {
   // Get the total count
   const totalProducts = await (prisma as any).product.count({ where })
 
+  // Determine what to display in the heading
+  let displayTitle = ''
+  if (q) {
+    displayTitle = `${translations.searchResults} "${q}"`
+  } else if (category) {
+    displayTitle = `${translations.productsIn} ${category}`
+  } else if (platformType) {
+    displayTitle = `${translations.productsIn} ${platformType}`
+  } else if (productCategory) {
+    displayTitle = `${translations.productsIn} ${productCategory}`
+  } else {
+    displayTitle = translations.productsIn
+  }
+
   return (
     <div className='mb-6 sm:mb-8 bg-gray-900 rounded-xl p-4 sm:p-6 shadow-sm'>
       <h1 className='text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-left text-white'>
-        {q ? `${translations.searchResults} "${q}"` : `${translations.productsIn} ${category}`}
+        {displayTitle}
       </h1>
       <p className='text-sm sm:text-base text-gray-300 text-left'>
         {translations.found} {totalProducts} {totalProducts === 1 ? translations.product : translations.products}
@@ -144,6 +168,8 @@ async function ProductResults({ params, translations }: {
     sort = 'newest',
     page = '1',
     tag = '',
+    platformType = '',
+    productCategory = '',
   } = params
 
   const currentPage = parseInt(page)
@@ -181,6 +207,14 @@ async function ProductResults({ params, translations }: {
     } else {
       where.tags = { has: tag }
     }
+  }
+  
+  if (platformType && platformType !== 'all') {
+    where.platformType = { equals: platformType, mode: 'insensitive' }
+  }
+  
+  if (productCategory && productCategory !== 'all') {
+    where.productCategory = { equals: productCategory, mode: 'insensitive' }
   }
   
   if (minPrice || maxPrice) {
@@ -234,9 +268,12 @@ async function ProductResults({ params, translations }: {
       ...product,
       price: Number(product.price),
       listPrice: Number(product.listPrice),
+      originalPrice: Number(product.originalPrice),
       avgRating: Number(product.avgRating),
       numReviews: Number(product.numReviews),
       variations: variations,
+      createdAt: product.createdAt?.toISOString(),
+      updatedAt: product.updatedAt?.toISOString(),
     }
   })
 
@@ -340,9 +377,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const {
     q = '',
     category = '',
+    platformType = '',
+    productCategory = '',
   } = params
 
-  if (!q && !category) {
+  if (!q && !category && !platformType && !productCategory) {
     notFound()
   }
 

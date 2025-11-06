@@ -75,9 +75,9 @@ const getVariationOptions = (platformType?: string, productCategory?: string): s
     }
   } else if (platformType === 'Playstation') {
     if (productCategory === 'Game') {
-      return ['Full Account', 'Primary PS5', 'Primary PS4', 'Secondary']
+      return ['Full Account', 'Personal Account', 'Digital Code', 'Primary PS5', 'Primary PS4', 'Secondary']
     } else if (productCategory === 'Subscription') {
-      return ['Full Account', 'Primary PS5', 'Primary PS4', 'Secondary']
+      return ['Full Account', 'Personal Account', 'Digital Code', 'Primary PS5', 'Primary PS4', 'Secondary']
     }
   } else if (platformType === 'Steam') {
     return []
@@ -826,7 +826,8 @@ const ProductForm = ({
                   <FormControl>
                     <Textarea
                       dir="ltr"
-                      className='resize-none border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'
+                      rows={8}
+                      className='resize-y border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left min-h-[150px]'
                       {...field}
                     />
                   </FormControl>

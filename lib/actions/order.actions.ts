@@ -7,6 +7,7 @@ import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
 import { revalidatePath } from 'next/cache'
 import { sendAskReviewOrderItems, sendPurchaseReceipt } from '@/lib/services/email.service'
+import { sendOrderConfirmationEmail, sendOrderPaidEmail } from '@/lib/email'
 
 import { DateRange } from 'react-day-picker'
 import data from '../data'
@@ -187,6 +188,25 @@ export const createOrderFromCart = async (
     })
   }
 
+  // Send order confirmation email
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, name: true }
+    })
+
+    if (user?.email) {
+      await sendOrderConfirmationEmail({
+        order,
+        userName: user.name,
+        userEmail: user.email,
+      })
+    }
+  } catch (emailError) {
+    console.error('Failed to send order confirmation email:', emailError)
+    // Don't fail the order if email fails
+  }
+
   return order
 }
 
@@ -214,7 +234,21 @@ export async function updateOrderToPaid(orderId: string) {
     })
     
     await updateProductStock(orderId)
-    if (order.user.email) await sendPurchaseReceipt({ order })
+    
+    // Send payment confirmation email
+    if (order.user.email) {
+      try {
+        await sendOrderPaidEmail({
+          order,
+          userName: order.user.name,
+          userEmail: order.user.email,
+        })
+      } catch (emailError) {
+        console.error('Failed to send order paid email:', emailError)
+        // Don't fail the order if email fails
+      }
+    }
+    
     revalidatePath(`/account/orders/${orderId}`)
     return { success: true, message: 'Order paid successfully' }
   } catch (err) {

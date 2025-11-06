@@ -1,11 +1,12 @@
 'use client'
 
 import * as React from 'react'
+import Link from 'next/link'
 import ProductCard from './product-card'
 import { IProductInput } from '@/types'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 
 // Import Swiper styles
 import 'swiper/css'
@@ -16,10 +17,12 @@ export default function ProductSlider({
   title,
   products,
   hideDetails = false,
+  categoryLink,
 }: {
   title?: string
   products: (IProductInput & { id: string })[]
   hideDetails?: boolean
+  categoryLink?: string
 }) {
   const [swiperInstance, setSwiperInstance] = React.useState<any>(null)
   const [isBeginning, setIsBeginning] = React.useState(true)
@@ -62,7 +65,18 @@ export default function ProductSlider({
   return (
     <div className='w-full font-cairo rounded-xl p-4 sm:p-6 overflow-visible' dir="ltr">
       {title && (
-        <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-left text-white'>{title}</h2>
+        <div className='flex items-center justify-between mb-4 sm:mb-6'>
+          <h2 className='text-xl sm:text-2xl font-bold text-left text-white'>{title}</h2>
+          {categoryLink && (
+            <Link 
+              href={categoryLink}
+              className='flex items-center gap-1 sm:gap-2 text-sm sm:text-base text-white hover:text-gray-200 transition-colors duration-200 font-semibold group'
+            >
+              <span>See More</span>
+              <ArrowRight className='h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform duration-200' />
+            </Link>
+          )}
+        </div>
       )}
       
       <div className="relative px-2 py-4">

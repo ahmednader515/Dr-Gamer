@@ -355,7 +355,7 @@ export async function signInWithCredentials(user: IUserSignIn) {
     console.log('⚠️ Sign in returned unexpected result:', result)
     return { 
       success: false, 
-      message: 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى' 
+      message: 'Login failed. Please try again' 
     }
   } catch (error) {
     console.log('💥 Sign in error caught:', error)

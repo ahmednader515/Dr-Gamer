@@ -25,7 +25,7 @@ export default function LoadingOverlay({
               {text}
             </h3>
             <p className="text-sm text-gray-300">
-              يرجى الانتظار بينما نقوم بتحميل المحتوى
+              please wait while we are loading the content
             </p>
           </div>
         </div>

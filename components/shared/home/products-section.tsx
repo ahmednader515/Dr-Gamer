@@ -5,9 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 const Products = [
-  { name: 'Games', image: '/images/games.jpg', href: '/search?tag=steam' },
-  { name: 'Subscriptions', image: '/images/sub.png', href: '/search?tag=xbox' },
-  { name: 'Gift Cards', image: '/images/gift.png', href: '/search?tag=playstation' },
+  { name: 'Games', image: '/images/games.jpg', href: '/search?productCategory=Game' },
+  { name: 'Subscriptions', image: '/images/sub.png', href: '/search?productCategory=Subscription' },
+  { name: 'Gift Cards', image: '/images/gift.png', href: '/search?productCategory=Gift Card' },
 ]
 
 export default function ProductsSection() {

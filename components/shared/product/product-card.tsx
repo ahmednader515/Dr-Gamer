@@ -47,121 +47,202 @@ const ProductCard = ({
   }, [product.id, checkIsFavorited]);
   
 
-  const ProductImage = () => (
-    <div className="relative group">
-      <Link href={`/product/${product.slug}`}>
-        <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden" style={{ backgroundColor: '#351564' }}>
-          {product.images && product.images.length > 0 && product.images[0] ? (
-            product.images.length > 1 ? (
-              <ImageHover
-                src={product.images[0]}
-                hoverSrc={product.images[1]}
-                alt={product.name}
-              />
+  const ProductImage = () => {
+    // Check if product has variations with discounts
+    const hasVariations = product.variations && Array.isArray(product.variations) && product.variations.length > 0;
+    let maxDiscountPercentage = 0;
+
+    if (hasVariations) {
+      const variationsWithDiscount = product.variations.filter((v: any) => {
+        const originalPrice = Number(v.originalPrice) || 0;
+        const currentPrice = Number(v.price) || 0;
+        return originalPrice > 0 && currentPrice > 0 && currentPrice < originalPrice;
+      });
+
+      if (variationsWithDiscount.length > 0) {
+        // Calculate max discount percentage
+        maxDiscountPercentage = Math.max(
+          ...variationsWithDiscount.map((v: any) => {
+            const original = Number(v.originalPrice);
+            const current = Number(v.price);
+            return Math.round(((original - current) / original) * 100);
+          })
+        );
+      }
+    }
+
+    return (
+      <div className="relative group">
+        <Link href={`/product/${product.slug}`}>
+          <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden" style={{ backgroundColor: '#351564' }}>
+            {product.images && product.images.length > 0 && product.images[0] ? (
+              product.images.length > 1 ? (
+                <ImageHover
+                  src={product.images[0]}
+                  hoverSrc={product.images[1]}
+                  alt={product.name}
+                />
+              ) : (
+                <Image
+                  src={product.images[0]}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                />
+              )
             ) : (
-              <Image
-                src={product.images[0]}
-                alt={product.name}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-              />
-            )
-          ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#351564' }}>
-              <span className="text-gray-400 text-sm">No Image</span>
+              <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#351564' }}>
+                <span className="text-gray-400 text-sm">No Image</span>
+              </div>
+            )}
+            
+            {/* Quick action buttons overlay */}
+            <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  router.push(`/product/${product.slug}`);
+                }}
+                className="p-1.5 sm:p-2 rounded-full shadow-md transition-all duration-200 hover:scale-110" 
+                style={{ backgroundColor: 'rgba(53, 21, 100, 0.9)' }} 
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 1)'} 
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 0.9)'}
+              >
+                <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-purple-400" />
+              </button>
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleFavorite(product.id);
+                }}
+                className={`p-1.5 sm:p-2 rounded-full shadow-md transition-all duration-200 hover:scale-110 ${isFavorited ? 'text-red-500' : 'text-purple-400'}`}
+                style={{ backgroundColor: 'rgba(53, 21, 100, 0.9)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 1)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 0.9)'}
+              >
+                <Heart className={`h-3 w-3 sm:h-4 sm:w-4 ${isFavorited ? 'fill-current' : ''}`} />
+              </button>
             </div>
-          )}
-          
-          {/* Quick action buttons overlay */}
-          <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
-            <button 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                router.push(`/product/${product.slug}`);
-              }}
-              className="p-1.5 sm:p-2 rounded-full shadow-md transition-all duration-200 hover:scale-110" 
-              style={{ backgroundColor: 'rgba(53, 21, 100, 0.9)' }} 
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 1)'} 
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 0.9)'}
-            >
-              <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-purple-400" />
-            </button>
-            <button 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleFavorite(product.id);
-              }}
-              className={`p-1.5 sm:p-2 rounded-full shadow-md transition-all duration-200 hover:scale-110 ${isFavorited ? 'text-red-500' : 'text-purple-400'}`}
-              style={{ backgroundColor: 'rgba(53, 21, 100, 0.9)' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 1)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(53, 21, 100, 0.9)'}
-            >
-              <Heart className={`h-3 w-3 sm:h-4 sm:w-4 ${isFavorited ? 'fill-current' : ''}`} />
-            </button>
+            
+            {/* Discount badge - Top left corner */}
+            {maxDiscountPercentage > 0 && (
+              <Badge variant="destructive" className="absolute top-2 sm:top-3 right-2 sm:right-3 text-xs font-bold z-10">
+                -{maxDiscountPercentage}% OFF
+              </Badge>
+            )}
+            
+            {/* Stock status badge - Below discount badge if both exist */}
+            {product.countInStock <= 10 && product.countInStock > 0 && (
+              <Badge variant="destructive" className={`absolute ${maxDiscountPercentage > 0 ? 'top-10 sm:top-12' : 'top-2 sm:top-3'} right-2 sm:right-3 text-xs`}>
+                Only {product.countInStock} left
+              </Badge>
+            )}
+            {product.countInStock === 0 && (
+               <Badge variant="secondary" className={`absolute ${maxDiscountPercentage > 0 ? 'top-10 sm:top-12' : 'top-2 sm:top-3'} right-2 sm:right-3 text-xs`} style={{ backgroundColor: '#351564' }}>
+                Out of Stock
+              </Badge>
+            )}
           </div>
-          
-          {/* Stock status badge */}
-          {product.countInStock <= 10 && product.countInStock > 0 && (
-            <Badge variant="destructive" className="absolute top-2 sm:top-3 right-2 sm:right-3 text-xs">
-              Only {product.countInStock} left
-            </Badge>
-          )}
-          {product.countInStock === 0 && (
-             <Badge variant="secondary" className="absolute top-2 sm:top-3 right-2 sm:right-3 text-xs" style={{ backgroundColor: '#351564' }}>
-              Out of Stock
-            </Badge>
-          )}
-        </div>
-      </Link>
-    </div>
-  );
+        </Link>
+      </div>
+    );
+  };
 
-  const ProductDetails = () => (
-    <div className="flex-1 space-y-3 sm:space-y-4 p-3 sm:p-4" style={{ backgroundColor: 'rgba(45, 26, 95, 0.5)' }} dir="ltr">
-      {/* Product Name */}
-      <Link
-        href={`/product/${product.slug}`}
-        className="block group"
-      >
-        <h3 
-           className="font-semibold text-gray-100 text-left leading-tight line-clamp-2 group-hover:text-purple-400 transition-colors duration-200 text-sm sm:text-base"
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-          }}
+  const ProductDetails = () => {
+    // Check if product has variations with discounts
+    const hasVariations = product.variations && Array.isArray(product.variations) && product.variations.length > 0;
+    let lowestDiscountedPrice = product.price;
+    let highestOriginalPrice = product.listPrice;
+    let maxDiscountPercentage = 0;
+    let hasAnyDiscount = false;
+
+    if (hasVariations) {
+      const variationsWithDiscount = product.variations.filter((v: any) => {
+        const originalPrice = Number(v.originalPrice) || 0;
+        const currentPrice = Number(v.price) || 0;
+        return originalPrice > 0 && currentPrice > 0 && currentPrice < originalPrice;
+      });
+
+      if (variationsWithDiscount.length > 0) {
+        hasAnyDiscount = true;
+        // Get lowest discounted price
+        lowestDiscountedPrice = Math.min(...variationsWithDiscount.map((v: any) => Number(v.price)));
+        // Get highest original price
+        highestOriginalPrice = Math.max(...variationsWithDiscount.map((v: any) => Number(v.originalPrice)));
+        // Calculate max discount percentage
+        maxDiscountPercentage = Math.max(
+          ...variationsWithDiscount.map((v: any) => {
+            const original = Number(v.originalPrice);
+            const current = Number(v.price);
+            return Math.round(((original - current) / original) * 100);
+          })
+        );
+      }
+    }
+
+    return (
+      <div className="flex-1 space-y-3 sm:space-y-4 p-3 sm:p-4" style={{ backgroundColor: 'rgba(45, 26, 95, 0.5)' }} dir="ltr">
+        {/* Product Name */}
+        <Link
+          href={`/product/${product.slug}`}
+          className="block group"
         >
-          {product.name}
-        </h3>
-      </Link>
+          <h3 
+             className="font-semibold text-gray-100 text-left leading-tight line-clamp-2 group-hover:text-purple-400 transition-colors duration-200 text-sm sm:text-base"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {product.name}
+          </h3>
+        </Link>
 
-      {/* Rating and Reviews - Clean Number Design */}
-      <div className="flex flex-col items-start gap-1 sm:gap-2">
-        <div className="flex items-center gap-1 sm:gap-2">
-          <span className="text-xs text-gray-500">Rating:</span>
-          <div className="bg-yellow-100 text-yellow-800 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-semibold">
-            {product.avgRating && !isNaN(product.avgRating) ? product.avgRating.toFixed(1) : '0.0'}
+        {/* Rating and Reviews - Clean Number Design */}
+        <div className="flex flex-col items-start gap-1 sm:gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <span className="text-xs text-gray-500">Rating:</span>
+            <div className="bg-yellow-100 text-yellow-800 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-semibold">
+              {product.avgRating && !isNaN(product.avgRating) ? product.avgRating.toFixed(1) : '0.0'}
+            </div>
           </div>
+          <span className="text-xs text-gray-500 text-left">
+            ({product.numReviews && !isNaN(product.numReviews) ? formatNumber(product.numReviews) : '0'} reviews)
+          </span>
         </div>
-        <span className="text-xs text-gray-500 text-left">
-          ({product.numReviews && !isNaN(product.numReviews) ? formatNumber(product.numReviews) : '0'} reviews)
-        </span>
-      </div>
 
-      {/* Price */}
-      <div className="text-left">
-        <ProductPrice
-          price={product.price}
-          originalPrice={product.listPrice}
-          className="items-start"
-          isRange={true}
-        />
+        {/* Price */}
+        <div className="text-left">
+          {hasAnyDiscount ? (
+            <div className="flex flex-col gap-1 items-start">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-white">
+                  {lowestDiscountedPrice.toFixed(2)} EGP
+                </span>
+                <Badge variant="destructive" className="text-xs">
+                  -{maxDiscountPercentage}%
+                </Badge>
+              </div>
+              <span className="text-sm text-gray-400 line-through">
+                {highestOriginalPrice.toFixed(2)} EGP
+              </span>
+            </div>
+          ) : (
+            <ProductPrice
+              price={product.price}
+              originalPrice={product.listPrice}
+              className="items-start"
+              isRange={true}
+            />
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const AddButton = () => {
     const { addItem } = useCartStore();

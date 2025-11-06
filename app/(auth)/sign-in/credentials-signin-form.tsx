@@ -267,6 +267,15 @@ export default function CredentialsSignInForm() {
             )}
           />
 
+          <div className="text-right">
+            <Link 
+              href="/forgot-password" 
+              className="text-sm md:text-base text-purple-400 hover:text-purple-300 transition-colors duration-200 font-cairo"
+            >
+              Forgot Password?
+            </Link>
+          </div>
+
           <div className="pt-4 md:pt-6">
             <Button 
               type='submit' 

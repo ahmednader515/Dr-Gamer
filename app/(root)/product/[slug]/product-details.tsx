@@ -62,11 +62,6 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         )}
       </div>
 
-      {/* Description */}
-      <div>
-        <p className='text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4'>{product.description}</p>
-      </div>
-
       {/* Variation Selection - Only if variations exist */}
       {hasVariations && (
         <div className='border border-gray-700 rounded-lg p-4 bg-gray-900/50'>
@@ -151,6 +146,12 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Description */}
+      <div>
+        <h3 className='font-semibold mb-2 text-sm sm:text-base'>Description</h3>
+        <p className='text-sm sm:text-base text-muted-foreground whitespace-pre-line'>{product.description}</p>
       </div>
     </div>
   )
