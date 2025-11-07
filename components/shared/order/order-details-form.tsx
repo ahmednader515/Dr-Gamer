@@ -2,8 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState, useTransition } from 'react'
 
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
@@ -13,12 +15,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Textarea } from '@/components/ui/textarea'
 import { IOrderList } from '@/types'
-import { cn, formatDateTime } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
+import { formatDateTime } from '@/lib/utils'
 import ProductPrice from '../product/product-price'
 import ActionButton from '../action-button'
-import { deliverOrder, updateOrderToPaid } from '@/lib/actions/order.actions'
+import {
+  adminCancelOrder,
+  adminHandleOrderRefund,
+  deliverOrder,
+  requestOrderRefund,
+  updateOrderToPaid,
+} from '@/lib/actions/order.actions'
+import { UploadButton } from '@/lib/uploadthing'
+import { useToast } from '@/hooks/use-toast'
+import { Loader2 } from 'lucide-react'
 
 export default function OrderDetailsForm({
   order,
@@ -30,15 +41,16 @@ export default function OrderDetailsForm({
   userRole?: string
 }) {
   const isModerator = userRole === 'Moderator'
+  const isAdminOrModerator = isAdmin || isModerator
+  const { toast } = useToast()
+  const [isUserSubmitting, startUserTransition] = useTransition()
+  const [isAdminSubmitting, startAdminTransition] = useTransition()
   const {
     customerEmail,
     customerPhone,
-    shippingAddress,
     items,
     orderItems,
     itemsPrice,
-    taxPrice,
-    shippingPrice,
     totalPrice,
     paymentMethod,
     paymentNumber,
@@ -48,7 +60,159 @@ export default function OrderDetailsForm({
     isDelivered,
     deliveredAt,
     expectedDeliveryDate,
+    refundRequested,
+    refundStatus,
+    refundReason,
+    refundTransactionImage,
+    refundRequestedAt,
+    refundProcessedAt,
+    isCancelled,
+    cancelledAt,
   } = order
+
+  const [refundRequestedState, setRefundRequestedState] = useState<boolean>(refundRequested ?? false)
+  const [refundStatusState, setRefundStatusState] = useState<string>(refundStatus || 'none')
+  const [refundReasonState, setRefundReasonState] = useState<string>(refundReason || '')
+  const [refundImageState, setRefundImageState] = useState<string>(refundTransactionImage || '')
+  const [refundRequestedAtState, setRefundRequestedAtState] = useState<string | null>(refundRequestedAt || null)
+  const [refundProcessedAtState, setRefundProcessedAtState] = useState<string | null>(refundProcessedAt || null)
+  const [isCancelledState, setIsCancelledState] = useState<boolean>(isCancelled ?? false)
+  const [cancelledAtState, setCancelledAtState] = useState<string | null>(cancelledAt || null)
+  const [adminAction, setAdminAction] = useState<'approve' | 'reject' | 'pending' | null>(null)
+  const [isCancellingOrder, startCancelTransition] = useTransition()
+
+  const canRequestRefund = isPaid && !isCancelledState
+  const canCancelOrder = !isCancelledState && !isDelivered
+
+  const formatDateValue = (value: string | null) => {
+    if (!value) return null
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return null
+    return formatDateTime(date as Date).dateTime
+  }
+
+  const handleRefundRequest = () => {
+    if (!canRequestRefund) {
+      toast({ description: 'Refunds are only available for paid orders.', variant: 'destructive' })
+      return
+    }
+    if (!refundReasonState.trim()) {
+      toast({
+        description: 'Please provide a refund reason.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (!refundImageState) {
+      toast({
+        description: 'Please upload a refund transaction image.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    startUserTransition(async () => {
+      const res = await requestOrderRefund(order.id, refundReasonState.trim(), refundImageState)
+      if (res.success) {
+        toast({ description: res.message })
+        setRefundRequestedState(true)
+        setRefundStatusState('pending')
+        setRefundRequestedAtState(new Date().toISOString())
+        setRefundProcessedAtState(null)
+        setIsCancelledState(false)
+        setCancelledAtState(null)
+      } else {
+        toast({ description: res.message, variant: 'destructive' })
+      }
+    })
+  }
+
+  const handleAdminRefundDecision = (decision: 'approve' | 'reject' | 'pending') => {
+    const trimmedReason = refundReasonState.trim()
+    if ((decision === 'approve' || decision === 'pending') && !trimmedReason) {
+      toast({
+        description: 'Please provide a reason before proceeding.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (decision !== 'reject') {
+      setRefundReasonState(trimmedReason)
+    }
+
+    setAdminAction(decision)
+    startAdminTransition(async () => {
+      try {
+        const res = await adminHandleOrderRefund(order.id, decision, {
+          reason: decision === 'reject' ? refundReasonState : trimmedReason,
+          transactionImage: refundImageState,
+        })
+
+        if (res.success) {
+          toast({ description: res.message })
+          const data = res.data || {}
+          setRefundRequestedState(!!data.refundRequested)
+          setRefundStatusState(data.refundStatus || (decision === 'approve' ? 'approved' : 'rejected'))
+          if (data.refundReason !== undefined) {
+            setRefundReasonState(data.refundReason || '')
+          }
+          if (data.refundTransactionImage !== undefined) {
+            setRefundImageState(data.refundTransactionImage || '')
+          }
+          if (data.refundRequestedAt !== undefined) {
+            setRefundRequestedAtState(data.refundRequestedAt || null)
+          }
+          setRefundProcessedAtState(data.refundProcessedAt || null)
+          setIsCancelledState(!!data.isCancelled)
+          setCancelledAtState(data.cancelledAt || null)
+        } else {
+          toast({ description: res.message, variant: 'destructive' })
+        }
+      } finally {
+        setAdminAction(null)
+      }
+    })
+  }
+
+  const handleCancelOrder = () => {
+    if (!canCancelOrder) {
+      toast({ description: 'This order can no longer be cancelled.', variant: 'destructive' })
+      return
+    }
+
+    const trimmedReason = refundReasonState.trim()
+
+    startCancelTransition(async () => {
+      const res = await adminCancelOrder(
+        order.id,
+        trimmedReason || (isPaid ? 'Customer requested cancellation and refund' : 'Customer cancelled before payment confirmation'),
+        refundImageState || undefined
+      )
+
+      if (res.success) {
+        toast({ description: 'Order cancelled successfully.' })
+        const data = res.data || {}
+        setRefundRequestedState(!!data.refundRequested)
+        setRefundStatusState(data.refundStatus || 'approved')
+        if (data.refundReason !== undefined) {
+          setRefundReasonState(data.refundReason || '')
+        }
+        if (data.refundTransactionImage !== undefined) {
+          setRefundImageState(data.refundTransactionImage || '')
+        }
+        if (data.refundRequestedAt !== undefined) {
+          setRefundRequestedAtState(data.refundRequestedAt || null)
+        }
+        setRefundProcessedAtState(data.refundProcessedAt || null)
+        setIsCancelledState(!!data.isCancelled)
+        setCancelledAtState(data.cancelledAt || null)
+      } else {
+        toast({ description: res.message, variant: 'destructive' })
+      }
+    })
+  }
 
   // Add safety checks for required properties
   if (!order) {
@@ -61,13 +225,6 @@ export default function OrderDetailsForm({
 
   // Use items or orderItems, whichever is available
   const orderItemsList = items || orderItems || []
-  
-  // Debug logging
-  console.log('Order data received:', order)
-  console.log('Items:', items)
-  console.log('OrderItems:', orderItems)
-  console.log('OrderItemsList:', orderItemsList)
-  console.log('CustomerEmail:', customerEmail)
   
   if (orderItemsList.length === 0) {
     return (
@@ -282,6 +439,12 @@ export default function OrderDetailsForm({
               </div>
             </div>
 
+            {isCancelledState && (
+              <Badge variant='destructive' className='mt-2 justify-center'>
+                Order Cancelled
+              </Badge>
+            )}
+
             {(isAdmin || isModerator) && !isPaid && (
               <ActionButton
                 caption='Mark as Paid'
@@ -293,6 +456,287 @@ export default function OrderDetailsForm({
                 caption='Mark as Delivered'
                 action={() => deliverOrder(order.id)}
               />
+            )}
+
+            {!isAdminOrModerator && (canRequestRefund || canCancelOrder) && (
+              <div className='border-t border-gray-700 pt-4 space-y-4'>
+                <h3 className='text-lg font-semibold'>Manage Your Order</h3>
+                {refundRequestedState && canRequestRefund ? (
+                  <div className='space-y-2 text-sm'>
+                    <p className='text-gray-300'>
+                      <span className='font-medium text-white'>Status:</span> {refundStatusState}
+                    </p>
+                    {refundRequestedAtState && (
+                      <p className='text-gray-300'>
+                        <span className='font-medium text-white'>Requested:</span> {formatDateValue(refundRequestedAtState)}
+                      </p>
+                    )}
+                    {refundProcessedAtState && (
+                      <p className='text-gray-300'>
+                        <span className='font-medium text-white'>Processed:</span> {formatDateValue(refundProcessedAtState)}
+                      </p>
+                    )}
+                    {isCancelledState && cancelledAtState && (
+                      <p className='text-gray-300'>
+                        <span className='font-medium text-white'>Cancelled:</span> {formatDateValue(cancelledAtState)}
+                      </p>
+                    )}
+                    {refundReasonState && (
+                      <p className='text-gray-300'>
+                        <span className='font-medium text-white'>Reason:</span> {refundReasonState}
+                      </p>
+                    )}
+                    {refundImageState && (
+                      <div className='space-y-2'>
+                        <p className='text-gray-300 font-medium'>Transaction Screenshot:</p>
+                        <a
+                          href={refundImageState}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='block'
+                        >
+                          <div className='relative w-full h-48 border border-gray-700 rounded-lg overflow-hidden hover:opacity-90 transition-opacity'>
+                            <img
+                              src={refundImageState}
+                              alt='Refund transaction screenshot'
+                              className='w-full h-full object-contain bg-gray-900'
+                            />
+                          </div>
+                        </a>
+                        <p className='text-xs text-gray-500'>Click to view full size image</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className='space-y-3'>
+                    <div>
+                      <label className='text-sm text-gray-400 block mb-1'>Reason (refund or cancellation)</label>
+                      <Textarea
+                        value={refundReasonState}
+                        onChange={(event) => setRefundReasonState(event.target.value)}
+                        placeholder='Tell us why you need to cancel or request a refund'
+                        className='min-h-[100px]'
+                      />
+                    </div>
+                    {canRequestRefund && (
+                      <div className='space-y-2'>
+                        <label className='text-sm text-gray-400 block'>Refund Transaction Screenshot</label>
+                        {refundImageState ? (
+                          <div className='space-y-2'>
+                            <div className='relative w-full h-48 border border-gray-700 rounded-lg overflow-hidden'>
+                              <img
+                                src={refundImageState}
+                                alt='Refund transaction screenshot'
+                                className='w-full h-full object-contain bg-gray-900'
+                              />
+                            </div>
+                            <Button
+                              variant='outline'
+                              className='w-full'
+                              onClick={() => setRefundImageState('')}
+                            >
+                              Remove Image
+                            </Button>
+                          </div>
+                        ) : (
+                          <UploadButton
+                            endpoint='imageUploader'
+                            onClientUploadComplete={(res) => {
+                              if (res && res[0]) {
+                                const url = res[0].url
+                                setRefundImageState(url)
+                                toast({ description: 'Image uploaded successfully' })
+                              }
+                            }}
+                            onUploadError={(error: Error) => {
+                              toast({ description: `Error uploading image: ${error.message}`, variant: 'destructive' })
+                            }}
+                            appearance={{
+                              button: 'ut-ready:bg-purple-500 ut-ready:bg-opacity-20 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-500 ut-uploading:bg-opacity-20 bg-gray-800 text-white border border-gray-700 cursor-pointer rounded-lg px-4 py-2 text-sm',
+                              container: 'w-full',
+                              allowedContent: 'text-gray-400 text-xs mt-2',
+                            }}
+                          />
+                        )}
+                      </div>
+                    )}
+                    <div className='grid gap-2 sm:grid-cols-2'>
+                      {canRequestRefund && (
+                        <Button
+                          className='w-full bg-purple-600 hover:bg-purple-700 text-white'
+                          onClick={handleRefundRequest}
+                          disabled={isUserSubmitting}
+                        >
+                          {isUserSubmitting ? (
+                            <span className='flex items-center gap-2 justify-center'>
+                              <Loader2 className='h-4 w-4 animate-spin' />
+                              Sending...
+                            </span>
+                          ) : (
+                            'Submit Refund Request'
+                          )}
+                        </Button>
+                      )}
+                      {canCancelOrder && (
+                        <Button
+                          variant='destructive'
+                          className='w-full'
+                          onClick={handleCancelOrder}
+                          disabled={isCancellingOrder}
+                        >
+                          {isCancellingOrder ? (
+                            <span className='flex items-center gap-2 justify-center'>
+                              <Loader2 className='h-4 w-4 animate-spin' />
+                              Cancelling...
+                            </span>
+                          ) : (
+                            'Cancel Entire Order'
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {isAdminOrModerator && (
+              <div className='border-t border-gray-700 pt-4 space-y-4 text-sm'>
+                <div className='space-y-2'>
+                  <h3 className='text-lg font-semibold'>Refund Management</h3>
+                  <p className='text-gray-300'>
+                    <span className='font-medium text-white'>Current Status:</span> {refundStatusState}
+                  </p>
+                  {refundRequestedAtState && (
+                    <p className='text-gray-300'>
+                      <span className='font-medium text-white'>Requested:</span> {formatDateValue(refundRequestedAtState)}
+                    </p>
+                  )}
+                  {refundProcessedAtState && (
+                    <p className='text-gray-300'>
+                      <span className='font-medium text-white'>Processed:</span> {formatDateValue(refundProcessedAtState)}
+                    </p>
+                  )}
+                  {isCancelledState && cancelledAtState && (
+                    <p className='text-gray-300'>
+                      <span className='font-medium text-white'>Cancelled:</span> {formatDateValue(cancelledAtState)}
+                    </p>
+                  )}
+                </div>
+
+                <div className='space-y-3'>
+                  <div>
+                    <label className='text-sm text-gray-400 block mb-1'>Refund Notes / Reason</label>
+                    <Textarea
+                      value={refundReasonState}
+                      onChange={(event) => setRefundReasonState(event.target.value)}
+                      placeholder='Add admin notes about the refund decision'
+                      className='min-h-[100px]'
+                      readOnly={!!refundReason && refundReason.trim() !== ''}
+                      disabled={!!refundReason && refundReason.trim() !== ''}
+                    />
+                    {!!refundReason && refundReason.trim() !== '' && (
+                      <p className='text-xs text-gray-500 mt-1'>Reason provided by customer. Editing disabled.</p>
+                    )}
+                  </div>
+                  <div className='space-y-2'>
+                    <label className='text-sm text-gray-400 block'>Refund Transaction Screenshot</label>
+                    {refundImageState ? (
+                      <div className='space-y-2'>
+                        <div className='relative w-full h-48 border border-gray-700 rounded-lg overflow-hidden'>
+                          <img
+                            src={refundImageState}
+                            alt='Refund transaction screenshot'
+                            className='w-full h-full object-contain bg-gray-900'
+                          />
+                        </div>
+                        <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+                          <Button
+                            variant='outline'
+                            onClick={() => setRefundImageState('')}
+                            disabled={isAdminSubmitting}
+                          >
+                            Remove Image
+                          </Button>
+                          <a
+                            href={refundImageState}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='inline-flex items-center justify-center rounded-md border border-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors'
+                          >
+                            View Image
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      <UploadButton
+                        endpoint='imageUploader'
+                        onClientUploadComplete={(res) => {
+                          if (res && res[0]) {
+                            const url = res[0].url
+                            setRefundImageState(url)
+                            toast({ description: 'Image uploaded successfully' })
+                          }
+                        }}
+                        onUploadError={(error: Error) => {
+                          toast({ description: `Error uploading image: ${error.message}`, variant: 'destructive' })
+                        }}
+                        appearance={{
+                          button: 'ut-ready:bg-purple-500 ut-ready:bg-opacity-20 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-500 ut-uploading:bg-opacity-20 bg-gray-800 text-white border border-gray-700 cursor-pointer rounded-lg px-4 py-2 text-sm',
+                          container: 'w-full',
+                          allowedContent: 'text-gray-400 text-xs mt-2',
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div className='grid gap-2 sm:grid-cols-3'>
+                    <Button
+                      variant='outline'
+                      className='w-full border border-purple-500 text-purple-400 hover:bg-purple-500/10'
+                      onClick={() => handleAdminRefundDecision('pending')}
+                      disabled={isAdminSubmitting || refundStatusState === 'pending' || isCancelledState}
+                    >
+                      {isAdminSubmitting && adminAction === 'pending' ? (
+                        <span className='flex items-center gap-2 justify-center'>
+                          <Loader2 className='h-4 w-4 animate-spin' />
+                          Saving...
+                        </span>
+                      ) : (
+                        'Mark Pending'
+                      )}
+                    </Button>
+                    <Button
+                      className='w-full bg-red-600 hover:bg-red-700 text-white'
+                      onClick={() => handleAdminRefundDecision('approve')}
+                      disabled={isAdminSubmitting || refundStatusState === 'approved'}
+                    >
+                      {isAdminSubmitting && adminAction === 'approve' ? (
+                        <span className='flex items-center gap-2 justify-center'>
+                          <Loader2 className='h-4 w-4 animate-spin' />
+                          Approving...
+                        </span>
+                      ) : (
+                        'Approve & Cancel'
+                      )}
+                    </Button>
+                    <Button
+                      variant='secondary'
+                      className='w-full bg-gray-700 hover:bg-gray-600 text-white'
+                      onClick={() => handleAdminRefundDecision('reject')}
+                      disabled={isAdminSubmitting || refundStatusState === 'rejected'}
+                    >
+                      {isAdminSubmitting && adminAction === 'reject' ? (
+                        <span className='flex items-center gap-2 justify-center'>
+                          <Loader2 className='h-4 w-4 animate-spin' />
+                          Rejecting...
+                        </span>
+                      ) : (
+                        'Reject Request'
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>

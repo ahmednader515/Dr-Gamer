@@ -59,11 +59,17 @@ export default function AddToCart({ product, className }: AddToCartProps) {
 
     await withLoading(
       async () => {
+        const category =
+          product.category ||
+          (product as any).productCategory ||
+          (product as any).platformType ||
+          'General'
+
         await addItem({
           product: product.id,
           name: product.name,
           slug: product.slug,
-          category: product.category,
+          category,
           image: product.images[0],
           price: hasVariations ? selectedPrice : Number(product.price), // Use selected variation price or product price
           countInStock: product.countInStock,

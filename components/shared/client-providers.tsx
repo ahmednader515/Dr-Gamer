@@ -20,8 +20,12 @@ export default function ClientProviders({
   
   // Check if we're on an admin route
   const isAdminRoute = pathname?.startsWith('/admin') ?? false
+  const isModeratorRoute = pathname?.startsWith('/moderator') ?? false
   // Use darker overlay for admin pages (0.6 instead of 0.3)
   const overlayOpacity = isAdminRoute ? 0.6 : 0.3
+
+  const contentPadding = 'pt-[80px] sm:pt-[90px] md:pt-[40px] lg:pt-[40px]'
+  const shouldApplyPadding = !(isAdminRoute || isModeratorRoute)
 
   return (
     <SessionProvider refetchOnWindowFocus={false} refetchWhenOffline={false}>
@@ -29,7 +33,7 @@ export default function ClientProviders({
         <AppInitializer setting={setting}>
           {visible ? (
             <div 
-              className='min-h-screen mr-32'
+              className={`min-h-screen mr-32 ${shouldApplyPadding ? contentPadding : ''}`}
               style={{
                 backgroundImage: `linear-gradient(rgba(0, 0, 0, ${overlayOpacity}), rgba(0, 0, 0, ${overlayOpacity})), url(/icons/background.jpeg)`,
                 backgroundSize: 'cover',
@@ -43,7 +47,7 @@ export default function ClientProviders({
             </div>
           ) : (
             <div 
-              className='min-h-screen'
+              className={`min-h-screen ${shouldApplyPadding ? contentPadding : ''}`}
               style={{
                 backgroundImage: `linear-gradient(rgba(0, 0, 0, ${overlayOpacity}), rgba(0, 0, 0, ${overlayOpacity})), url(/icons/background.jpeg)`,
                 backgroundSize: 'cover',

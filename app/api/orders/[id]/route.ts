@@ -23,7 +23,7 @@ export async function DELETE(
       where: { id },
       include: {
         orderItems: true,
-        orderShippingAddress: true
+        shippingAddress: true,
       }
     })
 

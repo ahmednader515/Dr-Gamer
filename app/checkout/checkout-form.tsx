@@ -153,12 +153,44 @@ export default function CheckoutForm() {
   const [gameAccountOption, setGameAccountOption] = useState<'own' | 'new'>('new')
   const [accountUsername, setAccountUsername] = useState('')
   const [accountPassword, setAccountPassword] = useState('')
+
+  useEffect(() => {
+    setCustomerEmail('')
+    setCustomerPhone('')
+    setPaymentNumber('')
+    setTransactionImage('')
+    contactInfoForm.reset({ email: '', phone: '' })
+    paymentDetailsForm.reset({ paymentNumber: '', transactionImage: '' })
+    setIsEmailSelected(false)
+    setIsPaymentMethodSelected(false)
+    setIsPaymentDetailsSelected(false)
+    setIsTermsAccepted(false)
+    setTermsAccepted(false)
+    setUploadedImageUrl('')
+  }, [
+    setCustomerEmail,
+    setCustomerPhone,
+    setPaymentNumber,
+    setTransactionImage,
+    contactInfoForm,
+    paymentDetailsForm,
+    setIsEmailSelected,
+    setIsPaymentMethodSelected,
+    setIsPaymentDetailsSelected,
+    setIsTermsAccepted,
+    setTermsAccepted,
+    setUploadedImageUrl,
+  ])
   
-  // Calculate new account tax (30 EGP per item with "New Account" variation)
+  // Calculate new account tax (30 EGP per qualifying account variation)
   const newAccountTax = Array.isArray(items) 
     ? items.reduce((total: number, item: any) => {
         const variation = item.selectedVariation?.toLowerCase() || ''
-        if (variation.includes('new account')) {
+        const platform = item.platformType?.toLowerCase() || ''
+        const isXboxNewAccount = variation.includes('new account')
+        const isPlayStationFullAccount = platform === 'playstation' && variation.includes('full account')
+
+        if (isXboxNewAccount || isPlayStationFullAccount) {
           return total + 30
         }
         return total
@@ -1070,7 +1102,7 @@ export default function CheckoutForm() {
                       className='text-sm cursor-pointer'
                     >
                       I agree to the{' '}
-                      <Link href="/terms" className='text-purple-400 hover:underline'>
+                      <Link href="/terms-of-use" className='text-purple-400 hover:underline'>
                         Terms and Conditions
                       </Link>
                     </label>

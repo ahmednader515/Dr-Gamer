@@ -257,6 +257,14 @@ const useCartStore = create(
 
     {
       name: 'cart-store',
+      partialize: (state) => {
+        const { customerEmail, customerPhone, paymentNumber, transactionImage, ...restCart } = state.cart
+        return {
+          cart: {
+            ...restCart,
+          },
+        }
+      },
     }
   )
 )

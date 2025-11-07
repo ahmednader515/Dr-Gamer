@@ -143,6 +143,14 @@ model Order {
   paidAt               DateTime?
   isDelivered          Boolean               @default(false)
   deliveredAt          DateTime?
+  refundRequested      Boolean               @default(false)
+  refundStatus         String                @default("none")
+  refundReason         String?
+  refundTransactionImage String?
+  refundRequestedAt    DateTime?
+  refundProcessedAt    DateTime?
+  isCancelled          Boolean               @default(false)
+  cancelledAt          DateTime?
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
   orderItems           OrderItem[]

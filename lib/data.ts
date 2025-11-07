@@ -959,7 +959,7 @@ Your data is safeguarded through robust security measures to prevent unauthorize
     },
     {
       title: 'Conditions of Use',
-      slug: 'conditions-of-use',
+      slug: 'terms-of-use',
       content: `Welcome to [Ecommerce Website Name]. By accessing or using our website, you agree to comply with and be bound by the following terms and conditions. These terms govern your use of our platform, including browsing, purchasing products, and interacting with any content or services provided. You must be at least 18 years old or have the consent of a parent or guardian to use this website. Any breach of these terms may result in the termination of your access to our platform.
 
 We strive to ensure all product descriptions, pricing, and availability information on our website are accurate. However, errors may occur, and we reserve the right to correct them without prior notice. All purchases are subject to our return and refund policy. By using our site, you acknowledge that your personal information will be processed according to our privacy policy, ensuring your data is handled securely and responsibly. Please review these terms carefully before proceeding with any transactions.
@@ -1334,8 +1334,13 @@ We accept cash on delivery, Vodafone Cash, InstaPay, and credit cards.
       },
       site: {
         name: 'Dr.GAMER',
-        description:
-          'Dr.GAMER - Your official store for everything Xbox! We offer the latest games, Xbox Game Pass Ultimate subscriptions, Xbox gift cards, Xbox Series X|S accessories, controllers, gaming headsets, and everything you need for an exceptional gaming experience. Shop now and enjoy the best prices and exclusive offers!',
+        description: `Welcome to Dr. Gamer — your trusted destination for digital gaming products, offering the best prices and fastest delivery. We specialize in Xbox and PlayStation digital content, including full accounts, shared accounts, Game Pass and PlayStation Plus subscriptions, and activation codes — all 100% legitimate and sourced from trusted suppliers.
+
+Our mission is simple: to make gaming easier, faster, and more affordable for every player. We take pride in our reputation for reliability, transparency, and professional after-sales support.
+
+At Dr. Gamer, we don’t just sell games — we build trust, offer genuine value, and bring you the smoothest digital experience possible.
+
+Powered by Mina Samir & Mohamed Hamaki Your game starts here.`,
         keywords: 'Xbox, Dr.GAMER, Xbox games, Xbox Game Pass, Xbox Live Gold, Xbox gift cards, Xbox Series X, Xbox Series S, Xbox controllers, Xbox accessories, Xbox subscriptions, video games, game store, Game Pass Ultimate',
         url: 'https://dr-gamer.com',
         logo: '/icons/logo.png',

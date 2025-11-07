@@ -159,6 +159,14 @@ export const OrderInputSchema = z.object({
   deliveredAt: z.date().optional(),
   isPaid: z.boolean().default(false),
   paidAt: z.date().optional(),
+  refundRequested: z.boolean().optional(),
+  refundStatus: z.string().optional(),
+  refundReason: z.string().optional(),
+  refundTransactionImage: z.string().optional(),
+  refundRequestedAt: z.date().optional(),
+  refundProcessedAt: z.date().optional(),
+  isCancelled: z.boolean().optional(),
+  cancelledAt: z.date().optional(),
 })
 // Cart
 

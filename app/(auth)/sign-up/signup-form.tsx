@@ -210,7 +210,7 @@ export default function SignUpForm() {
           
           <div className='text-sm md:text-base text-left text-gray-300 font-cairo leading-relaxed'>
             By creating an account, you agree to the{' '}
-            <Link href='/page/conditions-of-use' className="text-purple-400 hover:underline">Terms of Use</Link> and{' '}
+            <Link href='/page/terms-of-use' className="text-purple-400 hover:underline">Terms of Use</Link> and{' '}
             <Link href='/page/privacy-policy' className="text-purple-400 hover:underline">Privacy Policy</Link> of {site.name}.
           </div>
         </div>

@@ -39,7 +39,7 @@ Automatically includes pages with these keywords in the slug:
 **Examples:**
 - "Privacy Policy" (`privacy-policy`)
 - "Terms of Service" (`terms-of-service`)
-- "Conditions of Use" (`conditions-of-use`)
+- "Conditions of Use" (`terms-of-use`)
 - "Return Policy" (`return-policy`)
 
 ## 📝 How to Add Pages to Footer

@@ -240,7 +240,7 @@ export default function SignUpForm() {
           </div>
           <div className='text-sm'>
             By creating an account, you agree to {APP_NAME}&apos;s{' '}
-            <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
+            <Link href='/page/terms-of-use'>Conditions of Use</Link> and{' '}
             <Link href='/page/privacy-policy'> Privacy Notice. </Link>
           </div>
           <Separator className='mb-4' />

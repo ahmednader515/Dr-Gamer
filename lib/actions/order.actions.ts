@@ -7,7 +7,12 @@ import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
 import { revalidatePath } from 'next/cache'
 import { sendAskReviewOrderItems, sendPurchaseReceipt } from '@/lib/services/email.service'
-import { sendOrderConfirmationEmail, sendOrderPaidEmail } from '@/lib/email'
+import {
+  sendOrderCancellationEmail,
+  sendOrderConfirmationEmail,
+  sendOrderDeliveredEmail,
+  sendOrderPaidEmail,
+} from '@/lib/email'
 
 import { DateRange } from 'react-day-picker'
 import data from '../data'
@@ -102,9 +107,22 @@ export const createOrderFromCart = async (
     totalPrice: finalTotal,
   }
 
+  const itemsWithDefaults = (cart.items || []).map((rawItem: any) => {
+    const categoryFallback =
+      rawItem.category ||
+      rawItem.productCategory ||
+      rawItem.platformType ||
+      'General'
+
+    return {
+      ...rawItem,
+      category: categoryFallback,
+    }
+  })
+
   const orderData = OrderInputSchema.parse({
     user: userId,
-    items: cart.items,
+    items: itemsWithDefaults,
     customerEmail: cart.customerEmail,
     customerPhone: cart.customerPhone,
     shippingAddress: cart.shippingAddress,
@@ -295,17 +313,313 @@ export async function deliverOrder(orderId: string) {
     if (!order) throw new Error('Order not found')
     if (!order.isPaid) throw new Error('Order is not paid')
     
-    await prisma.order.update({
+    const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: {
         isDelivered: true,
         deliveredAt: new Date(),
-      }
+      },
+      include: {
+        user: {
+          select: { email: true, name: true }
+        },
+        orderItems: true,
+      },
     })
     
-    if (order.user.email) await sendAskReviewOrderItems({ order })
+    if (updatedOrder.user?.email) {
+      try {
+        await sendOrderDeliveredEmail({
+          order: updatedOrder,
+          userName: updatedOrder.user.name || 'Customer',
+          userEmail: updatedOrder.user.email,
+        })
+      } catch (emailError) {
+        console.error('Failed to send order delivered email:', emailError)
+      }
+    }
+
+    await sendAskReviewOrderItems({ order: updatedOrder as any })
     revalidatePath(`/account/orders/${orderId}`)
     return { success: true, message: 'Order delivered successfully' }
+  } catch (err) {
+    return { success: false, message: formatError(err) }
+  }
+}
+
+export async function requestOrderRefund(orderId: string, reason: string, transactionImage: string) {
+  try {
+    const session = await auth()
+    if (!session?.user) {
+      throw new Error('User is not authenticated')
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: {
+        id: true,
+        userId: true,
+        isPaid: true,
+        refundRequested: true,
+        refundStatus: true,
+        isCancelled: true,
+      },
+    })
+
+    if (!order) {
+      throw new Error('Order not found')
+    }
+
+    const isAdminOrModerator = session.user.role === 'Admin' || session.user.role === 'Moderator'
+    const isOwner = order.userId === session.user.id
+
+    if (!isOwner) {
+      throw new Error('Unauthorized to request refund for this order')
+    }
+
+    if (!order.isPaid) {
+      throw new Error('Only paid orders can be refunded')
+    }
+
+    if (order.isCancelled) {
+      throw new Error('Order is already cancelled')
+    }
+
+    if (order.refundRequested && order.refundStatus === 'pending') {
+      throw new Error('Refund request is already pending')
+    }
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        refundRequested: true,
+        refundStatus: 'pending',
+        refundReason: reason,
+        refundTransactionImage: transactionImage,
+        refundRequestedAt: new Date(),
+        refundProcessedAt: null,
+        isCancelled: false,
+        cancelledAt: null,
+      },
+    })
+
+    revalidatePath(`/account/orders/${orderId}`)
+    revalidatePath(`/admin/orders/${orderId}`)
+
+    return { success: true, message: 'Refund request submitted successfully' }
+  } catch (err) {
+    return { success: false, message: formatError(err) }
+  }
+}
+
+export async function adminCancelOrder(
+  orderId: string,
+  reason?: string,
+  transactionImage?: string
+) {
+  try {
+    const session = await auth()
+    if (!session?.user || (session.user.role !== 'Admin' && session.user.role !== 'Moderator')) {
+      throw new Error('Unauthorized')
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: {
+          select: { name: true, email: true },
+        },
+      },
+    })
+
+    if (!order) {
+      throw new Error('Order not found')
+    }
+
+    if (order.isCancelled) {
+      throw new Error('Order already cancelled')
+    }
+
+    const now = new Date()
+
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        refundRequested: true,
+        refundStatus: 'approved',
+        refundReason: reason && reason.trim() !== '' ? reason.trim() : order.refundReason,
+        refundTransactionImage: transactionImage || order.refundTransactionImage,
+        refundRequestedAt: order.refundRequestedAt ?? now,
+        refundProcessedAt: now,
+        isCancelled: true,
+        cancelledAt: now,
+      },
+      include: {
+        user: {
+          select: { name: true, email: true },
+        },
+      },
+    })
+
+    revalidatePath(`/account/orders/${orderId}`)
+    revalidatePath(`/admin/orders/${orderId}`)
+
+    if (updatedOrder.user?.email) {
+      try {
+        await sendOrderCancellationEmail({
+          order: updatedOrder,
+          userName: updatedOrder.user.name || 'Customer',
+          userEmail: updatedOrder.user.email,
+          reason: updatedOrder.refundReason,
+        })
+      } catch (emailError) {
+        console.error('Failed to send order cancellation email:', emailError)
+      }
+    }
+
+    return {
+      success: true,
+      message: 'Order cancelled successfully',
+      data: JSON.parse(JSON.stringify({
+        refundRequested: updatedOrder.refundRequested,
+        refundStatus: updatedOrder.refundStatus,
+        refundProcessedAt: updatedOrder.refundProcessedAt,
+        refundReason: updatedOrder.refundReason,
+        refundTransactionImage: updatedOrder.refundTransactionImage,
+        refundRequestedAt: updatedOrder.refundRequestedAt,
+        isCancelled: updatedOrder.isCancelled,
+        cancelledAt: updatedOrder.cancelledAt,
+      })),
+    }
+  } catch (err) {
+    return { success: false, message: formatError(err) }
+  }
+}
+
+export async function adminHandleOrderRefund(
+  orderId: string,
+  decision: 'approve' | 'reject' | 'pending',
+  options?: { reason?: string; transactionImage?: string }
+) {
+  try {
+    const session = await auth()
+    if (!session?.user) {
+      throw new Error('Unauthorized')
+    }
+
+    const isAdminLike = session.user.role === 'Admin' || session.user.role === 'Moderator'
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: {
+        id: true,
+        refundRequestedAt: true,
+        refundStatus: true,
+        userId: true,
+        user: {
+          select: { name: true, email: true },
+        },
+      },
+    })
+
+    if (!order) {
+      throw new Error('Order not found')
+    }
+
+    const isOwner = order.userId === session.user.id
+    if (!isAdminLike && !isOwner) {
+      throw new Error('Unauthorized')
+    }
+
+    if (!isAdminLike && decision !== 'approve') {
+      throw new Error('Unauthorized')
+    }
+
+    const now = new Date()
+    const updateData: any = {}
+
+    if (options && 'reason' in options) {
+      updateData.refundReason = options.reason && options.reason.trim() !== '' ? options.reason.trim() : null
+    }
+
+    if (options && 'transactionImage' in options) {
+      updateData.refundTransactionImage = options.transactionImage || null
+    }
+
+    if (decision === 'pending') {
+      updateData.refundRequested = true
+      updateData.refundStatus = 'pending'
+      updateData.refundProcessedAt = null
+      updateData.isCancelled = false
+      updateData.cancelledAt = null
+      updateData.refundRequestedAt = order.refundRequestedAt ?? now
+    } else if (decision === 'approve') {
+      updateData.refundRequested = true
+      updateData.refundStatus = 'approved'
+      updateData.refundProcessedAt = now
+      updateData.isCancelled = true
+      updateData.cancelledAt = now
+      updateData.refundRequestedAt = order.refundRequestedAt ?? now
+    } else {
+      updateData.refundRequested = true
+      updateData.refundStatus = 'rejected'
+      updateData.refundProcessedAt = now
+      updateData.isCancelled = false
+      updateData.cancelledAt = null
+      updateData.refundRequestedAt = order.refundRequestedAt ?? now
+    }
+
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: updateData,
+      include: {
+        user: {
+          select: { name: true, email: true },
+        },
+      },
+    })
+
+    revalidatePath(`/account/orders/${orderId}`)
+    revalidatePath(`/admin/orders/${orderId}`)
+
+    if (decision === 'approve' && updatedOrder.user?.email) {
+      try {
+        await sendOrderCancellationEmail({
+          order: updatedOrder,
+          userName: updatedOrder.user.name || 'Customer',
+          userEmail: updatedOrder.user.email,
+          reason: updateData.refundReason || updatedOrder.refundReason,
+        })
+      } catch (emailError) {
+        console.error('Failed to send order cancellation email:', emailError)
+      }
+    }
+
+    const responseData = {
+      refundRequested: updatedOrder.refundRequested,
+      refundStatus: updatedOrder.refundStatus,
+      refundProcessedAt: updatedOrder.refundProcessedAt,
+      refundReason: updatedOrder.refundReason,
+      refundTransactionImage: updatedOrder.refundTransactionImage,
+      refundRequestedAt: updatedOrder.refundRequestedAt,
+      isCancelled: updatedOrder.isCancelled,
+      cancelledAt: updatedOrder.cancelledAt,
+    }
+
+    let message = 'Refund status updated.'
+    if (decision === 'approve') {
+      message = 'Order cancelled and refund marked as approved.'
+    } else if (decision === 'reject') {
+      message = 'Refund request marked as rejected.'
+    } else {
+      message = 'Refund request marked as pending.'
+    }
+
+    return {
+      success: true,
+      message,
+      data: JSON.parse(JSON.stringify(responseData)),
+    }
   } catch (err) {
     return { success: false, message: formatError(err) }
   }

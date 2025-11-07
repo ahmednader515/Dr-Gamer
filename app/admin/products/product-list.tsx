@@ -26,6 +26,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { deleteProduct } from '@/lib/actions/product.actions'
 import { useToast } from '@/hooks/use-toast'
 
+const resolveCategory = (category?: string | null) =>
+  category && category.trim() !== '' ? category : 'Uncategorized'
+
 type Product = {
   id: string
   name: string
@@ -114,7 +117,9 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
   
   // Get unique categories
   const categories = useMemo(() => {
-    const uniqueCategories = Array.from(new Set(products.map(p => p.category)))
+    const uniqueCategories = Array.from(
+      new Set(products.map((p) => resolveCategory(p.category)))
+    )
     return uniqueCategories.sort()
   }, [products])
   
@@ -126,13 +131,17 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
     if (searchQuery.trim()) {
       result = result.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
+        resolveCategory(product.category)
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
       )
     }
     
     // Apply category filter
     if (categoryFilter !== 'all') {
-      result = result.filter(product => product.category === categoryFilter)
+      result = result.filter(
+        (product) => resolveCategory(product.category) === categoryFilter
+      )
     }
     
     // Apply alphabetical sorting
@@ -305,7 +314,7 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                       {product.price.toFixed(2)} EGP
                     </TableCell>
                     <TableCell className='text-left py-4 px-4'>
-                      {product.category}
+                      {resolveCategory(product.category)}
                     </TableCell>
                     <TableCell className='text-left py-4 px-4'>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -381,7 +390,9 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                     <Link href={`/admin/products/${product.id}`} className="text-white hover:text-gray-300 hover:underline font-medium text-lg block">
                       {product.name}
                     </Link>
-                    <div className="text-sm text-gray-400">{product.category}</div>
+                    <div className="text-sm text-gray-400">
+                      {resolveCategory(product.category)}
+                    </div>
                   </div>
                 </div>
 

@@ -1641,10 +1641,10 @@ import { i18n } from '@/i18n-config'
             </div>
           </div>
         </div>
--          <Link href='/page/conditions-of-use'>Conditions of Use</Link>
+-          <Link href='/page/terms-of-use'>Conditions of Use</Link>
 -          <Link href='/page/privacy-policy'> Privacy Notice</Link>
 -          <Link href='/page/help'>Help</Link>
-          <Link href='/page/conditions-of-use'>
+          <Link href='/page/terms-of-use'>
             {t('Footer.Conditions of Use')}
           </Link>
           <Link href='/page/privacy-policy'>{t('Footer.Privacy Notice')}</Link>
@@ -2383,7 +2383,7 @@ export default async function AuthLayout({
       <main className='mx-auto max-w-sm min-w-80 p-4'>{children}</main>
       <footer className=' flex-1 mt-8  bg-gray-800 w-full flex flex-col gap-4 items-center p-8 text-sm'>
         <div className='flex justify-center space-x-4'>
-          <Link href='/page/conditions-of-use'>Conditions of Use</Link>
+          <Link href='/page/terms-of-use'>Conditions of Use</Link>
           <Link href='/page/privacy-policy'> Privacy Notice</Link>
           <Link href='/page/help'> Help </Link>
         </div>
@@ -2509,7 +2509,7 @@ export default function CredentialsSignInForm() {
           </div>
           <div className='text-sm'>
             By signing in, you agree to {site.name}&apos;s{' '}
-            <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
+            <Link href='/page/terms-of-use'>Conditions of Use</Link> and{' '}
             <Link href='/page/privacy-policy'>Privacy Notice.</Link>
           </div>
         </div>
@@ -2808,7 +2808,7 @@ export default function CredentialsSignInForm() {
           </div>
           <div className='text-sm'>
             By creating an account, you agree to {site.name}&apos;s{' '}
-            <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
+            <Link href='/page/terms-of-use'>Conditions of Use</Link> and{' '}
             <Link href='/page/privacy-policy'> Privacy Notice. </Link>
           </div>
           <Separator className='mb-4' />
@@ -7247,7 +7247,7 @@ export default function CheckoutFooter() {
         complete until we send you an e-mail notifying you that the item has
         been shipped to you. By placing your order, you agree to {site.name}
         &apos;s <Link href='/page/privacy-policy'>privacy notice</Link> and
-        <Link href='/page/conditions-of-use'> conditions of use</Link>.
+        <Link href='/page/terms-of-use'> conditions of use</Link>.
       </p>
       <p>
         Within 30 days of delivery, you may return new, unopened merchandise in
@@ -7461,7 +7461,7 @@ const CheckoutForm = () => {
             <p className='text-xs text-center py-2'>
               By placing your order, you agree to {site.name}&apos;s{' '}
               <Link href='/page/privacy-policy'>privacy notice</Link> and
-              <Link href='/page/conditions-of-use'> conditions of use</Link>.
+              <Link href='/page/terms-of-use'> conditions of use</Link>.
             </p>
           </div>
         )}
@@ -7964,7 +7964,7 @@ const CheckoutForm = () => {
                       }&apos;s{' '}
                       <Link href='/page/privacy-policy'>privacy notice</Link>{' '}
                       and
-                      <Link href='/page/conditions-of-use'>
+                      <Link href='/page/terms-of-use'>
                         {' '}
                         conditions of use
                       </Link>

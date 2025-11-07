@@ -7,7 +7,7 @@ import Image from 'next/image'
 const Products = [
   { name: 'Games', image: '/images/games.jpg', href: '/search?productCategory=Game' },
   { name: 'Subscriptions', image: '/images/sub.png', href: '/search?productCategory=Subscription' },
-  { name: 'Gift Cards', image: '/images/gift.png', href: '/search?productCategory=Gift Card' },
+  { name: 'Gift Cards', image: '/images/gift.png', href: '/search?category=Digital Codes' },
 ]
 
 export default function ProductsSection() {

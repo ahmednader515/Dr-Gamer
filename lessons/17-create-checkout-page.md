@@ -179,7 +179,7 @@ export default function CheckoutFooter() {
         we send you an e-mail notifying you that the item has been shipped to
         you. By placing your order, you agree to {APP_NAME}
         &apos;s <Link href='/page/privacy-policy'>privacy notice</Link> and
-        <Link href='/page/conditions-of-use'> conditions of use</Link>.
+        <Link href='/page/terms-of-use'> conditions of use</Link>.
       </p>
       <p>
         Within 30 days of delivery, you may return new, unopened merchandise in
@@ -483,7 +483,7 @@ const CheckoutForm = () => {
             <p className='text-xs text-center py-2'>
               By placing your order, you agree to {APP_NAME}&apos;s{' '}
               <Link href='/page/privacy-policy'>privacy notice</Link> and
-              <Link href='/page/conditions-of-use'> conditions of use</Link>.
+              <Link href='/page/terms-of-use'> conditions of use</Link>.
             </p>
           </div>
         )}
@@ -985,7 +985,7 @@ const CheckoutForm = () => {
                       By placing your order, you agree to {APP_NAME}&apos;s <Link href='/page/privacy-policy'>
                         privacy notice
                       </Link> and
-                      <Link href='/page/conditions-of-use'>
+                      <Link href='/page/terms-of-use'>
                         {' '}
                         conditions of use
                       </Link>

@@ -131,7 +131,7 @@ export default async function Footer() {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/page/conditions-of-use" className="text-gray-300 hover:text-white transition-colors duration-200">
+                    <Link href="/page/terms-of-use" className="text-gray-300 hover:text-white transition-colors duration-200">
                       Terms of Service
                     </Link>
                   </li>

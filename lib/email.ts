@@ -521,3 +521,225 @@ DR.Gamer - Your Gaming Destination
   }
 }
 
+export async function sendOrderDeliveredEmail({
+  order,
+  userName,
+  userEmail,
+}: OrderEmailParams) {
+  console.log('📧 Sending order delivered email to:', userEmail)
+
+  try {
+    const orderDetailsUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/account/orders/${order.id}`
+    const deliveredAt = order.deliveredAt || new Date()
+
+    const result = await resend.emails.send({
+      from: `DR.Gamer <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>` ,
+      to: userEmail,
+      replyTo: process.env.RESEND_REPLY_TO || 'support@dr-gamer.net',
+      subject: `Order Delivered - #${order.id.slice(-8)} - DR.Gamer`,
+      text: `Hello ${userName},
+
+Great news! Your order has been delivered and is ready for you to enjoy.
+
+Order Number: #${order.id.slice(-8).toUpperCase()}
+Delivered At: ${new Date(deliveredAt).toLocaleString()}
+
+View your order details: ${orderDetailsUrl}
+
+Need help? We're here for you at support@dr-gamer.net.
+
+Happy gaming!
+DR.Gamer Team
+`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Order Delivered</title>
+          </head>
+          <body style="margin:0;padding:0;font-family:Arial,sans-serif;background-color:#0f0a1f;color:#d1d5db;">
+            <table role="presentation" style="width:100%;border-collapse:collapse;">
+              <tr>
+                <td align="center" style="padding:40px 0;">
+                  <table role="presentation" style="width:600px;border-collapse:collapse;background-color:#1a0f2e;border-radius:12px;overflow:hidden;">
+                    <tr>
+                      <td style="padding:40px;text-align:center;background:linear-gradient(135deg,#2d1a5f 0%,#1f0a4d 100%);">
+                        <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:bold;">DR.Gamer</h1>
+                        <p style="margin:10px 0 0 0;color:#a78bfa;font-size:14px;">The Xbox world at your fingertips</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="center" style="padding:30px 40px 10px 40px;">
+                        <div style="width:64px;height:64px;background-color:rgba(34,197,94,0.15);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:32px;">🚚</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:0 40px 40px 40px;text-align:left;">
+                        <h2 style="margin:0 0 20px 0;color:#ffffff;font-size:24px;text-align:center;">Your Order Is Delivered!</h2>
+                        <p style="margin:0 0 16px 0;font-size:16px;line-height:1.6;">Hello <strong style="color:#ffffff;">${userName}</strong>,</p>
+                        <p style="margin:0 0 24px 0;font-size:16px;line-height:1.6;">Great news! We've completed delivery for your order. Your digital items are ready for you.</p>
+                        <div style="background-color:#2d1a5f;border-radius:8px;padding:24px;margin-bottom:24px;">
+                          <h3 style="margin:0 0 16px 0;color:#ffffff;font-size:18px;">Order Summary</h3>
+                          <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                            <tr>
+                              <td style="padding:8px 0;color:#9ca3af;">Order Number</td>
+                              <td style="padding:8px 0;color:#ffffff;text-align:right;">#${order.id.slice(-8).toUpperCase()}</td>
+                            </tr>
+                            <tr>
+                              <td style="padding:8px 0;color:#9ca3af;">Delivered At</td>
+                              <td style="padding:8px 0;color:#ffffff;text-align:right;">${new Date(deliveredAt).toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                              <td style="padding:8px 0;color:#9ca3af;">Total Paid</td>
+                              <td style="padding:8px 0;color:#8b5cf6;font-size:18px;font-weight:bold;text-align:right;">${Number(order.totalPrice).toFixed(2)} EGP</td>
+                            </tr>
+                          </table>
+                        </div>
+                        <table role="presentation" style="margin:30px auto;">
+                          <tr>
+                            <td align="center">
+                              <a href="${orderDetailsUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#8b5cf6 0%,#6d28d9 100%);color:#ffffff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:bold;">View Order Details</a>
+                            </td>
+                          </tr>
+                        </table>
+                        <div style="margin:24px 0 0 0;padding:20px;border-radius:8px;border-left:4px solid #8b5cf6;background-color:#2d1a5f;">
+                          <p style="margin:0 0 10px 0;color:#ffffff;font-size:15px;font-weight:bold;">Need Assistance?</p>
+                          <p style="margin:0;font-size:14px;">If you have any questions or need support, reply to this email or reach out to support@dr-gamer.net.</p>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:30px 40px;background-color:#0f0a1f;text-align:center;border-top:1px solid #2d1a5f;">
+                        <p style="margin:0 0 10px 0;color:#9ca3af;font-size:14px;">DR.Gamer - Your Gaming Destination</p>
+                        <p style="margin:0;color:#6b7280;font-size:12px;">Questions? Contact us at support@dr-gamer.net</p>
+                        <p style="margin:10px 0 0 0;color:#6b7280;font-size:12px;">This is an automated email. Please do not reply to this message.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `,
+    })
+
+    console.log('✅ Order delivered email sent successfully!')
+    console.log('📧 Resend response:', JSON.stringify(result, null, 2))
+    return { success: true }
+  } catch (error) {
+    console.error('❌ Error sending order delivered email:', error)
+    console.error('❌ Error details:', JSON.stringify(error, null, 2))
+    return { success: false, error: 'Failed to send email' }
+  }
+}
+
+export async function sendOrderCancellationEmail({
+  order,
+  userName,
+  userEmail,
+  reason,
+}: OrderEmailParams & { reason?: string }) {
+  console.log('📧 Sending order cancellation email to:', userEmail)
+
+  const cancellationReason = reason && reason.trim() ? reason.trim() : 'No additional details were provided.'
+
+  try {
+    const orderDetailsUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/account/orders/${order.id}`
+    const cancelledAt = order.cancelledAt || new Date()
+
+    const result = await resend.emails.send({
+      from: `DR.Gamer <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>` ,
+      to: userEmail,
+      replyTo: process.env.RESEND_REPLY_TO || 'support@dr-gamer.net',
+      subject: `Order Cancelled - #${order.id.slice(-8)} - DR.Gamer`,
+      text: `Hello ${userName},
+
+We wanted to let you know that your order #${order.id.slice(-8).toUpperCase()} has been cancelled as of ${new Date(cancelledAt).toLocaleString()}.
+
+Reason provided:
+${cancellationReason}
+
+If you have any questions or believe this was a mistake, please contact us at support@dr-gamer.net and we'll be happy to assist.
+
+You can view the order details here: ${orderDetailsUrl}
+
+Thank you,
+DR.Gamer Support Team
+`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Order Cancelled</title>
+          </head>
+          <body style="margin:0;padding:0;font-family:Arial,sans-serif;background-color:#0f0a1f;color:#d1d5db;">
+            <table role="presentation" style="width:100%;border-collapse:collapse;">
+              <tr>
+                <td align="center" style="padding:40px 0;">
+                  <table role="presentation" style="width:600px;border-collapse:collapse;background-color:#1a0f2e;border-radius:12px;overflow:hidden;">
+                    <tr>
+                      <td style="padding:40px;text-align:center;background:linear-gradient(135deg,#4c1d95 0%,#1f0a4d 100%);">
+                        <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:bold;">DR.Gamer</h1>
+                        <p style="margin:10px 0 0 0;color:#a78bfa;font-size:14px;">The Xbox world at your fingertips</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="center" style="padding:30px 40px 10px 40px;">
+                        <div style="width:64px;height:64px;background-color:rgba(239,68,68,0.15);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:32px;">⚠️</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:0 40px 40px 40px;text-align:left;">
+                        <h2 style="margin:0 0 20px 0;color:#ffffff;font-size:24px;text-align:center;">Order Cancellation Notice</h2>
+                        <p style="margin:0 0 16px 0;font-size:16px;line-height:1.6;">Hello <strong style="color:#ffffff;">${userName}</strong>,</p>
+                        <p style="margin:0 0 16px 0;font-size:16px;line-height:1.6;">We’re sorry to inform you that your order has been cancelled. Please review the reason below:</p>
+                        <div style="background-color:#2d1a5f;border-radius:8px;padding:20px;margin-bottom:24px;border-left:4px solid #ef4444;">
+                          <h3 style="margin:0 0 12px 0;color:#ffffff;font-size:18px;">Cancellation Details</h3>
+                          <p style="margin:0 0 12px 0;font-size:14px;">Order Number: <strong style="color:#ffffff;">#${order.id.slice(-8).toUpperCase()}</strong></p>
+                          <p style="margin:0 0 12px 0;font-size:14px;">Cancelled At: <strong style="color:#ffffff;">${new Date(cancelledAt).toLocaleString()}</strong></p>
+                          <p style="margin:0;font-size:14px;line-height:1.6;"><strong style="color:#ffffff;">Reason:</strong> ${cancellationReason}</p>
+                        </div>
+                        <div style="margin:0 0 24px 0;padding:20px;border-radius:8px;background-color:#33214f;border-left:4px solid #8b5cf6;">
+                          <p style="margin:0;font-size:14px;line-height:1.6;">If you have already made a payment, a refund will be processed according to the payment method. For further details or clarification, please reply to this email or contact us at <a href="mailto:support@dr-gamer.net" style="color:#a78bfa;text-decoration:none;">support@dr-gamer.net</a>.</p>
+                        </div>
+                        <table role="presentation" style="margin:30px auto;">
+                          <tr>
+                            <td align="center">
+                              <a href="${orderDetailsUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#ef4444 0%,#b91c1c 100%);color:#ffffff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:bold;">View Order Details</a>
+                            </td>
+                          </tr>
+                        </table>
+                        <p style="margin:0;font-size:14px;line-height:1.6;">We appreciate your understanding. If you need further assistance, our support team is ready to help.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:30px 40px;background-color:#0f0a1f;text-align:center;border-top:1px solid #2d1a5f;">
+                        <p style="margin:0 0 10px 0;color:#9ca3af;font-size:14px;">DR.Gamer - Your Gaming Destination</p>
+                        <p style="margin:0;color:#6b7280;font-size:12px;">Questions? Contact us at support@dr-gamer.net</p>
+                        <p style="margin:10px 0 0 0;color:#6b7280;font-size:12px;">This is an automated email. Please do not reply to this message.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `,
+    })
+
+    console.log('✅ Order cancellation email sent successfully!')
+    console.log('📧 Resend response:', JSON.stringify(result, null, 2))
+    return { success: true }
+  } catch (error) {
+    console.error('❌ Error sending order cancellation email:', error)
+    console.error('❌ Error details:', JSON.stringify(error, null, 2))
+    return { success: false, error: 'Failed to send email' }
+  }
+}
+
