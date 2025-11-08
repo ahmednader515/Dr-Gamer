@@ -95,36 +95,29 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               const hasDiscount = pricing.saleActive
               const discountPercentage =
                 hasDiscount && pricing.originalPrice
-                  ? Math.round(((pricing.originalPrice - pricing.currentPrice) / pricing.originalPrice) * 100)
+                  ? Math.round(
+                      ((pricing.originalPrice - pricing.currentPrice) /
+                        pricing.originalPrice) *
+                        100,
+                    )
                   : 0
-              
+              const expiryDate = variation.salePriceExpiresAt
+                ? new Date(variation.salePriceExpiresAt)
+                : null
+              const hasExpiry =
+                !!expiryDate && !Number.isNaN(expiryDate.getTime())
+
               return (
                 <button
                   key={variation.name}
                   className={`w-full px-4 py-3 border rounded-lg text-sm sm:text-base transition-all text-left ${
-                    selectedVariation === variation.name 
-                      ? 'border-purple-500 bg-purple-500/20 text-white ring-2 ring-purple-500' 
+                    selectedVariation === variation.name
+                      ? 'border-purple-500 bg-purple-500/20 text-white ring-2 ring-purple-500'
                       : 'border-gray-600 bg-gray-800/50 hover:border-purple-400 hover:bg-gray-800'
                   }`}
                   onClick={() => setSelectedVariation(variation.name)}
                 >
-                  const expiryDate = variation.salePriceExpiresAt
-                    ? new Date(variation.salePriceExpiresAt)
-                    : null
-                  const hasExpiry =
-                    expiryDate && !Number.isNaN(expiryDate.getTime())
-
-                  return (
-                    <button
-                      key={variation.name}
-                      className={`w-full px-4 py-3 border rounded-lg text-sm sm:text-base transition-all text-left ${
-                        selectedVariation === variation.name 
-                          ? 'border-purple-500 bg-purple-500/20 text-white ring-2 ring-purple-500' 
-                          : 'border-gray-600 bg-gray-800/50 hover:border-purple-400 hover:bg-gray-800'
-                      }`}
-                      onClick={() => setSelectedVariation(variation.name)}
-                    >
-                      <div className='flex justify-between items-center'>
+                  <div className='flex justify-between items-center'>
                     <div className='flex-1'>
                       <span className='font-medium'>{variation.name}</span>
                       {hasDiscount && (
@@ -139,18 +132,24 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                           {pricing.originalPrice.toFixed(2)} EGP
                         </div>
                       )}
-                      <div className={`font-bold ${selectedVariation === variation.name ? 'text-purple-300' : 'text-purple-400'}`}>
+                      <div
+                        className={`font-bold ${
+                          selectedVariation === variation.name
+                            ? 'text-purple-300'
+                            : 'text-purple-400'
+                        }`}
+                      >
                         {pricing.currentPrice.toFixed(2)} EGP
                       </div>
                     </div>
                   </div>
-                      {hasDiscount && hasExpiry && (
-                        <p className='text-xs text-gray-500 mt-1'>
-                          Offer ends {expiryDate.toLocaleString()}
-                        </p>
-                      )}
-                    </button>
-                  )
+                  {hasDiscount && hasExpiry && (
+                    <p className='text-xs text-gray-500 mt-1'>
+                      Offer ends {expiryDate?.toLocaleString()}
+                    </p>
+                  )}
+                </button>
+              )
             })}
           </div>
         </div>
