@@ -31,7 +31,7 @@ import { IProductInput } from '@/types'
 import { UploadButton } from '@/lib/uploadthing'
 import { ProductInputSchema, ProductUpdateSchema } from '@/lib/validator'
 import { Checkbox } from '@/components/ui/checkbox'
-import { toSlug, toSlugArabic } from '@/lib/utils'
+import { getVariationPricing, toSlug, toSlugArabic } from '@/lib/utils'
 import { useLoading } from '@/hooks/use-loading'
 import { LoadingSpinner } from '@/components/shared/loading-overlay'
 
@@ -86,6 +86,22 @@ const getVariationOptions = (platformType?: string, productCategory?: string): s
   return []
 }
 
+const toInputDateTimeValue = (value?: string | null) => {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  const tzOffset = date.getTimezoneOffset()
+  const localDate = new Date(date.getTime() - tzOffset * 60000)
+  return localDate.toISOString().slice(0, 16)
+}
+
+const toISODateTime = (value?: string) => {
+  if (!value) return undefined
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return undefined
+  return date.toISOString()
+}
+
 const ProductForm = ({
   type,
   product,
@@ -119,6 +135,19 @@ const ProductForm = ({
       ? product.variations.reduce((acc: any, v: any) => ({ ...acc, [v.name]: v.originalPrice || 0 }), {})
       : {}
   )
+  const [variationSaleExpiry, setVariationSaleExpiry] = useState<{ [key: string]: string }>(
+    product?.variations && Array.isArray(product.variations)
+      ? product.variations.reduce((acc: any, v: any) => {
+          if (v.salePriceExpiresAt) {
+            const inputValue = toInputDateTimeValue(v.salePriceExpiresAt)
+            if (inputValue) {
+              acc[v.name] = inputValue
+            }
+          }
+          return acc
+        }, {} as { [key: string]: string })
+      : {}
+  )
   
   // Check if a variation should have dual pricing (original + discounted)
   const shouldHaveDualPricing = (variationName: string) => {
@@ -136,6 +165,54 @@ const ProductForm = ({
     shouldFocusError: false,
     shouldUnregister: false,
   })
+
+  const buildVariationsPayload = (
+    selectedSet: Set<string>,
+    pricesMap: Record<string, number>,
+    originalMap: Record<string, number>,
+    expiryMap: Record<string, string>
+  ) => {
+    return Array.from(selectedSet)
+      .map((name) => {
+        const price = pricesMap[name] || 0
+        if (!price || price <= 0) return null
+        const variation: any = {
+          name,
+          price,
+        }
+        if (shouldHaveDualPricing(name) && originalMap[name]) {
+          variation.originalPrice = originalMap[name]
+          const expiryInputValue = expiryMap[name]
+          const isoExpiry = toISODateTime(expiryInputValue)
+          if (isoExpiry) {
+            variation.salePriceExpiresAt = isoExpiry
+          }
+        }
+        return variation
+      })
+      .filter((v): v is { name: string; price: number; originalPrice?: number; salePriceExpiresAt?: string } => v !== null)
+  }
+
+  const updateFormVariationsState = (
+    selectedSet: Set<string>,
+    pricesMap: Record<string, number>,
+    originalMap: Record<string, number>,
+    expiryMap: Record<string, string>
+  ) => {
+    const variationsPayload = buildVariationsPayload(selectedSet, pricesMap, originalMap, expiryMap)
+    form.setValue('variations', variationsPayload)
+
+    if (variationsPayload.length > 0) {
+      const effectivePrices = variationsPayload.map((variation) => {
+        const pricing = getVariationPricing(variation)
+        return pricing.currentPrice || 0
+      })
+      const minPrice = Math.min(...effectivePrices)
+      const maxPrice = Math.max(...effectivePrices)
+      form.setValue('price', minPrice)
+      form.setValue('listPrice', maxPrice)
+    }
+  }
 
   // Fetch categories when component mounts
   useEffect(() => {
@@ -419,44 +496,24 @@ const ProductForm = ({
                           checked={isSelected}
                           onCheckedChange={(checked) => {
                             const newSelected = new Set(selectedVariations)
+                            const newPrices = { ...variationPrices }
+                            const newOriginalPrices = { ...variationOriginalPrices }
+                            const newExpiryDates = { ...variationSaleExpiry }
+
                             if (checked) {
                               newSelected.add(variation)
                             } else {
                               newSelected.delete(variation)
-                              // Remove prices when unchecked
-                              const newPrices = { ...variationPrices }
-                              const newOriginalPrices = { ...variationOriginalPrices }
                               delete newPrices[variation]
                               delete newOriginalPrices[variation]
-                              setVariationPrices(newPrices)
-                              setVariationOriginalPrices(newOriginalPrices)
+                              delete newExpiryDates[variation]
                             }
+
                             setSelectedVariations(newSelected)
-                            
-                            // Update form variations
-                            const variations = Array.from(newSelected)
-                              .map(name => {
-                                const variation: any = {
-                                  name,
-                                  price: variationPrices[name] || 0,
-                                }
-                                // Only add originalPrice for variations that should have dual pricing
-                                if (shouldHaveDualPricing(name) && variationOriginalPrices[name]) {
-                                  variation.originalPrice = variationOriginalPrices[name]
-                                }
-                                return variation
-                              })
-                              .filter(v => v.price > 0)
-                            form.setValue('variations', variations)
-                            
-                            // Update main price fields with min/max
-                            if (variations.length > 0) {
-                              const prices = variations.map(v => v.price)
-                              const minPrice = Math.min(...prices)
-                              const maxPrice = Math.max(...prices)
-                              form.setValue('price', minPrice)
-                              form.setValue('listPrice', maxPrice)
-                            }
+                            setVariationPrices(newPrices)
+                            setVariationOriginalPrices(newOriginalPrices)
+                            setVariationSaleExpiry(newExpiryDates)
+                            updateFormVariationsState(newSelected, newPrices, newOriginalPrices, newExpiryDates)
                           }}
                         />
                         <label 
@@ -482,79 +539,54 @@ const ProductForm = ({
                                     const originalPrice = parseFloat(e.target.value) || 0
                                     const newOriginalPrices = { ...variationOriginalPrices, [variation]: originalPrice }
                                     setVariationOriginalPrices(newOriginalPrices)
-                                    
-                                    // Update form variations
-                                    const variations = Array.from(selectedVariations)
-                                      .map(name => {
-                                        const variation: any = {
-                                          name,
-                                          price: variationPrices[name] || 0,
-                                        }
-                                        // Only add originalPrice for variations that should have dual pricing
-                                        if (shouldHaveDualPricing(name) && newOriginalPrices[name]) {
-                                          variation.originalPrice = newOriginalPrices[name]
-                                        }
-                                        return variation
-                                      })
-                                      .filter(v => v.price > 0)
-                                    form.setValue('variations', variations)
-                                    
-                                    // Update main price fields with min/max
-                                    if (variations.length > 0) {
-                                      const prices = variations.map(v => v.price)
-                                      const minPrice = Math.min(...prices)
-                                      const maxPrice = Math.max(...prices)
-                                      form.setValue('price', minPrice)
-                                      form.setValue('listPrice', maxPrice)
-                                    }
+                                    updateFormVariationsState(selectedVariations, variationPrices, newOriginalPrices, variationSaleExpiry)
                                   }}
                                   className='border-gray-700 bg-gray-800 text-gray-200'
                                 />
                               </div>
-                              <div>
-                                <label className='text-gray-400 text-sm mb-2 block'>Discounted Price (EGP)</label>
-                                <Input
-                                  type='number'
-                                  step='0.01'
-                                  placeholder='Enter discounted price'
-                                  value={variationPrices[variation] || ''}
-                                  onChange={(e) => {
-                                    const price = parseFloat(e.target.value) || 0
-                                    const newPrices = { ...variationPrices, [variation]: price }
-                                    setVariationPrices(newPrices)
-                                    
-                                    // Update form variations
-                                    const variations = Array.from(selectedVariations)
-                                      .map(name => {
-                                        const variation: any = {
-                                          name,
-                                          price: newPrices[name] || 0,
-                                        }
-                                        // Only add originalPrice for variations that should have dual pricing
-                                        if (shouldHaveDualPricing(name) && variationOriginalPrices[name]) {
-                                          variation.originalPrice = variationOriginalPrices[name]
-                                        }
-                                        return variation
-                                      })
-                                      .filter(v => v.price > 0)
-                                    form.setValue('variations', variations)
-                                    
-                                    // Update main price fields with min/max
-                                    if (variations.length > 0) {
-                                      const prices = variations.map(v => v.price)
-                                      const minPrice = Math.min(...prices)
-                                      const maxPrice = Math.max(...prices)
-                                      form.setValue('price', minPrice)
-                                      form.setValue('listPrice', maxPrice)
-                                    }
-                                  }}
-                                  className='border-gray-700 bg-gray-800 text-gray-200'
-                                />
-                                {variationOriginalPrices[variation] > 0 && variationPrices[variation] > 0 && variationPrices[variation] < variationOriginalPrices[variation] && (
-                                  <p className='text-xs text-green-400 mt-1'>
-                                    {Math.round(((variationOriginalPrices[variation] - variationPrices[variation]) / variationOriginalPrices[variation]) * 100)}% discount
+                              <div className='grid gap-3 sm:grid-cols-2'>
+                                <div>
+                                  <label className='text-gray-400 text-sm mb-2 block'>Discounted Price (EGP)</label>
+                                  <Input
+                                    type='number'
+                                    step='0.01'
+                                    placeholder='Enter discounted price'
+                                    value={variationPrices[variation] || ''}
+                                    onChange={(e) => {
+                                      const price = parseFloat(e.target.value) || 0
+                                      const newPrices = { ...variationPrices, [variation]: price }
+                                      setVariationPrices(newPrices)
+                                      updateFormVariationsState(selectedVariations, newPrices, variationOriginalPrices, variationSaleExpiry)
+                                    }}
+                                    className='border-gray-700 bg-gray-800 text-gray-200'
+                                  />
+                                  {variationOriginalPrices[variation] > 0 && variationPrices[variation] > 0 && variationPrices[variation] < variationOriginalPrices[variation] && (
+                                    <p className='text-xs text-green-400 mt-1'>
+                                      {Math.round(((variationOriginalPrices[variation] - variationPrices[variation]) / variationOriginalPrices[variation]) * 100)}% discount
+                                    </p>
+                                  )}
+                                </div>
+                                <div>
+                                  <label className='text-gray-400 text-sm mb-2 block'>Discount Expiry (optional)</label>
+                                  <Input
+                                    type='datetime-local'
+                                    value={variationSaleExpiry[variation] || ''}
+                                    onChange={(e) => {
+                                      const newExpiryDates = { ...variationSaleExpiry }
+                                      if (e.target.value) {
+                                        newExpiryDates[variation] = e.target.value
+                                      } else {
+                                        delete newExpiryDates[variation]
+                                      }
+                                      setVariationSaleExpiry(newExpiryDates)
+                                      updateFormVariationsState(selectedVariations, variationPrices, variationOriginalPrices, newExpiryDates)
+                                    }}
+                                    className='border-gray-700 bg-gray-800 text-gray-200'
+                                  />
+                                  <p className='text-xs text-gray-500 mt-1'>
+                                    Leave empty if the discounted price should not expire.
                                   </p>
-                                )}
+                                </div>
                               </div>
                             </>
                           ) : (
@@ -569,31 +601,7 @@ const ProductForm = ({
                                   const price = parseFloat(e.target.value) || 0
                                   const newPrices = { ...variationPrices, [variation]: price }
                                   setVariationPrices(newPrices)
-                                  
-                                  // Update form variations
-                                  const variations = Array.from(selectedVariations)
-                                    .map(name => {
-                                      const variation: any = {
-                                        name,
-                                        price: newPrices[name] || 0,
-                                      }
-                                      // Only add originalPrice for variations that should have dual pricing
-                                      if (shouldHaveDualPricing(name) && variationOriginalPrices[name]) {
-                                        variation.originalPrice = variationOriginalPrices[name]
-                                      }
-                                      return variation
-                                    })
-                                    .filter(v => v.price > 0)
-                                  form.setValue('variations', variations)
-                                  
-                                  // Update main price fields with min/max
-                                  if (variations.length > 0) {
-                                    const prices = variations.map(v => v.price)
-                                    const minPrice = Math.min(...prices)
-                                    const maxPrice = Math.max(...prices)
-                                    form.setValue('price', minPrice)
-                                    form.setValue('listPrice', maxPrice)
-                                  }
+                                    updateFormVariationsState(selectedVariations, newPrices, variationOriginalPrices, variationSaleExpiry)
                                 }}
                                 className='border-gray-700 bg-gray-800 text-gray-200'
                               />

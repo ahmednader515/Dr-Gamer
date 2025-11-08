@@ -32,6 +32,16 @@ export const ProductVariationSchema = z.object({
   name: z.string().min(1, 'Variation name is required'),
   price: Price('Variation price'),
   originalPrice: z.coerce.number().nonnegative('Original price must be non-negative').optional().default(0),
+  salePriceExpiresAt: z
+    .string()
+    .optional()
+    .refine(
+      (value) => {
+        if (!value || value.trim() === '') return true
+        return !Number.isNaN(Date.parse(value))
+      },
+      { message: 'Expiry date must be a valid date' }
+    ),
 })
 
 export const ProductInputSchema = z.object({
@@ -275,6 +285,17 @@ export const SiteCurrencySchema = z.object({
 export const PaymentMethodSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   commission: z.coerce.number().min(0, 'Commission must be at least 0'),
+  type: z.enum(['wallet', 'bank', 'link', 'instapay', 'other']).optional(),
+  label: z.string().min(1, 'Label is required').optional(),
+  number: z.string().min(1, 'Reference value is required').optional(),
+  icon: z.string().min(1, 'Icon is required').optional(),
+  userName: z.string().min(1, 'Username is required').optional(),
+  link: z.string().url('Link must be a valid URL').optional(),
+  linkLabel: z.string().min(1, 'Link label is required').optional(),
+  accountHolder: z.string().min(1, 'Account holder is required').optional(),
+  iban: z.string().min(1, 'IBAN is required').optional(),
+  swift: z.string().min(1, 'Swift code is required').optional(),
+  notes: z.string().min(1, 'Notes are required').optional(),
 })
 
 export const DeliveryDateSchema = z.object({

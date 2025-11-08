@@ -103,6 +103,124 @@ export function formatNumber(number: number) {
 export const round2 = (num: number) =>
   Math.round((num + Number.EPSILON) * 100) / 100
 
+type CartItemForPromo = {
+  product?: string
+  productId?: string
+  id?: string
+  price: number
+  quantity: number
+}
+
+type PromoApplicability = {
+  discountPercent: number
+  applicableProducts?: Array<{
+    productId: string
+    maxDiscountAmount?: number | null
+  }>
+}
+
+export function calculatePromoDiscount(
+  cartItems: CartItemForPromo[] | undefined,
+  promo: PromoApplicability | null,
+) {
+  if (!Array.isArray(cartItems) || !promo || !promo.discountPercent) {
+    return { discount: 0, eligibleItems: [] as string[] }
+  }
+
+  const percent = Number(promo.discountPercent)
+  if (!percent || Number.isNaN(percent)) {
+    return { discount: 0, eligibleItems: [] as string[] }
+  }
+
+  const applicableProducts = Array.isArray(promo.applicableProducts)
+    ? promo.applicableProducts
+    : []
+  const restrictToSpecificProducts = applicableProducts.length > 0
+
+  let totalDiscount = 0
+  const eligibleItems: string[] = []
+
+  cartItems.forEach((item) => {
+    const quantity = Number(item?.quantity ?? 0)
+    const price = Number(item?.price ?? 0)
+
+    if (!price || !quantity) return
+
+    const productId = String(
+      item.product ?? item.productId ?? item.id ?? '',
+    ).trim()
+    if (!productId) return
+
+    const productConfig = applicableProducts.find(
+      (product) => product.productId === productId,
+    )
+
+    if (restrictToSpecificProducts && !productConfig) {
+      return
+    }
+
+    const lineSubtotal = price * quantity
+    let lineDiscount = (lineSubtotal * percent) / 100
+
+    if (
+      productConfig &&
+      productConfig.maxDiscountAmount !== null &&
+      productConfig.maxDiscountAmount !== undefined
+    ) {
+      const cap = Number(productConfig.maxDiscountAmount)
+      if (!Number.isNaN(cap) && cap >= 0) {
+        lineDiscount = Math.min(lineDiscount, cap)
+      }
+    }
+
+    if (lineDiscount > 0) {
+      totalDiscount += lineDiscount
+      eligibleItems.push(productId)
+    }
+  })
+
+  if (totalDiscount < 0) totalDiscount = 0
+
+  return {
+    discount: round2(totalDiscount),
+    eligibleItems,
+  }
+}
+
+export const isVariationSaleActive = (variation: any) => {
+  const original = Number(variation?.originalPrice) || 0
+  const sale = Number(variation?.price) || 0
+  if (!(original > 0 && sale > 0 && sale < original)) {
+    return false
+  }
+  const expiresAt = variation?.salePriceExpiresAt
+  if (!expiresAt) return true
+  const expiryDate = new Date(expiresAt)
+  if (Number.isNaN(expiryDate.getTime())) return true
+  return expiryDate.getTime() > Date.now()
+}
+
+export const getVariationPricing = (variation: any) => {
+  const original = Number(variation?.originalPrice) || 0
+  const sale = Number(variation?.price) || 0
+  const saleActive = isVariationSaleActive(variation)
+
+  if (saleActive) {
+    return {
+      currentPrice: sale,
+      originalPrice: original,
+      saleActive: true,
+    }
+  }
+
+  const fallbackPrice = original > 0 ? original : sale
+  return {
+    currentPrice: fallbackPrice,
+    originalPrice: 0,
+    saleActive: false,
+  }
+}
+
 export const generateId = () =>
   Array.from({ length: 24 }, () => Math.floor(Math.random() * 10)).join('')
 

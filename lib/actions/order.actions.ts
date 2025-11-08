@@ -1,7 +1,7 @@
 'use server'
 
 import { Cart, OrderItem, ShippingAddress } from '@/types'
-import { formatError, round2 } from '../utils'
+import { formatError, round2, calculatePromoDiscount } from '../utils'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
@@ -95,15 +95,70 @@ export const createOrderFromCart = async (
     deliveryDateIndex: clientSideCart.deliveryDateIndex,
   })
   
-  // Apply discount to total price if promo code exists
-  let finalTotal = deliveryCalc.totalPrice
-  if (clientSideCart.discountAmount) {
-    finalTotal = round2(deliveryCalc.totalPrice - clientSideCart.discountAmount)
+  const cartItems = clientSideCart.items || []
+
+  let promoDiscountAmount = 0
+  let promoDiscountPercent: number | undefined
+
+  if (clientSideCart.promoCode) {
+    const promo = await prisma.promoCode.findUnique({
+      where: { code: clientSideCart.promoCode.toUpperCase() },
+      include: { applicableProducts: true },
+    })
+
+    if (!promo) {
+      throw new Error('Promo code is invalid')
+    }
+
+    if (!promo.isActive) {
+      throw new Error('Promo code is not active')
+    }
+
+    if (promo.expiresAt && promo.expiresAt < new Date()) {
+      throw new Error('Promo code has expired')
+    }
+
+    if (promo.usageLimit && promo.usageCount >= promo.usageLimit) {
+      throw new Error('Promo code usage limit reached')
+    }
+
+    const promoConfig = {
+      discountPercent: promo.discountPercent,
+      applicableProducts: promo.applicableProducts.map((product) => ({
+        productId: product.productId,
+        maxDiscountAmount: product.maxDiscountAmount
+          ? Number(product.maxDiscountAmount)
+          : null,
+      })),
+    }
+
+    const { discount, eligibleItems } = calculatePromoDiscount(
+      cartItems,
+      promoConfig,
+    )
+
+    if (
+      promoConfig.applicableProducts.length > 0 &&
+      eligibleItems.length === 0
+    ) {
+      throw new Error('Promo code does not apply to the selected products')
+    }
+
+    promoDiscountAmount = discount
+    promoDiscountPercent = promo.discountPercent
   }
-  
+
+  const totalBeforeDiscount = deliveryCalc.totalPrice
+  const finalTotal = round2(
+    Math.max(totalBeforeDiscount - promoDiscountAmount, 0),
+  )
+
   const cart = {
     ...clientSideCart,
     ...deliveryCalc,
+    discountAmount:
+      promoDiscountAmount > 0 ? round2(promoDiscountAmount) : undefined,
+    discountPercent: promoDiscountPercent,
     totalPrice: finalTotal,
   }
 
@@ -135,7 +190,7 @@ export const createOrderFromCart = async (
     totalPrice: cart.totalPrice,
     promoCode: cart.promoCode,
     discountPercent: cart.discountPercent,
-    discountAmount: cart.discountAmount ? round2(cart.discountAmount) : undefined,
+    discountAmount: cart.discountAmount,
     expectedDeliveryDate: cart.expectedDeliveryDate ? new Date(cart.expectedDeliveryDate) : new Date(),
   })
   
@@ -177,6 +232,7 @@ export const createOrderFromCart = async (
           isAddToOwnAccount: (item as any).isAddToOwnAccount ?? false,
           accountUsername: (item as any).accountUsername,
           accountPassword: (item as any).accountPassword,
+          accountBackupCode: (item as any).accountBackupCode,
         }))
       },
       shippingAddress: orderData.shippingAddress ? {
@@ -199,7 +255,7 @@ export const createOrderFromCart = async (
   })
 
   // Increment promo code usage count if used
-  if (orderData.promoCode) {
+  if (orderData.promoCode && promoDiscountAmount > 0) {
     await prisma.promoCode.update({
       where: { code: orderData.promoCode },
       data: { usageCount: { increment: 1 } }

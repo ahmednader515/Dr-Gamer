@@ -28,10 +28,14 @@ export default async function SettingsPage() {
       
       <Tabs defaultValue="carousel" className="w-full" dir="ltr">
         <div className="mb-6">
-          <TabsList className="grid w-full grid-cols-2 gap-1 h-auto">
+          <TabsList className="grid w-full grid-cols-1 gap-1 h-auto sm:grid-cols-3">
             <TabsTrigger value="carousel" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
               <span className="hidden sm:inline">Carousel</span>
               <span className="sm:hidden">Carousel</span>
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
+              <span className="hidden sm:inline">Payment Methods</span>
+              <span className="sm:hidden">Payments</span>
             </TabsTrigger>
             <TabsTrigger value="categories" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
               <span className="hidden sm:inline">Manage Categories</span>
@@ -42,6 +46,10 @@ export default async function SettingsPage() {
         
         <TabsContent value="carousel" className="space-y-6">
           <SettingsTabsContent setting={setting} tab="carousel" />
+        </TabsContent>
+
+        <TabsContent value="payments" className="space-y-6">
+          <SettingsTabsContent setting={setting} tab="payments" />
         </TabsContent>
         
         <TabsContent value="categories" className="space-y-6">

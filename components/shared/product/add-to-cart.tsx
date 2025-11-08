@@ -11,6 +11,7 @@ import { IProduct } from '@/types'
 import { useLoading } from '@/hooks/use-loading'
 import { LoadingSpinner } from '@/components/shared/loading-overlay'
 import SelectVariant from './select-variant'
+import { getVariationPricing } from '@/lib/utils'
 
 interface AddToCartProps {
   product: IProduct
@@ -29,7 +30,12 @@ export default function AddToCart({ product, className }: AddToCartProps) {
   const hasVariations = variations.length > 0
   const selectedVariation = (product as any).selectedVariation || ''
   const selectedPrice = selectedVariation && hasVariations
-    ? variations.find((v: any) => v.name === selectedVariation)?.price || Number(product.price)
+    ? (() => {
+        const variation = variations.find((v: any) => v.name === selectedVariation)
+        if (!variation) return Number(product.price)
+        const pricing = getVariationPricing(variation)
+        return pricing.currentPrice || Number(product.price)
+      })()
     : Number(product.price)
 
   const handleQuantityChange = (value: number) => {

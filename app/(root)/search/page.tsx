@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
+import { Prisma } from '@prisma/client'
 import ProductCard from '@/components/shared/product/product-card'
 import ProductSortSelector from '@/components/shared/product/product-sort-selector'
 import SearchFilters from '@/components/shared/search-filters'
@@ -134,17 +135,37 @@ async function SearchHeader({ params, translations }: {
   }
   
   if (minPrice || maxPrice) {
-    where.price = { }
+    const priceFilter: any = {}
     if (minPrice) {
-      where.price.gte = parseFloat(minPrice)
+      const parsed = Number(minPrice)
+      if (!Number.isNaN(parsed)) {
+        priceFilter.gte = new Prisma.Decimal(parsed.toFixed(2))
+      }
     }
     if (maxPrice) {
-      where.price.lte = parseFloat(maxPrice)
+      const parsed = Number(maxPrice)
+      if (!Number.isNaN(parsed)) {
+        priceFilter.lte = new Prisma.Decimal(parsed.toFixed(2))
+      }
+    }
+    if (Object.keys(priceFilter).length > 0) {
+      where.price = priceFilter
     }
   }
 
   // Get the total count
   const totalProducts = await (prisma as any).product.count({ where })
+
+  if (totalProducts === 0) {
+    return (
+      <div className='text-center py-8 sm:py-12'>
+        <h3 className='text-base sm:text-lg font-semibold mb-2'>{translations.noProductsFound}</h3>
+        <p className='text-sm sm:text-base text-muted-foreground px-4'>
+          {translations.tryAdjustingSearch}
+        </p>
+      </div>
+    )
+  }
 
   // Determine what to display in the heading
   let displayTitle = ''
@@ -255,12 +276,21 @@ async function ProductResults({ params, translations }: {
   }
   
   if (minPrice || maxPrice) {
-    where.price = { }
+    const priceFilter: any = {}
     if (minPrice) {
-      where.price.gte = parseFloat(minPrice)
+      const parsed = Number(minPrice)
+      if (!Number.isNaN(parsed)) {
+        priceFilter.gte = new Prisma.Decimal(parsed.toFixed(2))
+      }
     }
     if (maxPrice) {
-      where.price.lte = parseFloat(maxPrice)
+      const parsed = Number(maxPrice)
+      if (!Number.isNaN(parsed)) {
+        priceFilter.lte = new Prisma.Decimal(parsed.toFixed(2))
+      }
+    }
+    if (Object.keys(priceFilter).length > 0) {
+      where.price = priceFilter
     }
   }
 
@@ -306,6 +336,7 @@ async function ProductResults({ params, translations }: {
       price: Number(product.price),
       listPrice: Number(product.listPrice),
       originalPrice: Number(product.originalPrice),
+      itemsPrice: Number(product.itemsPrice ?? product.price),
       avgRating: Number(product.avgRating),
       numReviews: Number(product.numReviews),
       variations: variations,
@@ -314,9 +345,50 @@ async function ProductResults({ params, translations }: {
     }
   })
 
-  const totalPages = Math.ceil(totalProducts / limit)
-  const from = skip + 1
-  const to = Math.min(skip + limit, totalProducts)
+  const priceMinValue = minPrice ? Number(minPrice) : undefined
+  const priceMaxValue = maxPrice ? Number(maxPrice) : undefined
+
+  const filteredProducts = normalizedProducts.filter((product: any) => {
+    if (priceMinValue === undefined && priceMaxValue === undefined) {
+      return true
+    }
+
+    const candidatePrices: number[] = []
+    const basePrice = Number(product.price)
+    if (!Number.isNaN(basePrice)) {
+      candidatePrices.push(basePrice)
+    }
+
+    if (product.variations && Array.isArray(product.variations)) {
+      product.variations.forEach((variation: any) => {
+        const variationPrice = Number(variation.price)
+        if (!Number.isNaN(variationPrice)) {
+          candidatePrices.push(variationPrice)
+        }
+      })
+    }
+
+    if (candidatePrices.length === 0) {
+      return false
+    }
+
+    return candidatePrices.some((price) => {
+      if (priceMinValue !== undefined && price < priceMinValue) {
+        return false
+      }
+      if (priceMaxValue !== undefined && price > priceMaxValue) {
+        return false
+      }
+      return true
+    })
+  })
+
+  const resultProducts = filteredProducts
+  const hasResults = resultProducts.length > 0
+  const displayTotalProducts = hasResults ? totalProducts : 0
+  const totalPages = hasResults ? Math.max(1, Math.ceil(displayTotalProducts / limit)) : 1
+  const from = hasResults ? skip + 1 : 0
+  const to = hasResults ? Math.min(skip + resultProducts.length, displayTotalProducts) : 0
 
   return (
     <>
@@ -333,11 +405,11 @@ async function ProductResults({ params, translations }: {
           params={params}
         />
         <p className='text-xs sm:text-sm text-gray-300 text-left'>
-          {translations.showing} {from}-{to} {translations.of} {totalProducts} {translations.products}
+          {translations.showing} {from}-{to} {translations.of} {displayTotalProducts} {translations.products}
         </p>
       </div>
 
-      {products.length === 0 ? (
+      {resultProducts.length === 0 ? (
         <div className='text-center py-8 sm:py-12'>
           <h3 className='text-base sm:text-lg font-semibold mb-2'>{translations.noProductsFound}</h3>
           <p className='text-sm sm:text-base text-muted-foreground px-4'>
@@ -347,7 +419,7 @@ async function ProductResults({ params, translations }: {
       ) : (
         <>
           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 mb-6 sm:mb-8 items-stretch'>
-            {normalizedProducts.map((product: any) => (
+            {resultProducts.map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -414,8 +486,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const {
     q = '',
     category = '',
+    minPrice = '',
+    maxPrice = '',
     platformType = '',
     productCategory = '',
+    tag = '',
   } = params
 
   // Check if we have any valid search criteria
@@ -427,9 +502,24 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const cats = category.includes(',') ? category.split(',') : [category]
     hasCategory = cats.some(c => c.trim() !== '' && c.trim() !== 'all')
   }
+
+  const hasPriceFilter =
+    (typeof minPrice === 'string' && minPrice.trim() !== '') ||
+    (typeof maxPrice === 'string' && maxPrice.trim() !== '')
+
+  const hasTagFilter = Array.isArray(tag)
+    ? tag.some((value) => value && value !== '' && value !== 'all')
+    : Boolean(tag && tag !== '' && tag !== 'all')
   
   // Allow "all" as a valid search to show all products
-  if (!q && !hasCategory && !platformType && !productCategory && category !== 'all') {
+  if (
+    !q &&
+    !hasCategory &&
+    !platformType &&
+    !productCategory &&
+    !hasPriceFilter &&
+    !hasTagFilter
+  ) {
     notFound()
   }
 

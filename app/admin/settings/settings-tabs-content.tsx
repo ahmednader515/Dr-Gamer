@@ -5,12 +5,14 @@ import { toast } from '@/hooks/use-toast'
 import { Save } from 'lucide-react'
 import { updateSetting } from '@/lib/actions/setting.actions'
 import data from '@/lib/data'
+import { PaymentMethod } from '@/types'
 
 // Import all settings components
 import CarouselSettings from './carousel-settings'
 import DeliverySettings from './delivery-settings'
 import TaxSettings from './tax-settings'
 import PricingSettings from './pricing-settings'
+import PaymentSettings from './payment-settings'
 
 interface CarouselItem {
   title: string
@@ -49,7 +51,128 @@ interface ProductPricing {
 
 interface SettingsTabsContentProps {
   setting: any
-  tab: 'carousel' | 'delivery' | 'tax' | 'pricing'
+  tab: 'carousel' | 'delivery' | 'tax' | 'pricing' | 'payments'
+}
+
+const PAYMENT_METHOD_TYPES = ['wallet', 'instapay', 'bank', 'link', 'other'] as const
+type PaymentMethodType = (typeof PAYMENT_METHOD_TYPES)[number]
+
+const normalizeKey = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[_\-]+/g, '')
+    .replace(/[^\p{L}\p{N}]/gu, '')
+
+const templateMap = (() => {
+  const map = new Map<string, Partial<PaymentMethod>>()
+  data.settings[0].availablePaymentMethods.forEach((method) => {
+    map.set(normalizeKey(method.name ?? ''), method)
+  })
+
+  const aliasPairs: Array<[string, string]> = [
+    ['فودافون كاش', 'Vodafone Cash'],
+    ['فودافونكاش', 'Vodafone Cash'],
+    ['vodafone', 'Vodafone Cash'],
+    ['انستا باي', 'InstaPay'],
+    ['انستاباي', 'InstaPay'],
+    ['insta pay', 'InstaPay'],
+    ['تيلدا', 'Telda'],
+    ['الحساب البنكي', 'Bank Account'],
+    ['حساب بنكي', 'Bank Account'],
+    ['bank', 'Bank Account'],
+  ]
+
+  aliasPairs.forEach(([alias, reference]) => {
+    const template = map.get(normalizeKey(reference))
+    if (template) {
+      map.set(normalizeKey(alias), template)
+    }
+  })
+
+  return map
+})()
+
+const fallbackByType: Record<PaymentMethodType, Partial<PaymentMethod>> = {
+  wallet: {
+    type: 'wallet',
+    label: 'Wallet Number / Handle',
+    icon: '📱',
+    notes:
+      'Transfer the amount to the wallet number, then add your payment number and upload the receipt.',
+  },
+  instapay: {
+    type: 'instapay',
+    label: 'InstaPay Handle',
+    linkLabel: 'Send via InstaPay',
+    icon: '💳',
+    notes:
+      'Send the payment through InstaPay using the handle above, then upload the screenshot.',
+  },
+  bank: {
+    type: 'bank',
+    label: 'Bank Account Number',
+    icon: '🏦',
+    notes:
+      'Complete the bank transfer to the account above and provide the transaction details.',
+  },
+  link: {
+    type: 'link',
+    label: 'Payment Link',
+    linkLabel: 'Pay Now',
+    icon: '🔗',
+    notes: 'Use the payment link above to complete the transaction.',
+  },
+  other: {
+    type: 'other',
+    label: 'Payment Reference',
+    notes:
+      'Follow the instructions provided by the store to complete your payment.',
+  },
+}
+
+const sanitizeField = (value?: string | null) =>
+  value && value.trim().length ? value : undefined
+
+const normalizePaymentMethod = (method: PaymentMethod): PaymentMethod => {
+  const key = normalizeKey(method.name ?? '')
+  const template = templateMap.get(key)
+
+  const rawType = sanitizeField(method.type as string | undefined)
+  const templateType = template?.type as PaymentMethodType | undefined
+  const inferredType = (rawType ??
+    templateType ??
+    fallbackByType.other.type) as PaymentMethodType
+
+  const fallback = fallbackByType[inferredType]
+
+  const pick = (field: keyof PaymentMethod): string | undefined => {
+    const fromMethod = sanitizeField(method[field] as string | undefined)
+    if (fromMethod !== undefined) return fromMethod
+    const fromTemplate = template
+      ? sanitizeField(template[field] as string | undefined)
+      : undefined
+    if (fromTemplate !== undefined) return fromTemplate
+    const fromFallback = fallback
+      ? sanitizeField(fallback[field] as string | undefined)
+      : undefined
+    return fromFallback
+  }
+
+  return {
+    ...method,
+    type: inferredType,
+    label: pick('label'),
+    number: pick('number'),
+    icon: pick('icon'),
+    userName: pick('userName'),
+    link: pick('link'),
+    linkLabel: pick('linkLabel'),
+    accountHolder: pick('accountHolder'),
+    iban: pick('iban'),
+    swift: pick('swift'),
+    notes: pick('notes'),
+  }
 }
 
 export default function SettingsTabsContent({ setting, tab }: SettingsTabsContentProps) {
@@ -89,12 +212,25 @@ export default function SettingsTabsContent({ setting, tab }: SettingsTabsConten
       },
     ],
   })
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
+  const [defaultPaymentMethod, setDefaultPaymentMethod] = useState('')
 
   // Initialize settings from props
   useEffect(() => {
     const settings = setting || data.settings[0]
     if (settings) {
       setCarouselItems(settings.carousels || [])
+      if (Array.isArray(settings.availablePaymentMethods)) {
+        const normalizedMethods = settings.availablePaymentMethods.map(
+          (method: PaymentMethod) => normalizePaymentMethod(method),
+        )
+        setPaymentMethods(normalizedMethods)
+      }
+      if (settings.defaultPaymentMethod) {
+        setDefaultPaymentMethod(settings.defaultPaymentMethod)
+      } else if (settings.availablePaymentMethods?.length) {
+        setDefaultPaymentMethod(settings.availablePaymentMethods[0].name)
+      }
       if (settings.deliverySettings) {
         const delivery = settings.deliverySettings
         if ('deliveryTimeHours' in delivery) {
@@ -119,12 +255,68 @@ export default function SettingsTabsContent({ setting, tab }: SettingsTabsConten
   const handleSubmit = async () => {
     setIsLoading(true)
     
+    const allowedTypes = new Set<string>(PAYMENT_METHOD_TYPES)
+
+    const sanitizedPaymentMethods = paymentMethods
+      .map((method) => {
+        const trimmedName = method.name?.trim() ?? ''
+        const trim = (value?: string | null) => {
+          const result = value?.trim()
+          return result ? result : undefined
+        }
+        const typeValue =
+          allowedTypes.has((method.type as string) ?? '')
+            ? (method.type as string)
+            : 'other'
+
+        return {
+          name: trimmedName,
+          commission: Number.isFinite(method.commission)
+            ? method.commission
+            : 0,
+          type: typeValue as PaymentMethod['type'],
+          label: trim(method.label),
+          number: trim(method.number),
+          icon: trim(method.icon),
+          userName: trim(method.userName),
+          link: trim(method.link),
+          linkLabel: trim(method.linkLabel),
+          accountHolder: trim(method.accountHolder),
+          iban: trim(method.iban),
+          swift: trim(method.swift),
+          notes: trim(method.notes),
+        }
+      })
+      .filter((method) => method.name)
+
+    const resolvedDefaultPaymentMethod =
+      sanitizedPaymentMethods.find((method) => method.name === defaultPaymentMethod)?.name ??
+      sanitizedPaymentMethods[0]?.name ??
+      ''
+
+    if (!sanitizedPaymentMethods.length) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please keep at least one payment method with a valid name.',
+        variant: 'destructive',
+      })
+      setIsLoading(false)
+      return
+    }
+
+    if (resolvedDefaultPaymentMethod !== defaultPaymentMethod) {
+      setDefaultPaymentMethod(resolvedDefaultPaymentMethod)
+    }
+    setPaymentMethods(sanitizedPaymentMethods)
+
     try {
       // Get existing settings and merge with new data
       const existingSettings = setting || data.settings[0]
       const newSetting = {
         ...existingSettings,
         carousels: carouselItems,
+        availablePaymentMethods: sanitizedPaymentMethods,
+        defaultPaymentMethod: resolvedDefaultPaymentMethod,
         deliverySettings,
         taxSettings,
         productPricing,
@@ -185,6 +377,15 @@ export default function SettingsTabsContent({ setting, tab }: SettingsTabsConten
           <PricingSettings
             productPricing={productPricing}
             onProductPricingChange={setProductPricing}
+          />
+        )
+      case 'payments':
+        return (
+          <PaymentSettings
+            paymentMethods={paymentMethods}
+            defaultPaymentMethod={defaultPaymentMethod}
+            onPaymentMethodsChange={setPaymentMethods}
+            onDefaultPaymentMethodChange={setDefaultPaymentMethod}
           />
         )
       default:

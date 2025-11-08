@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
 import useSettingStore from '@/hooks/use-setting-store'
 
@@ -8,17 +10,25 @@ export default function AppInitializer({
   children: React.ReactNode
   setting: any
 }) {
-  const [rendered, setRendered] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    setRendered(true)
+    if (!setting) {
+      setHydrated(true)
+      return
+    }
+
+    useSettingStore.setState((currentState) => ({
+      setting: {
+        ...currentState.setting,
+        ...setting,
+      },
+    }))
+
+    setHydrated(true)
   }, [setting])
 
-  if (!rendered) {
-    useSettingStore.setState({
-      setting,
-    })
-  }
+  if (!hydrated) return null
 
   return children
 }

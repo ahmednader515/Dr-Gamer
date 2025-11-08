@@ -30,9 +30,11 @@ import Link from 'next/link'
 import useCartStore from '@/hooks/use-cart-store'
 import ProductPrice from '@/components/shared/product/product-price'
 import data from '@/lib/data'
+import useSettingStore from '@/hooks/use-setting-store'
 import PromoCodeInput from './promo-code-input'
 import { z } from 'zod'
 import { UploadButton } from '@/lib/uploadthing'
+import { calculatePromoDiscount } from '@/lib/utils'
 
 const ContactInfoSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -48,38 +50,13 @@ const PaymentDetailsSchema = z.object({
 
 type PaymentDetailsFormData = z.infer<typeof PaymentDetailsSchema>
 
-// Payment method details
-const PAYMENT_INFO = {
-  'Vodafone Cash': {
-    number: '01277910038',
-    label: 'Vodafone Cash Number',
-    icon: '📱',
-  },
-  'InstaPay': {
-    number: 'mina.shk',
-    label: 'InstaPay Username',
-    icon: '💳',
-    userName: 'mina.shk@instapay',
-    link: 'https://ipn.eg/S/mina.shk/instapay/2nU1nh',
-  },
-  'Telda': {
-    number: '@minahakim3',
-    label: 'Telda Username',
-    icon: '🟢',
-    instagram: '@minahakim3',
-  },
-  'Bank Account': {
-    number: '5110333000001242',
-    label: 'Bank Account Number',
-    icon: '🏦',
-    accountHolder: 'Mina Samir Hakim',
-    iban: 'EG060002051105110333000001242',
-    swift: 'BMISEGCXXXX',
-  },
-}
-
 export default function CheckoutForm() {
-  const { site, availablePaymentMethods, defaultPaymentMethod } = data.settings[0];
+  const { setting } = useSettingStore()
+  const site = setting?.site ?? data.settings[0].site
+  const availablePaymentMethods =
+    setting?.availablePaymentMethods ?? data.settings[0].availablePaymentMethods
+  const defaultPaymentMethod =
+    setting?.defaultPaymentMethod ?? data.settings[0].defaultPaymentMethod
   const { toast } = useToast()
   const router = useRouter()
   const { isLoading: isPlacingOrder, withLoading } = useLoading()
@@ -215,12 +192,39 @@ export default function CheckoutForm() {
       })
     : []
   
-  // Promo code state
-  const [appliedPromo, setAppliedPromo] = useState<{code: string, discountPercent: number} | null>(null)
-  
-  // Calculate discounted total - discount is applied to itemsPrice only (no tax/shipping for digital products)
-  const discountAmount = appliedPromo ? (itemsPrice * appliedPromo.discountPercent / 100) : 0
+  type AppliedPromo = {
+    code: string
+    discountPercent: number
+    applicableProducts: Array<{
+      productId: string
+      productName?: string
+      maxDiscountAmount: number | null
+    }>
+  }
+
+  const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null)
+
+  const {
+    discount: discountAmount,
+    eligibleItems: eligiblePromoItems,
+  } = appliedPromo
+    ? calculatePromoDiscount(items, appliedPromo)
+    : { discount: 0, eligibleItems: [] as string[] }
+
   const finalTotal = itemsPrice - discountAmount + newAccountTax
+
+  useEffect(() => {
+    if (!appliedPromo) return
+    if (appliedPromo.applicableProducts.length === 0) return
+    if (eligiblePromoItems.length > 0) return
+
+    setAppliedPromo(null)
+    toast({
+      title: 'Promo removed',
+      description:
+        'The promo code was removed because there are no eligible products in your cart.',
+    })
+  }, [appliedPromo, eligiblePromoItems.length, toast])
 
   const handlePlaceOrder = async () => {
     if (!customerEmail || !customerPhone) {
@@ -379,6 +383,7 @@ export default function CheckoutForm() {
             onPromoRemoved={() => setAppliedPromo(null)}
             appliedPromo={appliedPromo}
             discountAmount={discountAmount}
+            cartItems={items}
           />
         </div>
 
@@ -470,7 +475,19 @@ export default function CheckoutForm() {
     </Card>
   ))
 
-  const currentPaymentInfo = paymentMethod && PAYMENT_INFO[paymentMethod as keyof typeof PAYMENT_INFO]
+  const currentPaymentInfo =
+    paymentMethod &&
+    availablePaymentMethods.find((method) => method.name === paymentMethod)
+
+  const paymentReferenceLabel =
+    currentPaymentInfo?.label ??
+    (paymentMethod ? `${paymentMethod} reference` : 'Payment reference')
+
+  const paymentNotes =
+    currentPaymentInfo?.notes ??
+    'Transfer the amount to the reference above, then enter your payment number and upload the transaction screenshot.'
+
+  const paymentLinkLabel = currentPaymentInfo?.linkLabel ?? 'Click to Send Money'
 
   return (
     <main className='max-w-6xl mx-auto highlight-link px-4 py-6 sm:py-8 pb-32 lg:pb-8' dir='ltr'>
@@ -534,6 +551,7 @@ export default function CheckoutForm() {
                   onPromoRemoved={() => setAppliedPromo(null)}
                   appliedPromo={appliedPromo}
                   discountAmount={discountAmount}
+                  cartItems={items}
                 />
               </CardContent>
             </Card>
@@ -887,30 +905,30 @@ export default function CheckoutForm() {
                         {currentPaymentInfo && (
                           <div className='bg-gray-800 border border-gray-700 rounded-lg p-4'>
                             <div className='text-lg font-bold mb-3 flex items-center gap-2'>
-                              <span>{currentPaymentInfo.icon}</span>
+                              {currentPaymentInfo.icon ? (
+                                <span>{currentPaymentInfo.icon}</span>
+                              ) : null}
                               <span>Payment Information</span>
                             </div>
-                            <div className='text-sm sm:text-base space-y-2'>
+                            <div className='text-sm sm:text-base space-y-3'>
                               {currentPaymentInfo.userName && (
                                 <div>
-                                  <p className='mb-1 text-gray-300'>
-                                    Username:
-                                  </p>
+                                  <p className='mb-1 text-gray-300'>Username:</p>
                                   <p className='text-purple-400 font-bold text-lg'>
                                     {currentPaymentInfo.userName}
                                   </p>
                                 </div>
                               )}
+
                               <div>
                                 <p className='mb-1 text-gray-300'>
-                                  {currentPaymentInfo.label}:
+                                  {paymentReferenceLabel}:
                                 </p>
                                 <p className='text-purple-400 font-bold text-lg'>
-                                  {currentPaymentInfo.number}
+                                  {currentPaymentInfo.number ?? 'Not configured yet'}
                                 </p>
                               </div>
-                              
-                              {/* InstaPay Link */}
+
                               {currentPaymentInfo.link && (
                                 <div className='mt-3'>
                                   <a
@@ -918,46 +936,40 @@ export default function CheckoutForm() {
                                     target='_blank'
                                     rel='noopener noreferrer'
                                     className='inline-flex items-center justify-center w-full px-4 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-colors border-0'
-                                    style={{
-                                      backgroundColor: '#22c55e',
-                                      color: '#ffffff',
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      e.currentTarget.style.backgroundColor = '#16a34a'
-                                      e.currentTarget.style.color = '#ffffff'
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.currentTarget.style.backgroundColor = '#22c55e'
-                                      e.currentTarget.style.color = '#ffffff'
-                                    }}
                                   >
-                                    Click to Send Money
+                                    {paymentLinkLabel}
                                   </a>
-                                  <p className='text-xs text-gray-400 mt-2 text-center'>
-                                    Powered by InstaPay
-                                  </p>
                                 </div>
                               )}
-                              
-                              {/* Bank Account Details */}
-                              {currentPaymentInfo.accountHolder && (
+
+                              {(currentPaymentInfo.accountHolder ||
+                                currentPaymentInfo.iban ||
+                                currentPaymentInfo.swift) && (
                                 <div className='mt-3 pt-3 border-t border-gray-700 space-y-2'>
-                                  <p className='text-xs text-gray-400'>For payments from outside Egypt:</p>
-                                  <p className='text-sm text-gray-300'>
-                                    <span className='font-semibold'>Account Holder:</span> {currentPaymentInfo.accountHolder}
-                                  </p>
-                                  <p className='text-sm text-gray-300'>
-                                    <span className='font-semibold'>IBAN:</span> {currentPaymentInfo.iban}
-                                  </p>
-                                  <p className='text-sm text-gray-300'>
-                                    <span className='font-semibold'>Swift Code:</span> {currentPaymentInfo.swift}
-                                  </p>
+                                  {currentPaymentInfo.accountHolder && (
+                                    <p className='text-sm text-gray-300'>
+                                      <span className='font-semibold'>Account Holder:</span>{' '}
+                                      {currentPaymentInfo.accountHolder}
+                                    </p>
+                                  )}
+                                  {currentPaymentInfo.iban && (
+                                    <p className='text-sm text-gray-300'>
+                                      <span className='font-semibold'>IBAN:</span>{' '}
+                                      {currentPaymentInfo.iban}
+                                    </p>
+                                  )}
+                                  {currentPaymentInfo.swift && (
+                                    <p className='text-sm text-gray-300'>
+                                      <span className='font-semibold'>Swift Code:</span>{' '}
+                                      {currentPaymentInfo.swift}
+                                    </p>
+                                  )}
                                 </div>
                               )}
-                              
-                              {!currentPaymentInfo.link && !currentPaymentInfo.accountHolder && (
+
+                              {paymentNotes && (
                                 <p className='text-xs text-gray-400 mt-2'>
-                                  Transfer the amount to the number above, then enter your number and upload the transaction screenshot
+                                  {paymentNotes}
                                 </p>
                               )}
                             </div>
@@ -971,7 +983,9 @@ export default function CheckoutForm() {
                           render={({ field }) => (
                             <FormItem className='w-full'>
                               <FormLabel className='text-sm sm:text-base text-white'>
-                                {currentPaymentInfo ? `Your number in ${paymentMethod}` : 'Your payment number'}
+                                {currentPaymentInfo
+                                  ? `Your ${paymentReferenceLabel}`
+                                  : 'Your payment reference'}
                               </FormLabel>
                               <FormControl>
                                 <Input
@@ -1102,7 +1116,7 @@ export default function CheckoutForm() {
                       className='text-sm cursor-pointer'
                     >
                       I agree to the{' '}
-                      <Link href="/terms-of-use" className='text-purple-400 hover:underline'>
+                      <Link href="/page/terms-of-use" className='text-purple-400 hover:underline'>
                         Terms and Conditions
                       </Link>
                     </label>

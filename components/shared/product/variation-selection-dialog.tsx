@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
+import { getVariationPricing } from '@/lib/utils'
 
 interface VariationSelectionDialogProps {
   isOpen: boolean
@@ -89,12 +90,16 @@ export default function VariationSelectionDialog({
               <h3 className='text-base font-semibold mb-3 text-left'>Select Your Option: *</h3>
               <div className='space-y-2'>
                 {product.variations.map((variation: any) => {
-                  const originalPrice = Number(variation.originalPrice) || 0
-                  const currentPrice = Number(variation.price) || 0
-                  const hasDiscount = originalPrice > 0 && currentPrice > 0 && currentPrice < originalPrice
-                  const discountPercentage = hasDiscount 
-                    ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
-                    : 0
+                  const pricing = getVariationPricing(variation)
+                  const hasDiscount = pricing.saleActive
+                  const discountPercentage =
+                    hasDiscount && pricing.originalPrice
+                      ? Math.round(((pricing.originalPrice - pricing.currentPrice) / pricing.originalPrice) * 100)
+                      : 0
+                  const expiryDate = variation.salePriceExpiresAt
+                    ? new Date(variation.salePriceExpiresAt)
+                    : null
+                  const hasExpiry = expiryDate && !Number.isNaN(expiryDate.getTime())
                   
                   return (
                     <button
@@ -116,16 +121,21 @@ export default function VariationSelectionDialog({
                           )}
                         </div>
                         <div className='text-right'>
-                          {hasDiscount && (
+                          {hasDiscount && pricing.originalPrice > 0 && (
                             <div className='text-xs text-gray-400 line-through'>
-                              {originalPrice.toFixed(2)} EGP
+                              {pricing.originalPrice.toFixed(2)} EGP
                             </div>
                           )}
                           <div className={`font-bold ${selectedVariation === variation.name ? 'text-purple-300' : 'text-purple-400'}`}>
-                            {currentPrice.toFixed(2)} EGP
+                            {pricing.currentPrice.toFixed(2)} EGP
                           </div>
                         </div>
                       </div>
+                      {hasDiscount && hasExpiry && (
+                        <p className='text-xs text-gray-500 mt-1 text-right'>
+                          Offer ends {expiryDate.toLocaleString()}
+                        </p>
+                      )}
                     </button>
                   )
                 })}

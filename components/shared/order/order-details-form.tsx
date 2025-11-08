@@ -21,7 +21,6 @@ import { formatDateTime } from '@/lib/utils'
 import ProductPrice from '../product/product-price'
 import ActionButton from '../action-button'
 import {
-  adminCancelOrder,
   adminHandleOrderRefund,
   deliverOrder,
   requestOrderRefund,
@@ -79,10 +78,8 @@ export default function OrderDetailsForm({
   const [isCancelledState, setIsCancelledState] = useState<boolean>(isCancelled ?? false)
   const [cancelledAtState, setCancelledAtState] = useState<string | null>(cancelledAt || null)
   const [adminAction, setAdminAction] = useState<'approve' | 'reject' | 'pending' | null>(null)
-  const [isCancellingOrder, startCancelTransition] = useTransition()
 
   const canRequestRefund = isPaid && !isCancelledState
-  const canCancelOrder = !isCancelledState && !isDelivered
 
   const formatDateValue = (value: string | null) => {
     if (!value) return null
@@ -172,44 +169,6 @@ export default function OrderDetailsForm({
         }
       } finally {
         setAdminAction(null)
-      }
-    })
-  }
-
-  const handleCancelOrder = () => {
-    if (!canCancelOrder) {
-      toast({ description: 'This order can no longer be cancelled.', variant: 'destructive' })
-      return
-    }
-
-    const trimmedReason = refundReasonState.trim()
-
-    startCancelTransition(async () => {
-      const res = await adminCancelOrder(
-        order.id,
-        trimmedReason || (isPaid ? 'Customer requested cancellation and refund' : 'Customer cancelled before payment confirmation'),
-        refundImageState || undefined
-      )
-
-      if (res.success) {
-        toast({ description: 'Order cancelled successfully.' })
-        const data = res.data || {}
-        setRefundRequestedState(!!data.refundRequested)
-        setRefundStatusState(data.refundStatus || 'approved')
-        if (data.refundReason !== undefined) {
-          setRefundReasonState(data.refundReason || '')
-        }
-        if (data.refundTransactionImage !== undefined) {
-          setRefundImageState(data.refundTransactionImage || '')
-        }
-        if (data.refundRequestedAt !== undefined) {
-          setRefundRequestedAtState(data.refundRequestedAt || null)
-        }
-        setRefundProcessedAtState(data.refundProcessedAt || null)
-        setIsCancelledState(!!data.isCancelled)
-        setCancelledAtState(data.cancelledAt || null)
-      } else {
-        toast({ description: res.message, variant: 'destructive' })
       }
     })
   }
@@ -340,26 +299,57 @@ export default function OrderDetailsForm({
               <TableHeader>
                 <TableRow>
                   <TableHead className='text-left'>Product</TableHead>
+                  <TableHead className='text-left'>Variation</TableHead>
                   <TableHead className='text-left'>Quantity</TableHead>
                   <TableHead className='text-left'>Price</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orderItemsList.map((item, index) => (
-                  <TableRow key={item.slug || item.productId || `item-${index}`}>
+                {orderItemsList.map((item, index) => {
+                  const description = item?.product?.description?.trim() || ''
+                  const variationLabel =
+                    item?.selectedVariation ||
+                    item?.size ||
+                    item?.color ||
+                    ''
+
+                  const truncatedDescription =
+                    description.length > 180
+                      ? `${description.slice(0, 180)}…`
+                      : description
+
+                  return (
+                    <TableRow key={item.slug || item.productId || `item-${index}`}>
                     <TableCell>
-                      <Link
-                        href={`/product/${item.slug || '#'}`}
-                        className='flex items-center'
-                      >
-                        <Image
-                          src={item.image || '/placeholder-image.jpg'}
-                          alt={item.name || 'Product'}
-                          width={50}
-                          height={50}
-                        ></Image>
-                        <span className='px-2'>{item.name || 'Unknown product'}</span>
-                      </Link>
+                          <div className='flex items-start gap-3'>
+                        <Link
+                          href={`/product/${item.slug || '#'}`}
+                          className='flex-shrink-0'
+                        >
+                          <Image
+                            src={item.image || '/placeholder-image.jpg'}
+                            alt={item.name || 'Product'}
+                            width={50}
+                            height={50}
+                          ></Image>
+                        </Link>
+                        <div className='flex-1 space-y-1'>
+                          <Link
+                            href={`/product/${item.slug || '#'}`}
+                            className='font-medium text-white hover:text-purple-300 transition-colors'
+                          >
+                            {item.name || 'Unknown product'}
+                          </Link>
+                          {truncatedDescription && (
+                            <p className='text-xs text-gray-400 leading-snug'>
+                              {truncatedDescription}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className='text-left'>
+                      {variationLabel || '—'}
                     </TableCell>
                     <TableCell>
                       <span className='px-2'>{item.quantity || 0}</span>
@@ -368,17 +358,18 @@ export default function OrderDetailsForm({
                       <ProductPrice price={item.price || 0} plain />
                     </TableCell>
                   </TableRow>
-                ))}
+                  )
+                })}
               </TableBody>
             </Table>
             
             {/* Account Credentials Section */}
-            {orderItemsList.some((item: any) => item.accountUsername || item.accountPassword) && (
+            {orderItemsList.some((item: any) => item.accountUsername || item.accountPassword || item.accountBackupCode) && (
               <div className='mt-6 pt-6 border-t border-gray-700'>
                 <h3 className='text-lg font-semibold mb-4'>Account Credentials</h3>
                 <div className='space-y-4'>
                   {orderItemsList.map((item: any, index: number) => {
-                    if (!item.accountUsername && !item.accountPassword) return null
+                    if (!item.accountUsername && !item.accountPassword && !item.accountBackupCode) return null
                     
                     return (
                       <div key={`creds-${index}`} className='bg-gray-800 border border-gray-700 rounded-lg p-4'>
@@ -458,7 +449,7 @@ export default function OrderDetailsForm({
               />
             )}
 
-            {!isAdminOrModerator && (canRequestRefund || canCancelOrder) && (
+            {!isAdminOrModerator && (canRequestRefund || refundRequestedState) && (
               <div className='border-t border-gray-700 pt-4 space-y-4'>
                 <h3 className='text-lg font-semibold'>Manage Your Order</h3>
                 {refundRequestedState && canRequestRefund ? (
@@ -510,11 +501,11 @@ export default function OrderDetailsForm({
                 ) : (
                   <div className='space-y-3'>
                     <div>
-                      <label className='text-sm text-gray-400 block mb-1'>Reason (refund or cancellation)</label>
+                      <label className='text-sm text-gray-400 block mb-1'>Reason for refund</label>
                       <Textarea
                         value={refundReasonState}
                         onChange={(event) => setRefundReasonState(event.target.value)}
-                        placeholder='Tell us why you need to cancel or request a refund'
+                        placeholder='Tell us why you need a refund'
                         className='min-h-[100px]'
                       />
                     </div>
@@ -574,23 +565,6 @@ export default function OrderDetailsForm({
                             </span>
                           ) : (
                             'Submit Refund Request'
-                          )}
-                        </Button>
-                      )}
-                      {canCancelOrder && (
-                        <Button
-                          variant='destructive'
-                          className='w-full'
-                          onClick={handleCancelOrder}
-                          disabled={isCancellingOrder}
-                        >
-                          {isCancellingOrder ? (
-                            <span className='flex items-center gap-2 justify-center'>
-                              <Loader2 className='h-4 w-4 animate-spin' />
-                              Cancelling...
-                            </span>
-                          ) : (
-                            'Cancel Entire Order'
                           )}
                         </Button>
                       )}

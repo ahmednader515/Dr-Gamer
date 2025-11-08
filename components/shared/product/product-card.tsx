@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { IProductInput } from "@/types";
 import Rating from "./rating";
-import { formatNumber, generateId, round2 } from "@/lib/utils";
+import { formatNumber, generateId, getVariationPricing, isVariationSaleActive, round2 } from "@/lib/utils";
 import ProductPrice from "./product-price";
 import ImageHover from "./image-hover";
 import { Eye, Heart } from "lucide-react";
@@ -53,19 +53,17 @@ const ProductCard = ({
     let maxDiscountPercentage = 0;
 
     if (hasVariations) {
-      const variationsWithDiscount = product.variations.filter((v: any) => {
-        const originalPrice = Number(v.originalPrice) || 0;
-        const currentPrice = Number(v.price) || 0;
-        return originalPrice > 0 && currentPrice > 0 && currentPrice < originalPrice;
-      });
+      const variationsWithDiscount = product.variations.filter((v: any) =>
+        isVariationSaleActive(v)
+      );
 
       if (variationsWithDiscount.length > 0) {
         // Calculate max discount percentage
         maxDiscountPercentage = Math.max(
           ...variationsWithDiscount.map((v: any) => {
-            const original = Number(v.originalPrice);
-            const current = Number(v.price);
-            return Math.round(((original - current) / original) * 100);
+            const { currentPrice, originalPrice } = getVariationPricing(v);
+            if (!originalPrice || originalPrice <= currentPrice) return 0;
+            return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
           })
         );
       }
@@ -154,32 +152,49 @@ const ProductCard = ({
   const ProductDetails = () => {
     // Check if product has variations with discounts
     const hasVariations = product.variations && Array.isArray(product.variations) && product.variations.length > 0;
-    let lowestDiscountedPrice = product.price;
-    let highestOriginalPrice = product.listPrice;
+    const pricingDetails = hasVariations
+      ? product.variations.map((variation: any) => ({
+          variation,
+          pricing: getVariationPricing(variation),
+        }))
+      : [];
+    const currentPrices = pricingDetails.length
+      ? pricingDetails.map((entry) => entry.pricing.currentPrice || 0)
+      : [];
+    const minCurrentPrice = currentPrices.length ? Math.min(...currentPrices) : Number(product.price);
+    const maxCurrentPrice = currentPrices.length ? Math.max(...currentPrices) : Number(product.listPrice);
+
+    let lowestDiscountedPrice = minCurrentPrice;
+    let highestOriginalPrice = maxCurrentPrice;
     let maxDiscountPercentage = 0;
     let hasAnyDiscount = false;
 
     if (hasVariations) {
-      const variationsWithDiscount = product.variations.filter((v: any) => {
-        const originalPrice = Number(v.originalPrice) || 0;
-        const currentPrice = Number(v.price) || 0;
-        return originalPrice > 0 && currentPrice > 0 && currentPrice < originalPrice;
-      });
+      const variationsWithDiscount = pricingDetails.filter(
+        (entry) => entry.pricing.saleActive
+      );
 
       if (variationsWithDiscount.length > 0) {
         hasAnyDiscount = true;
         // Get lowest discounted price
-        lowestDiscountedPrice = Math.min(...variationsWithDiscount.map((v: any) => Number(v.price)));
+        lowestDiscountedPrice = Math.min(
+          ...variationsWithDiscount.map((entry) => entry.pricing.currentPrice)
+        );
         // Get highest original price
-        highestOriginalPrice = Math.max(...variationsWithDiscount.map((v: any) => Number(v.originalPrice)));
+        highestOriginalPrice = Math.max(
+          ...variationsWithDiscount.map((entry) => entry.pricing.originalPrice)
+        );
         // Calculate max discount percentage
         maxDiscountPercentage = Math.max(
-          ...variationsWithDiscount.map((v: any) => {
-            const original = Number(v.originalPrice);
-            const current = Number(v.price);
-            return Math.round(((original - current) / original) * 100);
+          ...variationsWithDiscount.map((entry) => {
+            const { currentPrice, originalPrice } = entry.pricing;
+            if (!originalPrice || originalPrice <= currentPrice) return 0;
+            return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
           })
         );
+      } else if (pricingDetails.length > 0) {
+        lowestDiscountedPrice = Math.min(...currentPrices);
+        highestOriginalPrice = Math.max(...currentPrices);
       }
     }
 
@@ -233,8 +248,8 @@ const ProductCard = ({
             </div>
           ) : (
             <ProductPrice
-              price={product.price}
-              originalPrice={product.listPrice}
+              price={minCurrentPrice}
+              originalPrice={maxCurrentPrice}
               className="items-start"
               isRange={true}
             />
@@ -257,7 +272,12 @@ const ProductCard = ({
     const addToCartWithVariation = async (selectedVariation: string) => {
       // Calculate the price based on selected variation
       const selectedPrice = selectedVariation && hasVariations
-        ? product.variations.find((v: any) => v.name === selectedVariation)?.price || Number(product.price)
+        ? (() => {
+            const variation = product.variations.find((v: any) => v.name === selectedVariation);
+            if (!variation) return Number(product.price);
+            const pricing = getVariationPricing(variation);
+            return pricing.currentPrice || Number(product.price);
+          })()
         : Number(product.price);
 
       await withLoading(
@@ -297,9 +317,14 @@ const ProductCard = ({
 
     const buyNowWithVariation = async (selectedVariation: string) => {
       // Calculate the price based on selected variation
-      const selectedPrice = selectedVariation && hasVariations
-        ? product.variations.find((v: any) => v.name === selectedVariation)?.price || Number(product.price)
-        : Number(product.price);
+        const selectedPrice = selectedVariation && hasVariations
+          ? (() => {
+              const variation = product.variations.find((v: any) => v.name === selectedVariation);
+              if (!variation) return Number(product.price);
+              const pricing = getVariationPricing(variation);
+              return pricing.currentPrice || Number(product.price);
+            })()
+          : Number(product.price);
 
       await withLoading(
         async () => {

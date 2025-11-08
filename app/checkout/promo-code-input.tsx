@@ -5,12 +5,32 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import ProductPrice from '@/components/shared/product/product-price'
+import { calculatePromoDiscount } from '@/lib/utils'
+
+type CartItem = {
+  product?: string
+  productId?: string
+  id?: string
+  price: number
+  quantity: number
+}
+
+type AppliedPromo = {
+  code: string
+  discountPercent: number
+  applicableProducts: Array<{
+    productId: string
+    productName?: string
+    maxDiscountAmount: number | null
+  }>
+}
 
 type PromoCodeInputProps = {
-  onPromoApplied: (data: { code: string; discountPercent: number }) => void
+  onPromoApplied: (data: AppliedPromo) => void
   onPromoRemoved: () => void
-  appliedPromo: { code: string; discountPercent: number } | null
+  appliedPromo: AppliedPromo | null
   discountAmount: number
+  cartItems: CartItem[]
 }
 
 export default function PromoCodeInput({
@@ -18,6 +38,7 @@ export default function PromoCodeInput({
   onPromoRemoved,
   appliedPromo,
   discountAmount,
+  cartItems,
 }: PromoCodeInputProps) {
   const [promoCode, setPromoCode] = useState('')
   const [isValidatingPromo, setIsValidatingPromo] = useState(false)
@@ -38,13 +59,51 @@ export default function PromoCodeInput({
       const response = await fetch('/api/promo-codes/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: promoCode.toUpperCase() }),
+        body: JSON.stringify({
+          code: promoCode.toUpperCase(),
+          items: cartItems.map((item) => ({
+            productId: item.productId || item.product || item.id,
+            price: item.price,
+            quantity: item.quantity,
+          })),
+        }),
       })
 
       const result = await response.json()
 
       if (result.success) {
-        onPromoApplied(result.data)
+        const applied: AppliedPromo = {
+          code: result.data.code,
+          discountPercent: result.data.discountPercent,
+          applicableProducts: result.data.applicableProducts || [],
+        }
+        const { discount, eligibleItems } = calculatePromoDiscount(
+          cartItems,
+          applied,
+        )
+
+        if (applied.applicableProducts.length > 0 && eligibleItems.length === 0) {
+          toast({
+            title: 'Not Eligible',
+            description:
+              'This promo code does not apply to any items currently in your cart.',
+            variant: 'destructive',
+          })
+          return
+        }
+
+        if (discount <= 0) {
+          toast({
+            title: 'Not Eligible',
+            description:
+              'This promo code does not apply to your current cart contents.',
+            variant: 'destructive',
+          })
+          return
+        }
+
+        onPromoApplied(applied)
+        setPromoCode('')
         toast({
           title: 'Applied',
           description: result.message,
@@ -103,6 +162,11 @@ export default function PromoCodeInput({
           <span>Discount ({appliedPromo.discountPercent}%):</span>
           <span>- <ProductPrice price={discountAmount} plain /></span>
         </div>
+        {appliedPromo.applicableProducts && appliedPromo.applicableProducts.length > 0 && (
+          <p className='text-xs text-gray-400 mt-1'>
+            Applies to: {appliedPromo.applicableProducts.map((product) => product.productName || product.productId).join(', ')}
+          </p>
+        )}
       </>
     )
   }

@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { SessionProvider } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import useCartSidebar from '@/hooks/use-cart-sidebar'
@@ -7,16 +7,28 @@ import CartSidebar from './cart-sidebar'
 import { ThemeProvider } from './theme-provider'
 import { Toaster } from '../ui/toaster'
 import AppInitializer from './app-initializer'
-import data from '@/lib/data'
 
 export default function ClientProviders({
   children,
+  setting,
 }: {
   children: React.ReactNode
+  setting: any
 }) {
   const visible = useCartSidebar()
   const pathname = usePathname()
-  const setting = data.settings[0]
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.requestAnimationFrame(() => {
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: 'auto',
+        })
+      })
+    }
+  }, [pathname])
   
   // Check if we're on an admin route
   const isAdminRoute = pathname?.startsWith('/admin') ?? false

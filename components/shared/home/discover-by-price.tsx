@@ -24,7 +24,10 @@ export default function DiscoverByPrice() {
           {priceRanges.map((range) => (
             <Link
               key={range.maxPrice}
-              href={`/search?maxPrice=${range.maxPrice}`}
+              href={{
+                pathname: '/search',
+                query: { maxPrice: range.maxPrice.toString() },
+              }}
               className='group'
             >
               <div className='bg-gray-800 hover:bg-gray-700 rounded-xl p-6 text-center transition-colors duration-300 border border-gray-700 h-[140px] flex items-center justify-center'>

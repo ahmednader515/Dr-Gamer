@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { auth } from "@/auth";
 import data from "@/lib/data";
 import TrustpilotScript from "@/components/shared/trustpilot-script";
+import { getSetting } from "@/lib/actions/setting.actions";
 
 const cairo = Cairo({
   variable: "--font-cairo",
@@ -51,7 +52,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const setting = data.settings[0];
+  const setting = await getSetting();
   const currencyCookie = (await cookies()).get("currency");
   const currency = currencyCookie ? currencyCookie.value : "EGP";
   
@@ -69,7 +70,7 @@ export default async function AppLayout({
         {/* Trustpilot Invitation Script for Free Plan */}
         <TrustpilotScript businessKey="pe8fdssimHJlnGNA" />
         
-        <ClientProviders>
+        <ClientProviders setting={setting}>
           {children}
         </ClientProviders>
       </body>
