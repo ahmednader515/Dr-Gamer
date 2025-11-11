@@ -103,6 +103,7 @@ model Category {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   products    Product[]
+  promoCodes  PromoCodeProduct[]
 
   @@map("categories")
 }
@@ -256,15 +257,20 @@ model PromoCode {
 }
 
 model PromoCodeProduct {
+  id                String    @id @default(cuid())
   promoCodeId       String
-  productId         String
-  maxDiscountAmount Decimal? @db.Decimal(10, 2)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  productId         String?
+  categoryId        String?
+  variationNames    String[]  @default([])
+  maxDiscountAmount Decimal?  @db.Decimal(10, 2)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
   promoCode         PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
-  product           Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product           Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category          Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  @@id([promoCodeId, productId])
+  @@unique([promoCodeId, productId])
+  @@unique([promoCodeId, categoryId])
   @@map("promo_code_products")
 }
 

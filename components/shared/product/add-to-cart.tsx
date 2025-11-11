@@ -76,6 +76,7 @@ export default function AddToCart({ product, className }: AddToCartProps) {
           name: product.name,
           slug: product.slug,
           category,
+          categoryId: (product as any).categoryId ?? null,
           image: product.images[0],
           price: hasVariations ? selectedPrice : Number(product.price), // Use selected variation price or product price
           countInStock: product.countInStock,

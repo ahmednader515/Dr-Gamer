@@ -3,6 +3,44 @@ import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 
+const extractVariationNames = (raw: any): string[] => {
+  if (!raw) return []
+
+  const normaliseToArray = (value: any): any[] => {
+    if (!value) return []
+    if (Array.isArray(value)) return value
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value)
+        return Array.isArray(parsed) ? parsed : []
+      } catch {
+        return []
+      }
+    }
+    if (typeof value === 'object') {
+      if (Array.isArray((value as any).value)) return (value as any).value
+      if (Array.isArray((value as any).data)) return (value as any).data
+      const entries = Object.values(value)
+      return Array.isArray(entries) ? entries : []
+    }
+    return []
+  }
+
+  const resolved = normaliseToArray(raw)
+
+  return resolved
+    .map((item) => {
+      if (!item) return ''
+      if (typeof item === 'string') return item.trim()
+      if (typeof item === 'object') {
+        if ('name' in item && typeof item.name === 'string') return item.name.trim()
+        if ('label' in item && typeof item.label === 'string') return item.label.trim()
+      }
+      return ''
+    })
+    .filter((name) => Boolean(name))
+}
+
 const serializePromoCode = (promoCode: any) => ({
   id: promoCode.id,
   code: promoCode.code,
@@ -12,16 +50,34 @@ const serializePromoCode = (promoCode: any) => ({
   usageLimit: promoCode.usageLimit,
   usageCount: promoCode.usageCount,
   createdAt: promoCode.createdAt.toISOString(),
-  applicableProducts: (promoCode.applicableProducts || []).map((link: any) => ({
-    productId: link.productId,
+  assignments: (promoCode.applicableProducts || []).map((link: any) => ({
+    id: link.id,
+    type: link.productId ? 'product' : 'category',
     maxDiscountAmount: link.maxDiscountAmount
       ? Number(link.maxDiscountAmount)
       : null,
-    product: {
-      id: link.product.id,
-      name: link.product.name,
-      price: Number(link.product.price),
-    },
+    variationNames: Array.isArray(link.variationNames)
+      ? link.variationNames
+      : [],
+    product: link.product
+      ? {
+          id: link.product.id,
+          name: link.product.name,
+          price: Number(link.product.price),
+          categoryId: link.product.categoryId,
+          categoryName:
+            link.product.categoryRelation?.name ??
+            link.product.category ??
+            'Uncategorized',
+          variations: extractVariationNames(link.product.variations),
+        }
+      : null,
+    category: link.category
+      ? {
+          id: link.category.id,
+          name: link.category.name,
+        }
+      : null,
   })),
 })
 
@@ -47,6 +103,21 @@ export async function GET() {
                 id: true,
                 name: true,
                 price: true,
+                categoryId: true,
+                categoryRelation: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                category: true,
+                variations: true,
+              },
+            },
+            category: {
+              select: {
+                id: true,
+                name: true,
               },
             },
           },
@@ -80,7 +151,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { code, discountPercent, expiresAt, usageLimit, products } = body
+    const { code, discountPercent, expiresAt, usageLimit, assignments } = body
 
     // Validation
     if (!code || !discountPercent) {
@@ -109,20 +180,61 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const productLinks = Array.isArray(products)
-      ? products
-          .filter(
-            (product: any) => product && typeof product.productId === 'string',
-          )
-          .map((product: any) => ({
-            product: { connect: { id: product.productId } },
-            maxDiscountAmount:
-              product.maxDiscountAmount !== null &&
-              product.maxDiscountAmount !== undefined &&
-              product.maxDiscountAmount !== ''
-                ? new Prisma.Decimal(product.maxDiscountAmount)
-                : null,
-          }))
+    const assignmentLinks = Array.isArray(assignments)
+      ? assignments
+          .map((assignment: any) => {
+            if (!assignment || typeof assignment !== 'object') return null
+            const { type, productId, categoryId, maxDiscountAmount, variationNames } =
+              assignment as {
+                type?: string
+                productId?: string
+                categoryId?: string
+                maxDiscountAmount?: number | string | null
+                variationNames?: string[]
+              }
+
+            const resolvedMaxDiscount =
+              maxDiscountAmount !== null &&
+              maxDiscountAmount !== undefined &&
+              maxDiscountAmount !== '' &&
+              !Number.isNaN(Number(maxDiscountAmount))
+                ? new Prisma.Decimal(maxDiscountAmount as Prisma.Decimal.Value)
+                : null
+
+            if (type === 'product' && productId) {
+              const variationList = Array.isArray(variationNames)
+                ? Array.from(
+                    new Set(
+                      variationNames
+                        .map((name) => (typeof name === 'string' ? name.trim() : ''))
+                        .filter((name) => name.length > 0),
+                    ),
+                  )
+                : []
+
+              return {
+                product: { connect: { id: productId } },
+                variationNames: variationList,
+                maxDiscountAmount: resolvedMaxDiscount,
+              }
+            }
+
+            if (type === 'category' && categoryId) {
+              return {
+                category: { connect: { id: categoryId } },
+                variationNames: [],
+                maxDiscountAmount: resolvedMaxDiscount,
+              }
+            }
+
+            return null
+          })
+          .filter((link): link is {
+            product?: { connect: { id: string } }
+            category?: { connect: { id: string } }
+            variationNames: string[]
+            maxDiscountAmount: Prisma.Decimal | null
+          } => Boolean(link))
       : []
 
     const promoCode = await prisma.promoCode.create({
@@ -131,9 +243,9 @@ export async function POST(request: NextRequest) {
         discountPercent: parseInt(discountPercent, 10),
         expiresAt: expiresAt ? new Date(expiresAt) : null,
         usageLimit: usageLimit ? parseInt(usageLimit, 10) : null,
-        applicableProducts: productLinks.length
+        applicableProducts: assignmentLinks.length
           ? {
-              create: productLinks,
+              create: assignmentLinks,
             }
           : undefined,
       },
@@ -145,6 +257,21 @@ export async function POST(request: NextRequest) {
                 id: true,
                 name: true,
                 price: true,
+                categoryId: true,
+                categoryRelation: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                category: true,
+                variations: true,
+              },
+            },
+            category: {
+              select: {
+                id: true,
+                name: true,
               },
             },
           },

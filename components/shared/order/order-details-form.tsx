@@ -306,50 +306,112 @@ export default function OrderDetailsForm({
               </TableHeader>
               <TableBody>
                 {orderItemsList.map((item, index) => {
-                  const description = item?.product?.description?.trim() || ''
-                  const variationLabel =
-                    item?.selectedVariation ||
-                    item?.size ||
-                    item?.color ||
-                    ''
+                  const variationParts: string[] = []
 
-                  const truncatedDescription =
-                    description.length > 180
-                      ? `${description.slice(0, 180)}…`
-                      : description
+                  const rawSelectedVariation =
+                    typeof item?.selectedVariation === 'string'
+                      ? item.selectedVariation.trim()
+                      : ''
+
+                  const productVariationsRaw = item?.product?.variations
+                  const parsedProductVariations: any[] = Array.isArray(productVariationsRaw)
+                    ? productVariationsRaw
+                    : typeof productVariationsRaw === 'string'
+                      ? (() => {
+                          try {
+                            const parsed = JSON.parse(productVariationsRaw)
+                            return Array.isArray(parsed) ? parsed : []
+                          } catch (error) {
+                            console.warn('Failed to parse product variations JSON', error)
+                            return []
+                          }
+                        })()
+                      : []
+
+                  let derivedVariationName = rawSelectedVariation
+
+                  if (!derivedVariationName) {
+                    // Try to infer variation by price match
+                    const matchedByPrice = parsedProductVariations.find((variation: any) => {
+                      if (!variation) return false
+                      const variantPrice = Number(variation?.price)
+                      return Number.isFinite(variantPrice) && variantPrice === Number(item.price)
+                    })
+
+                    if (matchedByPrice?.name && typeof matchedByPrice.name === 'string') {
+                      derivedVariationName = matchedByPrice.name.trim()
+                    }
+                  }
+
+                  if (!derivedVariationName && parsedProductVariations.length === 1) {
+                    const single = parsedProductVariations[0]
+                    if (single?.name && typeof single.name === 'string') {
+                      derivedVariationName = single.name.trim()
+                    }
+                  }
+
+                  if (derivedVariationName) {
+                    variationParts.push(derivedVariationName)
+                  }
+
+                  const nestedOptions = Array.isArray(item?.selectedOptions)
+                    ? item.selectedOptions
+                    : []
+
+                  nestedOptions.forEach((option: any) => {
+                    if (option && option.name && option.value) {
+                      const optionLabel = `${option.name}: ${option.value}`
+                      variationParts.push(optionLabel)
+                    }
+                  })
+
+                  const optionLabels: Array<[unknown, string]> = [
+                    [item?.size ?? item?.product?.size, 'Size'],
+                    [item?.color ?? item?.product?.color, 'Color'],
+                    [item?.platformType ?? item?.product?.platformType, 'Platform'],
+                    [item?.productCategory ?? item?.product?.productCategory, 'Type'],
+                  ]
+
+                  optionLabels.forEach(([value, label]) => {
+                    if (typeof value === 'string') {
+                      const normalized = value.trim()
+                      if (normalized && !variationParts.includes(normalized) && !variationParts.includes(`${label}: ${normalized}`)) {
+                        variationParts.push(`${label}: ${normalized}`)
+                      }
+                    }
+                  })
+
+                  const variationLabel = variationParts.length
+                    ? variationParts.join(' • ')
+                    : '—'
 
                   return (
                     <TableRow key={item.slug || item.productId || `item-${index}`}>
                     <TableCell>
-                          <div className='flex items-start gap-3'>
-                        <Link
-                          href={`/product/${item.slug || '#'}`}
-                          className='flex-shrink-0'
-                        >
-                          <Image
-                            src={item.image || '/placeholder-image.jpg'}
-                            alt={item.name || 'Product'}
-                            width={50}
-                            height={50}
-                          ></Image>
-                        </Link>
-                        <div className='flex-1 space-y-1'>
-                          <Link
-                            href={`/product/${item.slug || '#'}`}
-                            className='font-medium text-white hover:text-purple-300 transition-colors'
-                          >
-                            {item.name || 'Unknown product'}
-                          </Link>
-                          {truncatedDescription && (
-                            <p className='text-xs text-gray-400 leading-snug'>
-                              {truncatedDescription}
-                            </p>
-                          )}
-                        </div>
-                      </div>
+                  <div className='flex items-start gap-3'>
+                    <Link
+                      href={`/product/${item.slug || '#'}`}
+                      className='flex-shrink-0'
+                    >
+                      <Image
+                        src={item.image || '/placeholder-image.jpg'}
+                        alt={item.name || 'Product'}
+                        width={50}
+                        height={50}
+                      ></Image>
+                    </Link>
+                    <div className='flex-1'>
+                      <Link
+                        href={`/product/${item.slug || '#'}`}
+                        className='font-medium text-white hover:text-purple-300 transition-colors'
+                      >
+                        {item.name || 'Unknown product'}
+                      </Link>
+                    </div>
+                  </div>
                     </TableCell>
                     <TableCell className='text-left'>
-                      {variationLabel || '—'}
+                  {variationLabel}
                     </TableCell>
                     <TableCell>
                       <span className='px-2'>{item.quantity || 0}</span>

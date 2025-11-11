@@ -192,30 +192,56 @@ export default function CheckoutForm() {
       })
     : []
   
+  type AppliedPromoAssignment = {
+    id: string
+    type: 'product' | 'category'
+    maxDiscountAmount: number | null
+    variationNames: string[]
+    product?: {
+      id: string
+      name: string
+      categoryName?: string | null
+    } | null
+    category?: {
+      id: string
+      name: string
+    } | null
+  }
+
   type AppliedPromo = {
     code: string
     discountPercent: number
-    applicableProducts: Array<{
-      productId: string
-      productName?: string
-      maxDiscountAmount: number | null
-    }>
+    assignments: AppliedPromoAssignment[]
   }
 
   const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null)
 
+  const promoCalculationInput = appliedPromo
+    ? {
+        discountPercent: appliedPromo.discountPercent,
+        assignments: appliedPromo.assignments.map((assignment) => ({
+          type: assignment.type,
+          productId: assignment.product?.id,
+          categoryId: assignment.category?.id,
+          categoryName: assignment.category?.name,
+          variationNames: assignment.variationNames,
+          maxDiscountAmount: assignment.maxDiscountAmount,
+        })),
+      }
+    : null
+
   const {
     discount: discountAmount,
     eligibleItems: eligiblePromoItems,
-  } = appliedPromo
-    ? calculatePromoDiscount(items, appliedPromo)
+  } = promoCalculationInput
+    ? calculatePromoDiscount(items, promoCalculationInput)
     : { discount: 0, eligibleItems: [] as string[] }
 
   const finalTotal = itemsPrice - discountAmount + newAccountTax
 
   useEffect(() => {
     if (!appliedPromo) return
-    if (appliedPromo.applicableProducts.length === 0) return
+    if (appliedPromo.assignments.length === 0) return
     if (eligiblePromoItems.length > 0) return
 
     setAppliedPromo(null)

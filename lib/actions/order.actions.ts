@@ -103,7 +103,18 @@ export const createOrderFromCart = async (
   if (clientSideCart.promoCode) {
     const promo = await prisma.promoCode.findUnique({
       where: { code: clientSideCart.promoCode.toUpperCase() },
-      include: { applicableProducts: true },
+      include: {
+        applicableProducts: {
+          include: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
     })
 
     if (!promo) {
@@ -124,11 +135,17 @@ export const createOrderFromCart = async (
 
     const promoConfig = {
       discountPercent: promo.discountPercent,
-      applicableProducts: promo.applicableProducts.map((product) => ({
-        productId: product.productId,
-        maxDiscountAmount: product.maxDiscountAmount
-          ? Number(product.maxDiscountAmount)
+      assignments: promo.applicableProducts.map((target) => ({
+        type: target.productId ? 'product' : 'category',
+        productId: target.productId || undefined,
+        categoryId: target.categoryId || undefined,
+        categoryName: target.category?.name || undefined,
+        maxDiscountAmount: target.maxDiscountAmount
+          ? Number(target.maxDiscountAmount)
           : null,
+        variationNames: Array.isArray(target.variationNames)
+          ? target.variationNames
+          : [],
       })),
     }
 
@@ -138,7 +155,7 @@ export const createOrderFromCart = async (
     )
 
     if (
-      promoConfig.applicableProducts.length > 0 &&
+      promoConfig.assignments.length > 0 &&
       eligibleItems.length === 0
     ) {
       throw new Error('Promo code does not apply to the selected products')
@@ -229,10 +246,14 @@ export const createOrderFromCart = async (
           size: item.size,
           color: item.color,
           productType: (item as any).productType,
+          platformType: (item as any).platformType,
+          productCategory: (item as any).productCategory,
+          selectedVariation: (item as any).selectedVariation,
           isAddToOwnAccount: (item as any).isAddToOwnAccount ?? false,
           accountUsername: (item as any).accountUsername,
           accountPassword: (item as any).accountPassword,
           accountBackupCode: (item as any).accountBackupCode,
+          disableTwoStepVerified: (item as any).disableTwoStepVerified ?? false,
         }))
       },
       shippingAddress: orderData.shippingAddress ? {

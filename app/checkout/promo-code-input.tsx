@@ -13,16 +13,32 @@ type CartItem = {
   id?: string
   price: number
   quantity: number
+  categoryId?: string | null
+  categoryName?: string | null
+  category?: string | null
+  selectedVariation?: string | null
+}
+
+type PromoAssignmentResponse = {
+  id: string
+  type: 'product' | 'category'
+  maxDiscountAmount: number | null
+  variationNames: string[]
+  product?: {
+    id: string
+    name: string
+    categoryName?: string | null
+  } | null
+  category?: {
+    id: string
+    name: string
+  } | null
 }
 
 type AppliedPromo = {
   code: string
   discountPercent: number
-  applicableProducts: Array<{
-    productId: string
-    productName?: string
-    maxDiscountAmount: number | null
-  }>
+  assignments: PromoAssignmentResponse[]
 }
 
 type PromoCodeInputProps = {
@@ -65,6 +81,9 @@ export default function PromoCodeInput({
             productId: item.productId || item.product || item.id,
             price: item.price,
             quantity: item.quantity,
+            categoryId: item.categoryId ?? null,
+            categoryName: item.categoryName ?? item.category ?? null,
+            selectedVariation: item.selectedVariation ?? null,
           })),
         }),
       })
@@ -75,14 +94,21 @@ export default function PromoCodeInput({
         const applied: AppliedPromo = {
           code: result.data.code,
           discountPercent: result.data.discountPercent,
-          applicableProducts: result.data.applicableProducts || [],
+          assignments: result.data.assignments || [],
         }
-        const { discount, eligibleItems } = calculatePromoDiscount(
-          cartItems,
-          applied,
-        )
+        const { discount, eligibleItems } = calculatePromoDiscount(cartItems, {
+          discountPercent: applied.discountPercent,
+          assignments: applied.assignments.map((assignment: PromoAssignmentResponse) => ({
+            type: assignment.type,
+            productId: assignment.product?.id,
+            categoryId: assignment.category?.id,
+            categoryName: assignment.category?.name,
+            variationNames: assignment.variationNames,
+            maxDiscountAmount: assignment.maxDiscountAmount,
+          })),
+        })
 
-        if (applied.applicableProducts.length > 0 && eligibleItems.length === 0) {
+        if (applied.assignments.length > 0 && eligibleItems.length === 0) {
           toast({
             title: 'Not Eligible',
             description:
@@ -162,9 +188,20 @@ export default function PromoCodeInput({
           <span>Discount ({appliedPromo.discountPercent}%):</span>
           <span>- <ProductPrice price={discountAmount} plain /></span>
         </div>
-        {appliedPromo.applicableProducts && appliedPromo.applicableProducts.length > 0 && (
+        {appliedPromo.assignments && appliedPromo.assignments.length > 0 && (
           <p className='text-xs text-gray-400 mt-1'>
-            Applies to: {appliedPromo.applicableProducts.map((product) => product.productName || product.productId).join(', ')}
+            Applies to:{' '}
+            {appliedPromo.assignments
+              .map((assignment) => {
+                if (assignment.type === 'product' && assignment.product) {
+                  return assignment.product.name
+                }
+                if (assignment.type === 'category' && assignment.category) {
+                  return `${assignment.category.name} (category)`
+                }
+                return assignment.id
+              })
+              .join(', ')}
           </p>
         )}
       </>

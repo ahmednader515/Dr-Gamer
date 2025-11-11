@@ -109,14 +109,24 @@ type CartItemForPromo = {
   id?: string
   price: number
   quantity: number
+  categoryId?: string | null
+  categoryName?: string | null
+  category?: string | null
+  selectedVariation?: string | null
+}
+
+type PromoAssignmentConfig = {
+  type: 'product' | 'category'
+  productId?: string
+  categoryId?: string
+  categoryName?: string
+  variationNames?: string[]
+  maxDiscountAmount?: number | null
 }
 
 type PromoApplicability = {
   discountPercent: number
-  applicableProducts?: Array<{
-    productId: string
-    maxDiscountAmount?: number | null
-  }>
+  assignments?: PromoAssignmentConfig[]
 }
 
 export function calculatePromoDiscount(
@@ -132,10 +142,10 @@ export function calculatePromoDiscount(
     return { discount: 0, eligibleItems: [] as string[] }
   }
 
-  const applicableProducts = Array.isArray(promo.applicableProducts)
-    ? promo.applicableProducts
+  const assignments = Array.isArray(promo.assignments)
+    ? promo.assignments
     : []
-  const restrictToSpecificProducts = applicableProducts.length > 0
+  const restrictToSpecificTargets = assignments.length > 0
 
   let totalDiscount = 0
   const eligibleItems: string[] = []
@@ -151,11 +161,50 @@ export function calculatePromoDiscount(
     ).trim()
     if (!productId) return
 
-    const productConfig = applicableProducts.find(
-      (product) => product.productId === productId,
-    )
+    const itemCategoryId = item.categoryId ? String(item.categoryId).trim() : ''
+    const itemCategoryName = item.categoryName
+      ? String(item.categoryName).trim().toLowerCase()
+      : item.category
+      ? String(item.category).trim().toLowerCase()
+      : ''
+    const itemVariation = item.selectedVariation
+      ? String(item.selectedVariation).trim().toLowerCase()
+      : ''
 
-    if (restrictToSpecificProducts && !productConfig) {
+    const assignment = assignments.find((candidate) => {
+      if (!candidate || typeof candidate !== 'object') return false
+
+      if (candidate.type === 'product') {
+        if (candidate.productId && candidate.productId === productId) {
+          const variations = Array.isArray(candidate.variationNames)
+            ? candidate.variationNames
+                .map((name) => (typeof name === 'string' ? name.trim().toLowerCase() : ''))
+                .filter((name) => name.length > 0)
+            : []
+          if (variations.length === 0) return true
+          return variations.includes(itemVariation)
+        }
+        return false
+      }
+
+      if (candidate.type === 'category') {
+        const targetCategoryId = candidate.categoryId ? candidate.categoryId.trim() : ''
+        if (targetCategoryId && itemCategoryId) {
+          return targetCategoryId === itemCategoryId
+        }
+        const targetCategoryName = candidate.categoryName
+          ? candidate.categoryName.trim().toLowerCase()
+          : ''
+        if (targetCategoryName && itemCategoryName) {
+          return targetCategoryName === itemCategoryName
+        }
+        return false
+      }
+
+      return false
+    })
+
+    if (restrictToSpecificTargets && !assignment) {
       return
     }
 
@@ -163,11 +212,11 @@ export function calculatePromoDiscount(
     let lineDiscount = (lineSubtotal * percent) / 100
 
     if (
-      productConfig &&
-      productConfig.maxDiscountAmount !== null &&
-      productConfig.maxDiscountAmount !== undefined
+      assignment &&
+      assignment.maxDiscountAmount !== null &&
+      assignment.maxDiscountAmount !== undefined
     ) {
-      const cap = Number(productConfig.maxDiscountAmount)
+      const cap = Number(assignment.maxDiscountAmount)
       if (!Number.isNaN(cap) && cap >= 0) {
         lineDiscount = Math.min(lineDiscount, cap)
       }
