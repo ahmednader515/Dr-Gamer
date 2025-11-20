@@ -1,0 +1,22 @@
+[
+  {
+    "id": "cmhjois6x0002j0fl6oeupxrx",
+    "categoryId": "cmhjoirob0000j0flajo60yyb",
+    "question": "How to use",
+    "answer": "Test",
+    "sortOrder": 0,
+    "isActive": true,
+    "createdAt": "2025-11-03T19:55:54.298Z",
+    "updatedAt": "2025-11-03T19:55:54.298Z"
+  },
+  {
+    "id": "cmhkxg4zc0005lbh0kkpw2o28",
+    "categoryId": "cmhkxg4a40003lbh0pwig56h5",
+    "question": "How to make my account primary?",
+    "answer": "",
+    "sortOrder": 0,
+    "isActive": false,
+    "createdAt": "2025-11-04T16:53:33.625Z",
+    "updatedAt": "2025-11-04T16:53:33.625Z"
+  }
+]

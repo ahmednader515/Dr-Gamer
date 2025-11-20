@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-11-20T21:04:29.333Z",
+  "source": "Aiven PostgreSQL",
+  "tables": [
+    "users",
+    "categories",
+    "products",
+    "settings",
+    "user_addresses",
+    "password_reset_tokens",
+    "orders",
+    "order_shipping_addresses",
+    "order_items",
+    "reviews",
+    "favorites",
+    "promo_codes",
+    "promo_code_products",
+    "web_pages",
+    "faq_categories",
+    "faq_questions"
+  ],
+  "backupDir": "E:\\ahmed nader\\web dev\\Projects\\Dr Gamer\\backups\\aiven-backup-1763672602698"
+}

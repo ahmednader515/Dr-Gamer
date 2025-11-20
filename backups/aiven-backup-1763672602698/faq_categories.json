@@ -1,0 +1,20 @@
+[
+  {
+    "id": "cmhjoirob0000j0flajo60yyb",
+    "title": "Xbox",
+    "slug": "xbox",
+    "sortOrder": 0,
+    "isActive": true,
+    "createdAt": "2025-11-03T19:55:53.625Z",
+    "updatedAt": "2025-11-03T19:55:53.625Z"
+  },
+  {
+    "id": "cmhkxg4a40003lbh0pwig56h5",
+    "title": "Playstation",
+    "slug": "playstation",
+    "sortOrder": 0,
+    "isActive": true,
+    "createdAt": "2025-11-04T16:53:32.715Z",
+    "updatedAt": "2025-11-04T16:53:32.715Z"
+  }
+]
