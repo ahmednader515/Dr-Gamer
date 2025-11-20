@@ -415,12 +415,17 @@ export async function getAllUsers({
   limit = limit || pageSize
 
   const skipAmount = (Number(page) - 1) * limit
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: 'desc' },
-    skip: skipAmount,
-    take: limit
-  })
-  const usersCount = await prisma.user.count()
+  
+  // Batch fetch users and count in parallel
+  const [users, usersCount] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip: skipAmount,
+      take: limit
+    }),
+    prisma.user.count()
+  ])
+  
   return {
     data: JSON.parse(JSON.stringify(users)),
     totalPages: Math.ceil(usersCount / limit),

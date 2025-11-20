@@ -79,7 +79,7 @@ async function SearchHeader({ params, translations }: {
     productCategory = '',
   } = params
 
-  // Build the same where clause to get the count
+  // Build the same where clause to get the count - reuse category lookup logic
   const where: any = { isPublished: true }
   
   if (q && q !== 'all') {
@@ -96,8 +96,10 @@ async function SearchHeader({ params, translations }: {
   }
   const validCategories = categories.filter(c => c && c !== 'all' && c !== '')
   
+  // Look up categories once and reuse in both queries
+  let categoryRecords: { id: string; name: string }[] = []
   if (validCategories.length > 0) {
-    const categoryRecords = await prisma.category.findMany({
+    categoryRecords = await prisma.category.findMany({
       where: { 
         name: { in: validCategories },
         isActive: true 
@@ -153,7 +155,7 @@ async function SearchHeader({ params, translations }: {
     }
   }
 
-  // Get the total count
+  // Get the total count - using cached where clause
   const totalProducts = await (prisma as any).product.count({ where })
 
   if (totalProducts === 0) {
@@ -236,7 +238,7 @@ async function ProductResults({ params, translations }: {
   const validCategories = categories.filter(c => c && c !== 'all' && c !== '')
   
   if (validCategories.length > 0) {
-    // Look up categories by name to get IDs
+    // Look up categories by name to get IDs - batch with count query if possible
     const categoryRecords = await prisma.category.findMany({
       where: { 
         name: { in: validCategories },

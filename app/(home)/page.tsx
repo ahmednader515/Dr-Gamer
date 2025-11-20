@@ -125,23 +125,17 @@ async function MostPurchasedSection() {
   }
 }
 
-async function FirstCategorySection({ categories }: { categories: string[] }) {
+async function FirstCategorySection({ categories, categoryMap }: { categories: string[], categoryMap: Map<string, string> }) {
   try {
     const firstCategory = categories[0]
     if (!firstCategory) return null
 
-    const categoryRecords = await prisma.category.findMany({
-      where: { name: firstCategory, isActive: true },
-      select: { id: true, name: true }
-    })
-
-    const categoryRecord = categoryRecords[0]
-    const categoryIdToName = categoryRecord ? { [categoryRecord.id]: categoryRecord.name } : {}
+    const categoryId = categoryMap.get(firstCategory)
 
     const allProducts = await prisma.product.findMany({
       where: {
-        OR: categoryRecord ? [
-          { categoryId: categoryRecord.id },
+        OR: categoryId ? [
+          { categoryId: categoryId },
           { category: firstCategory }
         ] : [{ category: firstCategory }],
         isPublished: true,
@@ -165,7 +159,8 @@ async function FirstCategorySection({ categories }: { categories: string[] }) {
         variations: true,
         countInStock: true,
         brand: true,
-      }
+      },
+      take: 8
     })
 
     const products = allProducts.slice(0, 8).map(product => {
@@ -221,22 +216,21 @@ async function FirstCategorySection({ categories }: { categories: string[] }) {
   }
 }
 
-async function RemainingCategoriesSection({ categories }: { categories: string[] }) {
+async function RemainingCategoriesSection({ categories, categoryMap }: { categories: string[], categoryMap: Map<string, string> }) {
   try {
     const remainingCategories = categories.slice(1)
     if (remainingCategories.length === 0) return null
 
-    const categoryRecords = await prisma.category.findMany({
-      where: { name: { in: remainingCategories }, isActive: true },
-      select: { id: true, name: true }
-    })
-
-    const categoryIds = categoryRecords.map(cat => cat.id)
-    const categoryIdToName = Object.fromEntries(categoryRecords.map(cat => [cat.id, cat.name]))
+    const categoryIds = remainingCategories
+      .map(cat => categoryMap.get(cat))
+      .filter((id): id is string => id !== undefined)
 
     const allProducts = await prisma.product.findMany({
       where: {
-        OR: [{ categoryId: { in: categoryIds } }, { category: { in: remainingCategories } }],
+        OR: categoryIds.length > 0 ? [
+          { categoryId: { in: categoryIds } }, 
+          { category: { in: remainingCategories } }
+        ] : [{ category: { in: remainingCategories } }],
         isPublished: true,
       },
       orderBy: [{ numSales: 'desc' }, { avgRating: 'desc' }],
@@ -261,10 +255,14 @@ async function RemainingCategoriesSection({ categories }: { categories: string[]
       }
     })
 
+    const categoryIdToName = new Map(
+      Array.from(categoryMap.entries()).map(([name, id]) => [id, name])
+    )
+
     const productsByCategory = remainingCategories.reduce((acc, category) => {
       acc[category] = allProducts
         .filter(product => {
-          const categoryName = product.categoryId ? categoryIdToName[product.categoryId] : product.category
+          const categoryName = product.categoryId ? categoryIdToName.get(product.categoryId) : product.category
           return categoryName === category
         })
         .slice(0, 8)
@@ -333,14 +331,19 @@ async function RemainingCategoriesSection({ categories }: { categories: string[]
 }
 
 export default async function HomePage() {
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: 'asc' },
-    select: { id: true, name: true, image: true },
-  })
+  // Batch fetch categories and settings in parallel
+  const [categories, setting] = await Promise.all([
+    prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: 'asc' },
+      select: { id: true, name: true, image: true },
+    }),
+    prisma.setting.findFirst({ select: { carousels: true } })
+  ])
 
   const categoryList = categories.map(c => c.name)
-  const setting = await prisma.setting.findFirst()
+  // Create a map for efficient category lookups (name -> id)
+  const categoryMap = new Map(categories.map(c => [c.name, c.id]))
   
   // Split categories for L-shape: some beside carousel, rest below
   const categoriesBeside = categories.slice(0, 3)
@@ -418,7 +421,7 @@ export default async function HomePage() {
       <div className='p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8'>
         <div className='max-w-[80%] mx-auto'>
           <Suspense fallback={<ProductSliderSkeleton title='Products' />}>
-            <FirstCategorySection categories={categoryList} />
+            <FirstCategorySection categories={categoryList} categoryMap={categoryMap} />
           </Suspense>
         </div>
       </div>
@@ -427,7 +430,7 @@ export default async function HomePage() {
       <div className='p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8'>
         <div className='max-w-[80%] mx-auto'>
           <Suspense fallback={<ProductSliderSkeleton title='Products' />}>
-            <RemainingCategoriesSection categories={categoryList} />
+            <RemainingCategoriesSection categories={categoryList} categoryMap={categoryMap} />
           </Suspense>
         </div>
       </div>

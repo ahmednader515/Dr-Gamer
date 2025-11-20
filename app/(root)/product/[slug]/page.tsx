@@ -137,8 +137,21 @@ async function ProductHeader({ slug }: { slug: string }) {
   )
 }
 
-async function ReviewsSection({ slug }: { slug: string }) {
-  // Direct database query for product to get ID for reviews
+async function ReviewsSection({ productId }: { productId: string }) {
+  return (
+    <div className='mb-8 sm:mb-12'>
+      <Separator className='mb-6 sm:mb-8' />
+      <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6'>Customer Reviews</h2>
+      {/* Review List */}
+      <ReviewList productId={productId} />
+    </div>
+  )
+}
+
+export default async function ProductPage({ params }: ProductPageProps) {
+  const { slug } = await params
+
+  // Fetch product once and share ID between components to avoid duplicate query
   const product = await prisma.product.findFirst({
     where: { 
       slug, 
@@ -146,19 +159,10 @@ async function ReviewsSection({ slug }: { slug: string }) {
     },
     select: { id: true }
   })
-  
-  return (
-    <div className='mb-8 sm:mb-12'>
-      <Separator className='mb-6 sm:mb-8' />
-      <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6'>Customer Reviews</h2>
-      {/* Review List */}
-      {product && <ReviewList productId={product.id} />}
-    </div>
-  )
-}
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const { slug } = await params
+  if (!product) {
+    notFound()
+  }
 
   return (
     <div className='container mx-auto px-4 py-6 sm:py-8' dir="ltr">
@@ -169,7 +173,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       {/* Reviews Section - Load second */}
       <Suspense fallback={<ReviewsSkeleton />}>
-        <ReviewsSection slug={slug} />
+        <ReviewsSection productId={product.id} />
       </Suspense>
     </div>
   )

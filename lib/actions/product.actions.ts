@@ -250,12 +250,41 @@ export async function getAllProductsForAdmin({
 
     const skip = limit * (Number(page) - 1)
     
+    // Batch fetch products and count in parallel with select to limit fields
     const [products, countProducts] = await Promise.all([
       prisma.product.findMany({
         where,
         orderBy,
         skip,
         take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          category: true,
+          categoryId: true,
+          images: true,
+          brand: true,
+          description: true,
+          productType: true,
+          platformType: true,
+          productCategory: true,
+          variations: true,
+          price: true,
+          listPrice: true,
+          originalPrice: true,
+          countInStock: true,
+          tags: true,
+          colors: true,
+          sizes: true,
+          avgRating: true,
+          numReviews: true,
+          ratingDistribution: true,
+          numSales: true,
+          isPublished: true,
+          createdAt: true,
+          updatedAt: true,
+        }
       }),
       prisma.product.count({ where })
     ])
@@ -536,12 +565,41 @@ export async function getAllProducts({
 
     const skip = limit * (Number(page) - 1)
     
+    // Batch fetch products and count in parallel with select to limit fields
     const [products, countProducts] = await Promise.all([
       prisma.product.findMany({
         where,
         orderBy,
         skip,
         take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          category: true,
+          categoryId: true,
+          images: true,
+          brand: true,
+          description: true,
+          productType: true,
+          platformType: true,
+          productCategory: true,
+          variations: true,
+          price: true,
+          listPrice: true,
+          originalPrice: true,
+          countInStock: true,
+          tags: true,
+          colors: true,
+          sizes: true,
+          avgRating: true,
+          numReviews: true,
+          ratingDistribution: true,
+          numSales: true,
+          isPublished: true,
+          createdAt: true,
+          updatedAt: true,
+        }
       }),
       prisma.product.count({ where })
     ])
@@ -633,106 +691,59 @@ export async function getHomePageData() {
   try {
     console.log('🔍 getHomePageData called - fetching all homepage data in single connection')
     try {
-      // Fetch data with reduced concurrency to avoid exhausting DB connections
-      // Use pooled client with pagination/selects
-      const todaysDeals = await prisma.product.findMany({
-        where: {
-          tags: { has: 'best-seller' },
-          isPublished: true,
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 10
-      })
+      // Batch all queries in parallel for optimal performance
+      const productSelect = {
+        id: true,
+        name: true,
+        slug: true,
+        images: true,
+        price: true,
+        listPrice: true,
+        originalPrice: true,
+        avgRating: true,
+        numReviews: true,
+        productType: true,
+        variations: true,
+        category: true,
+        countInStock: true,
+        brand: true,
+      }
 
-      const bestSellingProducts = await prisma.product.findMany({
-        where: {
-          tags: { has: 'best-seller' },
-          isPublished: true,
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 10
-      })
-
-      const categories = await prisma.product.findMany({
-        where: { isPublished: true },
-        select: { category: true },
-        distinct: ['category']
-      })
-
-      const newArrivals = await prisma.product.findMany({
-        where: {
-          tags: { has: 'featured' },
-          isPublished: true,
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 4,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          images: true,
-          price: true,
-          listPrice: true,
-          originalPrice: true,
-          avgRating: true,
-          numReviews: true,
-          productType: true,
-          variations: true,
-          category: true,
-          countInStock: true,
-          brand: true,
-        }
-      })
-
-      const featureds = await prisma.product.findMany({
-        where: {
-          tags: { has: 'featured' },
-          isPublished: true,
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 4,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          images: true,
-          price: true,
-          listPrice: true,
-          originalPrice: true,
-          avgRating: true,
-          numReviews: true,
-          productType: true,
-          variations: true,
-          category: true,
-          countInStock: true,
-          brand: true,
-        }
-      })
-
-      const bestSellers = await prisma.product.findMany({
-        where: {
-          tags: { has: 'best-seller' },
-          isPublished: true,
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 4,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          images: true,
-          price: true,
-          listPrice: true,
-          originalPrice: true,
-          avgRating: true,
-          numReviews: true,
-          productType: true,
-          variations: true,
-          category: true,
-          countInStock: true,
-          brand: true,
-        }
-      })
+      // Fetch data efficiently - combine duplicate queries
+      const [bestSellerProducts, categories, featuredProducts] = await Promise.all([
+        // Fetch best sellers once (10 items) and reuse for todaysDeals and bestSellingProducts
+        prisma.product.findMany({
+          where: {
+            tags: { has: 'best-seller' },
+            isPublished: true,
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+          select: productSelect
+        }),
+        prisma.product.findMany({
+          where: { isPublished: true },
+          select: { category: true },
+          distinct: ['category']
+        }),
+        // Fetch featured once (4 items) and reuse for newArrivals and featureds
+        prisma.product.findMany({
+          where: {
+            tags: { has: 'featured' },
+            isPublished: true,
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 4,
+          select: productSelect
+        })
+      ])
+      
+      // Reuse fetched data instead of duplicate queries
+      const todaysDeals = bestSellerProducts
+      const bestSellingProducts = bestSellerProducts
+      const newArrivals = featuredProducts
+      const featureds = featuredProducts
+      const bestSellers = bestSellerProducts.slice(0, 4)
       
       // Process categories
       const categoryList = categories.map((c: any) => c.category).slice(0, 4)

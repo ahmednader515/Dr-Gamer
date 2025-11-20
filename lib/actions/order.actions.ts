@@ -211,90 +211,90 @@ export const createOrderFromCart = async (
     expectedDeliveryDate: cart.expectedDeliveryDate ? new Date(cart.expectedDeliveryDate) : new Date(),
   })
   
-      const order = await prisma.order.create({
-    data: {
-      userId: orderData.user as string,
-      customerEmail: orderData.customerEmail,
-      customerPhone: orderData.customerPhone,
-      expectedDeliveryDate: orderData.expectedDeliveryDate,
-      paymentMethod: orderData.paymentMethod,
-      paymentNumber: orderData.paymentNumber,
-      transactionImage: orderData.transactionImage,
-      paymentResult: orderData.paymentResult as any,
-      itemsPrice: orderData.itemsPrice,
-      shippingPrice: orderData.shippingPrice,
-      taxPrice: orderData.taxPrice,
-      totalPrice: orderData.totalPrice,
-      promoCode: orderData.promoCode,
-      discountPercent: orderData.discountPercent,
-      discountAmount: orderData.discountAmount,
-      isPaid: orderData.isPaid,
-      paidAt: orderData.paidAt,
-      isDelivered: orderData.isDelivered,
-      deliveredAt: orderData.deliveredAt,
-      orderItems: {
-        create: orderData.items.map(item => ({
-          productId: item.product,
-          clientId: item.clientId,
-          name: item.name,
-          slug: item.slug,
-          category: item.category,
-          quantity: item.quantity,
-          countInStock: item.countInStock,
-          image: item.image,
-          price: item.price,
-          size: item.size,
-          color: item.color,
-          productType: (item as any).productType,
-          platformType: (item as any).platformType,
-          productCategory: (item as any).productCategory,
-          selectedVariation: (item as any).selectedVariation,
-          isAddToOwnAccount: (item as any).isAddToOwnAccount ?? false,
-          accountUsername: (item as any).accountUsername,
-          accountPassword: (item as any).accountPassword,
-          accountBackupCode: (item as any).accountBackupCode,
-          disableTwoStepVerified: (item as any).disableTwoStepVerified ?? false,
-        }))
-      },
-      shippingAddress: orderData.shippingAddress ? {
-        create: {
-          street: orderData.shippingAddress.street,
-          province: orderData.shippingAddress.province,
-          area: orderData.shippingAddress.area,
-          apartment: orderData.shippingAddress.apartment,
-          building: orderData.shippingAddress.building,
-          floor: orderData.shippingAddress.floor,
-          landmark: orderData.shippingAddress.landmark,
+      // Use transaction to ensure atomicity and reduce separate operations
+      const order = await prisma.$transaction(async (tx) => {
+        const createdOrder = await tx.order.create({
+          data: {
+            userId: orderData.user as string,
+            customerEmail: orderData.customerEmail,
+            customerPhone: orderData.customerPhone,
+            expectedDeliveryDate: orderData.expectedDeliveryDate,
+            paymentMethod: orderData.paymentMethod,
+            paymentNumber: orderData.paymentNumber,
+            transactionImage: orderData.transactionImage,
+            paymentResult: orderData.paymentResult as any,
+            itemsPrice: orderData.itemsPrice,
+            shippingPrice: orderData.shippingPrice,
+            taxPrice: orderData.taxPrice,
+            totalPrice: orderData.totalPrice,
+            promoCode: orderData.promoCode,
+            discountPercent: orderData.discountPercent,
+            discountAmount: orderData.discountAmount,
+            isPaid: orderData.isPaid,
+            paidAt: orderData.paidAt,
+            isDelivered: orderData.isDelivered,
+            deliveredAt: orderData.deliveredAt,
+            orderItems: {
+              create: orderData.items.map(item => ({
+                productId: item.product,
+                clientId: item.clientId,
+                name: item.name,
+                slug: item.slug,
+                category: item.category,
+                quantity: item.quantity,
+                countInStock: item.countInStock,
+                image: item.image,
+                price: item.price,
+                size: item.size,
+                color: item.color,
+                productType: (item as any).productType,
+                platformType: (item as any).platformType,
+                productCategory: (item as any).productCategory,
+                selectedVariation: (item as any).selectedVariation,
+                isAddToOwnAccount: (item as any).isAddToOwnAccount ?? false,
+                accountUsername: (item as any).accountUsername,
+                accountPassword: (item as any).accountPassword,
+                accountBackupCode: (item as any).accountBackupCode,
+                disableTwoStepVerified: (item as any).disableTwoStepVerified ?? false,
+              }))
+            },
+            shippingAddress: orderData.shippingAddress ? {
+              create: {
+                street: orderData.shippingAddress.street,
+                province: orderData.shippingAddress.province,
+                area: orderData.shippingAddress.area,
+                apartment: orderData.shippingAddress.apartment,
+                building: orderData.shippingAddress.building,
+                floor: orderData.shippingAddress.floor,
+                landmark: orderData.shippingAddress.landmark,
+              }
+            } : undefined
+          },
+          include: {
+            orderItems: true,
+            shippingAddress: true,
+            user: { select: { email: true, name: true } }
+          }
+        })
+
+        // Increment promo code usage count if used (within transaction)
+        if (orderData.promoCode && promoDiscountAmount > 0) {
+          await tx.promoCode.update({
+            where: { code: orderData.promoCode },
+            data: { usageCount: { increment: 1 } }
+          })
         }
-      } : undefined
-    },
-    include: {
-      orderItems: true,
-      shippingAddress: true,
-      user: true
-    }
-  })
 
-  // Increment promo code usage count if used
-  if (orderData.promoCode && promoDiscountAmount > 0) {
-    await prisma.promoCode.update({
-      where: { code: orderData.promoCode },
-      data: { usageCount: { increment: 1 } }
-    })
-  }
+        return createdOrder
+      })
 
-  // Send order confirmation email
+  // Send order confirmation email (user data already included in order query)
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { email: true, name: true }
-    })
-
-    if (user?.email) {
+    if (order.user?.email) {
       await sendOrderConfirmationEmail({
         order,
-        userName: user.name,
-        userEmail: user.email,
+        userName: order.user.name,
+        userEmail: order.user.email,
       })
     }
   } catch (emailError) {
@@ -307,31 +307,53 @@ export const createOrderFromCart = async (
 
 export async function updateOrderToPaid(orderId: string) {
   try {
-    // Mock mode removed: always use database
-    
-    const order = await prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        user: {
-          select: { email: true, name: true }
+    // Use transaction to ensure order update and stock update are atomic
+    const order = await prisma.$transaction(async (tx) => {
+      const existingOrder = await tx.order.findUnique({
+        where: { id: orderId },
+        select: {
+          id: true,
+          isPaid: true,
+          user: { select: { email: true, name: true } },
+          orderItems: { select: { productId: true, quantity: true } }
         }
-      }
+      })
+      
+      if (!existingOrder) throw new Error('Order not found')
+      if (existingOrder.isPaid) throw new Error('Order is already paid')
+      
+      // Update order status
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          isPaid: true,
+          paidAt: new Date()
+        },
+        include: {
+          user: { select: { email: true, name: true } },
+          orderItems: true
+        }
+      })
+      
+      // Batch update all products in parallel within transaction
+      await Promise.all(
+        existingOrder.orderItems.map(item =>
+          tx.product.update({
+            where: { id: item.productId },
+            data: {
+              countInStock: {
+                decrement: item.quantity
+              }
+            }
+          })
+        )
+      )
+      
+      return updatedOrder
     })
-    if (!order) throw new Error('Order not found')
-    if (order.isPaid) throw new Error('Order is already paid')
     
-    await prisma.order.update({
-      where: { id: orderId },
-      data: {
-        isPaid: true,
-        paidAt: new Date()
-      }
-    })
-    
-    await updateProductStock(orderId)
-    
-    // Send payment confirmation email
-    if (order.user.email) {
+    // Send payment confirmation email (outside transaction)
+    if (order.user?.email) {
       try {
         await sendOrderPaidEmail({
           order,
@@ -352,24 +374,25 @@ export async function updateOrderToPaid(orderId: string) {
 }
 const updateProductStock = async (orderId: string) => {
   try {
-    // Mock mode removed: always use database
-    
     const order = await prisma.order.findUnique({
       where: { id: orderId },
-      include: { orderItems: true }
+      select: { orderItems: { select: { productId: true, quantity: true } } }
     })
     if (!order) throw new Error('Order not found')
 
-    for (const item of order.orderItems) {
-      await prisma.product.update({
-        where: { id: item.productId },
-        data: {
-          countInStock: {
-            decrement: item.quantity
+    // Batch update all products in parallel instead of sequential N+1 queries
+    await Promise.all(
+      order.orderItems.map(item =>
+        prisma.product.update({
+          where: { id: item.productId },
+          data: {
+            countInStock: {
+              decrement: item.quantity
+            }
           }
-        }
-      })
-    }
+        })
+      )
+    )
     return true
   } catch (error) {
     throw error
@@ -734,22 +757,25 @@ export async function getAllOrders({
   } = data.settings[0];
   limit = limit || pageSize
   
-  // Mock mode removed: always use database
-  
   const skipAmount = (Number(page) - 1) * limit
-  const orders = await prisma.order.findMany({
-    include: {
-      user: {
-        select: { name: true }
-      }
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    skip: skipAmount,
-    take: limit,
-  })
-  const ordersCount = await prisma.order.count()
+  
+  // Batch fetch orders and count in parallel
+  const [orders, ordersCount] = await Promise.all([
+    prisma.order.findMany({
+      include: {
+        user: {
+          select: { name: true }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: skipAmount,
+      take: limit,
+    }),
+    prisma.order.count()
+  ])
+  
   return {
     data: JSON.parse(JSON.stringify(orders)),
     totalPages: Math.ceil(ordersCount / limit),
@@ -771,22 +797,21 @@ export async function getMyOrders({
     throw new Error('User is not authenticated')
   }
   
-  // Mock mode removed: always use database
-  
   const skipAmount = (Number(page) - 1) * limit
-  const orders = await prisma.order.findMany({
-    where: {
-      userId: session?.user?.id,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    skip: skipAmount,
-    take: limit,
-  })
-  const ordersCount = await prisma.order.count({
-    where: { userId: session?.user?.id }
-  })
+  const where = { userId: session.user.id }
+  
+  // Batch fetch orders and count in parallel
+  const [orders, ordersCount] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: skipAmount,
+      take: limit,
+    }),
+    prisma.order.count({ where })
+  ])
 
   return {
     data: JSON.parse(JSON.stringify(orders)),
@@ -794,15 +819,82 @@ export async function getMyOrders({
   }
 }
 export async function getOrderById(orderId: string) {
-  // Mock mode removed: always use database
-  
+  // Use select instead of include to limit data fetched
   const order = await prisma.order.findUnique({
     where: { id: orderId },
-    include: {
+    select: {
+      id: true,
+      userId: true,
+      customerEmail: true,
+      customerPhone: true,
+      expectedDeliveryDate: true,
+      paymentMethod: true,
+      paymentResult: true,
+      paymentNumber: true,
+      transactionImage: true,
+      itemsPrice: true,
+      shippingPrice: true,
+      taxPrice: true,
+      totalPrice: true,
+      promoCode: true,
+      discountPercent: true,
+      discountAmount: true,
+      isPaid: true,
+      paidAt: true,
+      isDelivered: true,
+      deliveredAt: true,
+      refundRequested: true,
+      refundStatus: true,
+      refundReason: true,
+      refundTransactionImage: true,
+      refundRequestedAt: true,
+      refundProcessedAt: true,
+      isCancelled: true,
+      cancelledAt: true,
+      createdAt: true,
+      updatedAt: true,
       shippingAddress: true,
       orderItems: {
-        include: {
-          product: true
+        select: {
+          id: true,
+          orderId: true,
+          productId: true,
+          clientId: true,
+          name: true,
+          slug: true,
+          category: true,
+          quantity: true,
+          countInStock: true,
+          image: true,
+          price: true,
+          size: true,
+          color: true,
+          productType: true,
+          platformType: true,
+          productCategory: true,
+          selectedVariation: true,
+          isAddToOwnAccount: true,
+          accountUsername: true,
+          accountPassword: true,
+          accountBackupCode: true,
+          disableTwoStepVerified: true,
+          createdAt: true,
+          updatedAt: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              images: true,
+              price: true,
+              listPrice: true,
+              category: true,
+              brand: true,
+              productType: true,
+              platformType: true,
+              productCategory: true,
+            }
+          }
         }
       },
       user: {
@@ -885,14 +977,16 @@ export async function getOrderSummary(date: DateRange) {
       lte: date.to,
     }
 
-    // Run queries sequentially to avoid exhausting low-connection pools in dev
-    const ordersCount = await prisma.order.count({ where: { createdAt: dateWhere } })
-    const productsCount = await prisma.product.count({ where: { createdAt: dateWhere } })
-    const usersCount = await prisma.user.count({ where: { createdAt: dateWhere } })
-    const totalSalesResult = await prisma.order.aggregate({
-      where: { createdAt: dateWhere },
-      _sum: { totalPrice: true },
-    })
+    // Batch count queries in parallel for better performance
+    const [ordersCount, productsCount, usersCount, totalSalesResult] = await Promise.all([
+      prisma.order.count({ where: { createdAt: dateWhere } }),
+      prisma.product.count({ where: { createdAt: dateWhere } }),
+      prisma.user.count({ where: { createdAt: dateWhere } }),
+      prisma.order.aggregate({
+        where: { createdAt: dateWhere },
+        _sum: { totalPrice: true },
+      })
+    ])
     const monthlySalesData = await prisma.order.findMany({
       where: { createdAt: { gte: new Date(date.from.getFullYear(), date.from.getMonth() - 5, 1) } },
       select: { createdAt: true, totalPrice: true },
@@ -948,29 +1042,19 @@ export async function getOverviewHeaderStats(date: DateRange) {
   try {
     if (!date?.from || !date?.to) throw new Error('Invalid date range')
     const dateWhere = { gte: date.from, lte: date.to }
+    const paidDateWhere = { createdAt: dateWhere, isPaid: true }
     
-    // Count all orders (paid and unpaid)
-    const ordersCount = await prisma.order.count({ where: { createdAt: dateWhere } })
-    
-    // Count only paid orders for revenue calculation
-    const paidOrdersCount = await prisma.order.count({ 
-      where: { 
-        createdAt: dateWhere,
-        isPaid: true 
-      } 
-    })
-    
-    const productsCount = await prisma.product.count({ where: { createdAt: dateWhere } })
-    const usersCount = await prisma.user.count({ where: { createdAt: dateWhere } })
-    
-    // Calculate total sales only from paid orders
-    const totalSalesResult = await prisma.order.aggregate({
-      where: { 
-        createdAt: dateWhere,
-        isPaid: true 
-      },
-      _sum: { totalPrice: true },
-    })
+    // Batch all count and aggregate queries in parallel
+    const [ordersCount, paidOrdersCount, productsCount, usersCount, totalSalesResult] = await Promise.all([
+      prisma.order.count({ where: { createdAt: dateWhere } }),
+      prisma.order.count({ where: paidDateWhere }),
+      prisma.product.count({ where: { createdAt: dateWhere } }),
+      prisma.user.count({ where: { createdAt: dateWhere } }),
+      prisma.order.aggregate({
+        where: paidDateWhere,
+        _sum: { totalPrice: true },
+      })
+    ])
     
     return {
       ordersCount: paidOrdersCount, // Show only paid orders count

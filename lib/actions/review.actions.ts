@@ -27,57 +27,61 @@ export async function createUpdateReview({
       user: session.user.id,
     })
 
-    // Check if user already reviewed this product
-    const existingReview = await prisma.review.findFirst({
-      where: {
-        productId: review.product,
-        userId: review.user,
+    // Use transaction to batch operations
+    const { product, wasUpdate } = await prisma.$transaction(async (tx) => {
+      // Check if review exists first
+      const existingReview = await tx.review.findFirst({
+        where: {
+          productId: review.product,
+          userId: review.user,
+        },
+        select: { id: true }
+      })
+
+      // Update or create review
+      if (existingReview) {
+        await tx.review.update({
+          where: { id: existingReview.id },
+          data: {
+            comment: review.comment,
+            rating: review.rating,
+            title: review.title,
+            updatedAt: new Date(),
+          }
+        })
+      } else {
+        await tx.review.create({
+          data: {
+            userId: review.user,
+            productId: review.product,
+            isVerifiedPurchase: review.isVerifiedPurchase,
+            rating: review.rating,
+            title: review.title || '',
+            comment: review.comment,
+          }
+        })
       }
+
+      // Get product slug for revalidation and update stats in parallel
+      const [productRecord] = await Promise.all([
+        tx.product.findUnique({
+          where: { id: review.product },
+          select: { slug: true },
+        }),
+        updateProductReviewStatsInTx(tx, review.product)
+      ])
+
+      return { product: productRecord, wasUpdate: !!existingReview }
     })
 
-    if (existingReview) {
-      // Update existing review
-      await prisma.review.update({
-        where: { id: existingReview.id },
-        data: {
-          comment: review.comment,
-          rating: review.rating,
-          title: review.title,
-          updatedAt: new Date(),
-        }
-      })
-    } else {
-      // Create new review
-      await prisma.review.create({
-        data: {
-          userId: review.user,
-          productId: review.product,
-          isVerifiedPurchase: review.isVerifiedPurchase,
-          rating: review.rating,
-          title: review.title || '',
-          comment: review.comment,
-        }
-      })
+    // Revalidate outside transaction
+    if (product?.slug) {
+      revalidatePath(`/product/${product.slug}`)
     }
-
-    // Update product review statistics
-    await updateProductReviewStats(review.product)
-
-    // Revalidate the correct product page by slug
-    try {
-      const product = await prisma.product.findUnique({
-        where: { id: review.product },
-        select: { slug: true },
-      })
-      if (product?.slug) {
-        revalidatePath(`/product/${product.slug}`)
-      }
-    } catch (e) {
-      // noop
-    }
+    
     return {
       success: true,
-      message: existingReview ? 'Review updated successfully' : 'Review created successfully',
+      message: wasUpdate ? 'Review updated successfully' : 'Review created successfully',
     }
   } catch (error) {
     console.error('Review creation error:', error)
@@ -88,17 +92,18 @@ export async function createUpdateReview({
   }
 }
 
-const updateProductReviewStats = async (productId: string) => {
+// Transaction-aware version for use within transactions
+const updateProductReviewStatsInTx = async (tx: any, productId: string) => {
   try {
-    // Get all reviews for this product
-    const reviews = await prisma.review.findMany({
+    // Use aggregate for better performance
+    const stats = await tx.review.groupBy({
+      by: ['rating'],
       where: { productId },
-      select: { rating: true }
+      _count: { rating: true }
     })
-    
-    if (reviews.length === 0) {
-      // No reviews, reset product stats
-      await prisma.product.update({
+
+    if (stats.length === 0) {
+      await tx.product.update({
         where: { id: productId },
         data: {
           avgRating: 0,
@@ -109,29 +114,37 @@ const updateProductReviewStats = async (productId: string) => {
       return
     }
 
-    // Calculate average rating
-    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0)
-    const avgRating = totalRating / reviews.length
-
-    // Calculate rating distribution
-    const ratingDistribution = []
+    // Calculate from grouped stats
+    let totalRating = 0
+    let totalReviews = 0
+    const ratingDistribution: any[] = []
+    
     for (let i = 1; i <= 5; i++) {
-      const count = reviews.filter(r => r.rating === i).length
+      const stat = stats.find((s: any) => s.rating === i)
+      const count = stat?._count?.rating || 0
+      totalRating += i * count
+      totalReviews += count
       ratingDistribution.push({ rating: i, count })
     }
+
+    const avgRating = totalReviews > 0 ? totalRating / totalReviews : 0
     
-    // Update product with new stats
-    await prisma.product.update({
+    await tx.product.update({
       where: { id: productId },
       data: {
         avgRating: parseFloat(avgRating.toFixed(1)),
-        numReviews: reviews.length,
+        numReviews: totalReviews,
         ratingDistribution,
       }
     })
   } catch (error) {
     console.error('Error updating product review stats:', error)
   }
+}
+
+// Non-transaction version for backward compatibility
+const updateProductReviewStats = async (productId: string) => {
+  await updateProductReviewStatsInTx(prisma, productId)
 }
 
 export async function getReviews({
@@ -243,25 +256,28 @@ export const deleteReview = async (reviewId: string, path: string) => {
       throw new Error('You can only delete your own reviews')
     }
 
-    // Delete the review
-    await prisma.review.delete({
-      where: { id: reviewId }
-    })
+    // Use transaction to batch operations
+    const product = await prisma.$transaction(async (tx) => {
+      // Delete the review
+      await tx.review.delete({
+        where: { id: reviewId }
+      })
 
-    // Update product review stats
-    await updateProductReviewStats(review.productId)
+      // Update product review stats (within transaction)
+      await updateProductReviewStatsInTx(tx, review.productId)
 
-    // Revalidate the correct product page by slug
-    try {
-      const product = await prisma.product.findUnique({
+      // Get product slug for revalidation (within transaction)
+      const productRecord = await tx.product.findUnique({
         where: { id: review.productId },
         select: { slug: true },
       })
-      if (product?.slug) {
-        revalidatePath(`/product/${product.slug}`)
-      }
-    } catch (e) {
-      // noop
+
+      return productRecord
+    })
+
+    // Revalidate outside transaction
+    if (product?.slug) {
+      revalidatePath(`/product/${product.slug}`)
     }
     return {
       success: true,
