@@ -1,0 +1,46 @@
+[
+  {
+    "id": "cmi79vue3002hfsedqbultdgf",
+    "code": "FIRST10",
+    "discountPercent": 10,
+    "isActive": true,
+    "expiresAt": "2025-11-22T19:59:00.000Z",
+    "usageLimit": null,
+    "usageCount": 0,
+    "createdAt": "2025-11-20T08:12:37.659Z",
+    "updatedAt": "2025-11-20T08:12:37.659Z"
+  },
+  {
+    "id": "cmi22f38r0005ele5h3lrq5xx",
+    "code": "ARC100",
+    "discountPercent": 10,
+    "isActive": true,
+    "expiresAt": "2025-11-23T19:59:00.000Z",
+    "usageLimit": 100,
+    "usageCount": 2,
+    "createdAt": "2025-11-16T16:44:47.787Z",
+    "updatedAt": "2025-11-18T18:16:53.364Z"
+  },
+  {
+    "id": "cmi5cz6hc0002k3gwoeixbym6",
+    "code": "2GPU10",
+    "discountPercent": 10,
+    "isActive": true,
+    "expiresAt": "2025-11-20T15:00:00.000Z",
+    "usageLimit": null,
+    "usageCount": 0,
+    "createdAt": "2025-11-19T00:03:39.792Z",
+    "updatedAt": "2025-11-19T00:03:39.792Z"
+  },
+  {
+    "id": "cmi4zfab10009l3e8oi31v9xi",
+    "code": "12GPU100",
+    "discountPercent": 10,
+    "isActive": true,
+    "expiresAt": "2025-11-19T19:59:00.000Z",
+    "usageLimit": 2,
+    "usageCount": 1,
+    "createdAt": "2025-11-18T17:44:16.622Z",
+    "updatedAt": "2025-11-19T06:40:51.079Z"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "cmhe12swh004lhafl2mcmga7r",
+    "name": "Playstation Plus",
+    "slug": "playstation-plus",
+    "description": "Playstation Plus",
+    "image": "https://utfs.io/f/MBy75kmeCFNo7FWGaqbylU90qfJhYxPL1rCOja8cSvWDANmg",
+    "isActive": true,
+    "sortOrder": 3,
+    "createdAt": "2025-10-30T20:00:46.674Z",
+    "updatedAt": "2025-11-03T21:05:13.750Z"
+  },
+  {
+    "id": "cmhgrgxxm0003kve7q16s0huh",
+    "name": "Xbox Games",
+    "slug": "xbox-games",
+    "description": "xbox games",
+    "image": "https://utfs.io/f/MBy75kmeCFNoKOiKVLh0PN6JCoMjGZTUWmsVtwrKyERa2Bc4",
+    "isActive": true,
+    "sortOrder": 0,
+    "createdAt": "2025-11-01T18:55:08.747Z",
+    "updatedAt": "2025-11-06T11:22:00.484Z"
+  },
+  {
+    "id": "cmhe12sw4004ihafly1k7ttg0",
+    "name": "Xbox Gamepass",
+    "slug": "xbox-gamepass",
+    "description": "Gamepass",
+    "image": "https://utfs.io/f/MBy75kmeCFNoVD7pRVsiSAFMoYlVbZgnOchUB8DIz7XCfJ3x",
+    "isActive": true,
+    "sortOrder": 1,
+    "createdAt": "2025-10-30T20:00:46.661Z",
+    "updatedAt": "2025-11-06T11:22:14.327Z"
+  },
+  {
+    "id": "cmhgqw9hc0000kve7wb5jfvn9",
+    "name": "Playstation Games",
+    "slug": "playstation-games",
+    "description": "playstation games",
+    "image": "https://utfs.io/f/MBy75kmeCFNoJ6cFVdj9h0Dm7fUPoGcetVIBOQwabsnF2XTr",
+    "isActive": true,
+    "sortOrder": 2,
+    "createdAt": "2025-11-01T18:39:03.904Z",
+    "updatedAt": "2025-11-06T11:22:25.185Z"
+  },
+  {
+    "id": "cmhjrm115000bfnfj04154tea",
+    "name": "Digital Codes",
+    "slug": "digital-codes",
+    "description": "Digital Codes",
+    "image": "https://utfs.io/f/MBy75kmeCFNoSycY1e7xLwv6coNGR7984EsbtDdFU5WmTKP3",
+    "isActive": true,
+    "sortOrder": 4,
+    "createdAt": "2025-11-03T21:22:24.570Z",
+    "updatedAt": "2025-11-06T11:35:38.748Z"
+  }
+]

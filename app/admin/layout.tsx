@@ -1,0 +1,71 @@
+import { auth } from '@/auth'
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import Image from 'next/image'
+import AdminNav from './admin-nav'
+import Footer from '@/components/shared/footer'
+import data from '@/lib/data'
+import DesktopNav from './desktop-nav'
+
+const allNavigation = [
+  { name: 'Overview', href: '/admin/overview', roles: ['Admin'] },
+  { name: 'Products', href: '/admin/products', roles: ['Admin', 'Moderator'] },
+  { name: 'Orders', href: '/admin/orders', roles: ['Admin'] },
+  { name: 'Users', href: '/admin/users', roles: ['Admin'] },
+  { name: 'Promo Codes', href: '/admin/promo-codes', roles: ['Admin'] },
+  { name: 'Web Pages', href: '/admin/web-pages', roles: ['Admin', 'Moderator'] },
+  { name: 'FAQ', href: '/admin/faq', roles: ['Admin', 'Moderator'] },
+  { name: 'Settings', href: '/admin/settings', roles: ['Admin', 'Moderator'] },
+]
+
+export default async function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const session = await auth()
+  const userRole = session?.user.role
+  
+  // Allow both Admin and Moderator
+  if (userRole !== 'Admin' && userRole !== 'Moderator') redirect('/')
+  
+  // Filter navigation based on user role
+  const navigation = allNavigation.filter(item => 
+    item.roles.includes(userRole as string)
+  )
+  
+  const { site } = data.settings[0];
+  
+  return (
+    <>
+      <div className='flex flex-col min-h-screen ltr admin-container' style={{ fontFamily: 'Cairo, sans-serif' }}>
+        <div className='bg-black text-white relative'>
+          <div className='flex items-center justify-between h-16 px-4 py-2'>
+            {/* Desktop Navigation Links on the left - hidden on mobile */}
+            <div className='hidden md:block'>
+              <DesktopNav navigation={navigation} />
+            </div>
+            
+            {/* Menu button on the left - visible only on mobile */}
+            <div className='md:hidden'>
+              <AdminNav userRole={userRole as string} />
+            </div>
+            
+            {/* Logo on the right */}
+            <Link href='/' className='flex items-center'>
+              <Image
+                src='/icons/logo.png'
+                width={48}
+                height={48}
+                alt={`${site.name} logo`}
+                className='w-10 h-10 sm:w-12 sm:h-12'
+              />
+            </Link>
+          </div>
+        </div>
+        <main className='flex-1 p-3 sm:p-4 lg:p-6 ltr admin-container' style={{ fontFamily: 'Cairo, sans-serif' }}>{children}</main>
+        <Footer />
+      </div>
+    </>
+  )
+}

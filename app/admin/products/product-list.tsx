@@ -1,0 +1,491 @@
+'use client'
+import Link from 'next/link'
+import Image from 'next/image'
+import { useState, useMemo } from 'react'
+
+import DeleteDialog from '@/components/shared/delete-dialog'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { formatDateTime } from '@/lib/utils'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { deleteProduct } from '@/lib/actions/product.actions'
+import { useToast } from '@/hooks/use-toast'
+
+const resolveCategory = (category?: string | null) =>
+  category && category.trim() !== '' ? category : 'Uncategorized'
+
+type Product = {
+  id: string
+  name: string
+  price: number
+  category: string
+  countInStock: number
+  avgRating: number
+  isPublished: boolean
+  images: string[]
+  slug: string
+  updatedAt: Date
+}
+
+type ProductListProps = {
+  initialProducts: Product[]
+  totalProducts: number
+}
+
+// Loading skeleton component for table rows
+const TableRowSkeleton = () => (
+  <TableRow className="bg-gray-800 animate-pulse border-b border-gray-700">
+    <TableCell className='text-left py-4 px-4'>
+      <div className="w-16 h-16 bg-gray-200 rounded-md"></div>
+    </TableCell>
+    <TableCell className='text-left py-4 px-4'>
+      <div className="h-4 bg-gray-200 rounded w-32"></div>
+    </TableCell>
+    <TableCell className='text-left py-4 px-4'>
+      <div className="h-4 bg-gray-200 rounded w-16"></div>
+    </TableCell>
+    <TableCell className='text-left py-4 px-4'>
+      <div className="h-4 bg-gray-200 rounded w-20"></div>
+    </TableCell>
+    <TableCell className='text-left py-4 px-4'>
+      <div className="h-6 bg-gray-200 rounded-full w-12"></div>
+    </TableCell>
+    <TableCell className='text-left py-4 px-4'>
+      <div className="h-4 bg-gray-200 rounded w-16"></div>
+    </TableCell>
+    <TableCell className='text-left py-4 px-4'>
+      <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+    </TableCell>
+    <TableCell className='text-left py-4 px-4'>
+      <div className="h-4 bg-gray-200 rounded w-24"></div>
+    </TableCell>
+    <TableCell className='py-4 px-4'>
+      <div className="flex gap-2">
+        <div className="h-8 bg-gray-200 rounded w-16"></div>
+        <div className="h-8 bg-gray-200 rounded w-16"></div>
+        <div className="h-8 bg-gray-200 rounded w-16"></div>
+      </div>
+    </TableCell>
+  </TableRow>
+)
+
+// Loading skeleton component for mobile cards
+const MobileCardSkeleton = () => (
+  <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4 space-y-3 animate-pulse">
+    <div className="flex items-center gap-3">
+      <div className="w-16 h-16 bg-gray-700 rounded-md"></div>
+      <div className="flex-1 space-y-2">
+        <div className="h-4 bg-gray-700 rounded w-32"></div>
+        <div className="h-3 bg-gray-700 rounded w-20"></div>
+      </div>
+    </div>
+    <div className="space-y-2">
+      <div className="h-3 bg-gray-700 rounded w-24"></div>
+      <div className="h-3 bg-gray-700 rounded w-16"></div>
+      <div className="h-3 bg-gray-700 rounded w-20"></div>
+    </div>
+    <div className="flex gap-2">
+      <div className="h-8 bg-gray-700 rounded w-16"></div>
+      <div className="h-8 bg-gray-700 rounded w-16"></div>
+      <div className="h-8 bg-gray-700 rounded w-16"></div>
+    </div>
+  </div>
+)
+
+const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
+  const [page, setPage] = useState<number>(1)
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
+  const [sortOrder, setSortOrder] = useState<string>('default')
+  const [products, setProducts] = useState<Product[]>(initialProducts)
+  const { toast } = useToast()
+  
+  // Get unique categories
+  const categories = useMemo(() => {
+    const uniqueCategories = Array.from(
+      new Set(products.map((p) => resolveCategory(p.category)))
+    )
+    return uniqueCategories.sort()
+  }, [products])
+  
+  // Client-side search, filtering, and sorting
+  const filteredProducts = useMemo(() => {
+    let result = products
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      result = result.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        resolveCategory(product.category)
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
+      )
+    }
+    
+    // Apply category filter
+    if (categoryFilter !== 'all') {
+      result = result.filter(
+        (product) => resolveCategory(product.category) === categoryFilter
+      )
+    }
+    
+    // Apply alphabetical sorting
+    if (sortOrder === 'a-z') {
+      result = [...result].sort((a, b) => a.name.localeCompare(b.name))
+    } else if (sortOrder === 'z-a') {
+      result = [...result].sort((a, b) => b.name.localeCompare(a.name))
+    }
+    
+    return result
+  }, [products, searchQuery, categoryFilter, sortOrder])
+
+  // Pagination
+  const itemsPerPage = 10
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
+  const startIndex = (page - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentProducts = filteredProducts.slice(startIndex, endIndex)
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+  }
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    setPage(1) // Reset to first page when searching
+  }
+
+  // Client-side delete function that calls the API route
+  const deleteProductClient = async (id: string) => {
+    try {
+      // Optimistic update
+      setProducts(prev => prev.filter(p => p.id !== id))
+      
+      // Call the API route
+      const response = await fetch(`/api/products/${id}`, {
+        method: 'DELETE',
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        // Show success message
+        toast({
+          title: 'Product deleted successfully',
+          description: result.message,
+        })
+        // Product is already removed from state
+        return { success: true, message: result.message }
+      } else {
+        // Revert optimistic update on failure
+        window.location.reload()
+        toast({
+          title: 'Error deleting product',
+          description: result.message || 'An unexpected error occurred',
+          variant: 'destructive',
+        })
+        return { success: false, message: result.message || 'An unexpected error occurred' }
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error)
+      // Revert optimistic update on error
+      window.location.reload()
+      toast({
+        title: 'Error deleting product',
+        description: 'An unexpected error occurred during deletion',
+        variant: 'destructive',
+      })
+      return { success: false, message: 'An error occurred during deletion' }
+    }
+  }
+
+  return (
+    <div className='ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
+      <div className='space-y-4'>
+        {/* Title and Create Button Row */}
+        <div className='flex justify-between items-center'>
+          <h1 className='font-bold text-lg text-left'>Products</h1>
+          <Button asChild variant='default'>
+            <Link href='/admin/products/create'>Create Product</Link>
+          </Button>
+        </div>
+
+        {/* Search and Filters Row */}
+        <div className='flex flex-wrap items-center gap-2'>
+          <Input
+            className='w-full sm:w-auto min-w-[200px]'
+            type='text'
+            value={searchQuery}
+            onChange={handleSearch}
+            placeholder='Search by name...'
+          />
+          
+          <Select value={categoryFilter} onValueChange={(value) => {
+            setCategoryFilter(value)
+            setPage(1)
+          }}>
+            <SelectTrigger className='w-full sm:w-[180px]'>
+              <SelectValue placeholder='All Categories' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Categories</SelectItem>
+              {categories.map(category => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={sortOrder} onValueChange={(value) => {
+            setSortOrder(value)
+            setPage(1)
+          }}>
+            <SelectTrigger className='w-full sm:w-[180px]'>
+              <SelectValue placeholder='Sort by' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='default'>Default Order</SelectItem>
+              <SelectItem value='a-z'>A-Z (Alphabetical)</SelectItem>
+              <SelectItem value='z-a'>Z-A (Reverse)</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <p className='text-sm'>
+            {filteredProducts.length === 0
+              ? 'No'
+              : `${startIndex + 1}-${Math.min(endIndex, filteredProducts.length)} of ${filteredProducts.length}`}
+            {' results'}
+          </p>
+        </div>
+        
+        {/* Desktop Table - Hidden on mobile */}
+        <div className='hidden md:block'>
+          <Table className="admin-table border border-gray-300 rounded-lg overflow-hidden shadow-lg">
+            <TableHeader>
+              <TableRow className="bg-gray-100 border-b-2 border-gray-300">
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Image</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Name</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Price</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Category</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Stock</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Rating</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Published</TableHead>
+                <TableHead className='text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Last Updated</TableHead>
+                <TableHead className='w-[120px] text-left bg-gray-100 text-gray-800 font-semibold py-4 px-4'>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {currentProducts.length > 0 ? (
+                currentProducts.map((product) => (
+                  <TableRow key={product.id} className="bg-gray-800 hover:bg-gray-700 border-b border-gray-700">
+                    <TableCell className='text-left py-4 px-4'>
+                      <div className="w-16 h-16 rounded-md overflow-hidden border border-gray-200">
+                        <Image
+                          src={product.images[0] || '/images/placeholder.jpg'}
+                          alt={product.name}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell className='text-left py-4 px-4'>
+                      <Link href={`/admin/products/${product.id}`} className="text-white hover:text-gray-300 hover:underline font-medium">
+                        {product.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell className='text-left py-4 px-4 font-semibold text-purple-700'>
+                      {product.price.toFixed(2)} EGP
+                    </TableCell>
+                    <TableCell className='text-left py-4 px-4'>
+                      {resolveCategory(product.category)}
+                    </TableCell>
+                    <TableCell className='text-left py-4 px-4'>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
+                        product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {product.countInStock}
+                      </span>
+                    </TableCell>
+                    <TableCell className='text-left py-4 px-4'>
+                      <span className="flex items-center gap-1">
+                        <span className="text-yellow-500">★</span>
+                        <span className="font-medium">{product.avgRating}</span>
+                      </span>
+                    </TableCell>
+                    <TableCell className='text-left py-4 px-4'>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        product.isPublished ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {product.isPublished ? 'Yes' : 'No'}
+                      </span>
+                    </TableCell>
+                    <TableCell className='text-left py-4 px-4 text-sm text-gray-600'>
+                      {formatDateTime(product.updatedAt)?.dateTime || 'Not available'}
+                    </TableCell>
+                    <TableCell className='py-4 px-4'>
+                      <div className='flex flex-row gap-2 items-center'>
+                        <Button asChild variant='default' size='sm'>
+                          <Link href={`/admin/products/${product.id}`}>Edit</Link>
+                        </Button>
+                        <Button asChild variant='secondary' size='sm'>
+                          <Link target='_blank' href={`/product/${product.slug}`}>
+                            View
+                          </Link>
+                        </Button>
+                        <DeleteDialog
+                          id={product.id}
+                          action={deleteProductClient}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                    No products found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Mobile Cards - Visible only on mobile */}
+        <div className='md:hidden space-y-4'>
+          {currentProducts.length > 0 ? (
+            currentProducts.map((product) => (
+              <div key={product.id} className="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4 space-y-3">
+                {/* Product Header with Image and Name */}
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 rounded-md overflow-hidden border border-gray-200 flex-shrink-0">
+                    <Image
+                      src={product.images[0] || '/images/placeholder.jpg'}
+                      alt={product.name}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <Link href={`/admin/products/${product.id}`} className="text-white hover:text-gray-300 hover:underline font-medium text-lg block">
+                      {product.name}
+                    </Link>
+                    <div className="text-sm text-gray-400">
+                      {resolveCategory(product.category)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Product Details */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">Price:</span>
+                    <span className="font-semibold text-purple-400">{product.price.toFixed(2)} EGP</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">Stock:</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
+                      product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {product.countInStock}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">Rating:</span>
+                    <span className="flex items-center gap-1">
+                      <span className="text-yellow-500">★</span>
+                      <span className="font-medium text-white">{product.avgRating}</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">Published:</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      product.isPublished ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {product.isPublished ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">Last Updated:</span>
+                    <span className="text-sm text-gray-400">
+                      {formatDateTime(product.updatedAt)?.dateTime || 'Not available'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="border-t border-gray-700 pt-3 flex gap-2">
+                  <Button asChild variant='default' size='sm' className="flex-1">
+                    <Link href={`/admin/products/${product.id}`}>
+                      Edit
+                    </Link>
+                  </Button>
+                  <Button asChild variant='secondary' size='sm' className="flex-1">
+                    <Link target='_blank' href={`/product/${product.slug}`}>
+                      View
+                    </Link>
+                  </Button>
+                  <DeleteDialog
+                    id={product.id}
+                    action={deleteProductClient}
+                  />
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              No products
+            </div>
+          )}
+        </div>
+          
+        {/* Pagination - only show when there are multiple pages */}
+        {totalPages > 1 && (
+          <div className='flex items-center gap-2 mt-4'>
+            <Button
+              variant='outline'
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page <= 1}
+              className='w-24'
+            >
+              <ChevronLeft /> Previous
+            </Button>
+            Page {page} of {totalPages}
+            <Button
+              variant='outline'
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page >= totalPages}
+              className='w-24'
+            >
+              Next <ChevronRight />
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default ProductList

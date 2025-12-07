@@ -1,0 +1,149 @@
+[
+  {
+    "id": "cmhe12twx0060haflan8ygcta",
+    "common": {
+      "pageSize": 9,
+      "isMaintenanceMode": false,
+      "freeShippingMinPrice": 35
+    },
+    "site": {
+      "url": "https://dr-gamer.com",
+      "logo": "/icons/logo.png",
+      "name": "DR.GAMER",
+      "email": "support@dr-gamer.com",
+      "phone": "+20 123 456 7890",
+      "author": "DR.GAMER",
+      "slogan": "عالم Xbox بين يديك - اكتشف، العب، استمتع",
+      "address": "القاهرة، مصر",
+      "keywords": "Xbox، dr.gamer، ألعاب Xbox، Xbox Game Pass، Xbox Live Gold، بطاقات هدايا Xbox، Xbox Series X، Xbox Series S، وحدات تحكم Xbox، إكسسوارات Xbox، اشتراكات Xbox، ألعاب إلكترونية، متجر ألعاب، Game Pass Ultimate",
+      "copyright": "2024، DR.GAMER، جميع الحقوق محفوظة.",
+      "description": "dr.gamer - متجرك الرسمي لكل ما يتعلق بـ Xbox! نوفر أحدث الألعاب، اشتراكات Xbox Game Pass Ultimate، بطاقات هدايا Xbox، إكسسوارات Xbox Series X|S، وحدات التحكم، سماعات الألعاب، وكل ما تحتاجه لتجربة ألعاب استثنائية. تسوق الآن واستمتع بأفضل الأسعار والعروض الحصرية!"
+    },
+    "carousels": [
+      {
+        "url": "https://www.dr-gamer.net/product/ea-fc-26-standard-edition-xbox",
+        "image": "https://utfs.io/f/MBy75kmeCFNocdpWmWT7NGHOxjgfKP95XivtqcCyFD0mw8Q4",
+        "title": "FC26",
+        "buttonCaption": "BUY NOW"
+      },
+      {
+        "url": "dr-gamer.vercel.app",
+        "image": "https://utfs.io/f/MBy75kmeCFNoPyQEOhlK9nBG7WcKov6twP81heClT0dzrgqx",
+        "title": "Battlefield 6",
+        "buttonCaption": "BUY NOW"
+      },
+      {
+        "url": "dr-gamer.vercel.app",
+        "image": "https://utfs.io/f/MBy75kmeCFNophkTzQ7THZiKwcW0mnuV6G9S43E5UQebLlXY",
+        "title": "Arc Raiders",
+        "buttonCaption": "BUY NOW"
+      }
+    ],
+    "availableLanguages": [
+      {
+        "code": "ar-SA",
+        "name": "العربية"
+      },
+      {
+        "code": "en-US",
+        "name": "English"
+      }
+    ],
+    "defaultLanguage": "ar-SA",
+    "availableCurrencies": [
+      {
+        "code": "EGP",
+        "name": "الجنيه المصري",
+        "symbol": "E£",
+        "convertRate": 1
+      },
+      {
+        "code": "USD",
+        "name": "الدولار الأمريكي",
+        "symbol": "$",
+        "convertRate": 0.032
+      },
+      {
+        "code": "EUR",
+        "name": "اليورو",
+        "symbol": "€",
+        "convertRate": 0.03
+      },
+      {
+        "code": "AED",
+        "name": "الدرهم الإماراتي",
+        "symbol": "AED",
+        "convertRate": 0.118
+      }
+    ],
+    "defaultCurrency": "EGP",
+    "availablePaymentMethods": [
+      {
+        "icon": "💳",
+        "link": "https://ipn.eg/S/mina.shk/instapay/2nU1nh",
+        "name": "Instapay 1",
+        "type": "instapay",
+        "label": "Number",
+        "notes": "Send the payment through Instapay to the username above, then share your payment number and proof.",
+        "number": "01277910038",
+        "userName": "mina.shk@instapay",
+        "linkLabel": "Pay now",
+        "commission": 0
+      },
+      {
+        "iban": "EG060002051105110333000001242",
+        "icon": "🏦",
+        "name": "Bank transfer",
+        "type": "bank",
+        "label": "Banque Misr",
+        "notes": "- Send the payment to the account above, then share your payment number and proof.\n- For transfers from outside Egypt, use the IBAN and Swift details provided.",
+        "swift": "BMISEGCXXXX",
+        "number": "5110333000001242",
+        "commission": 0,
+        "accountHolder": "Mina Samir Hakim"
+      },
+      {
+        "icon": "📱",
+        "name": "Vodafone cash 1",
+        "type": "wallet",
+        "label": "Number",
+        "notes": "Send the payment through vodafone cash to the number above, then share your payment number and proof.",
+        "number": "01206227605",
+        "userName": "Mina S H",
+        "commission": 0
+      },
+      {
+        "icon": "📱",
+        "name": "Etisalat cash",
+        "type": "wallet",
+        "label": "Etisalat cash number",
+        "notes": "Send the payment through etisalat cash to the number above, then share your payment number and proof.",
+        "number": "01112313760",
+        "userName": "Mina S H",
+        "commission": 0
+      },
+      {
+        "icon": "🟢",
+        "name": "Telda",
+        "type": "wallet",
+        "label": "Telda number",
+        "notes": "Send the payment through telda to the number above, then share your payment number and proof.",
+        "number": "01277910038",
+        "userName": "@minahakim3",
+        "commission": 0
+      }
+    ],
+    "defaultPaymentMethod": "Instapay 1",
+    "availableDeliveryDates": [
+      {
+        "name": "خلال 5 أيام",
+        "daysToDeliver": 5,
+        "shippingPrice": 4.9,
+        "freeShippingMinPrice": 35
+      }
+    ],
+    "defaultDeliveryDate": "خلال 5 أيام",
+    "createdAt": "2025-10-30T20:00:47.985Z",
+    "updatedAt": "2025-11-11T02:38:44.911Z"
+  }
+]

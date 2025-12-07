@@ -1,0 +1,180 @@
+import React, { Suspense } from 'react'
+import { notFound } from 'next/navigation'
+import { prisma } from '@/lib/db'
+import ProductGallery from '@/components/shared/product/product-gallery'
+import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history'
+import Rating from '@/components/shared/product/rating'
+import ReviewList from './review-list'
+import { Separator } from '@/components/ui/separator'
+import ProductDetails from './product-details'
+
+interface ProductPageProps {
+  params: Promise<{
+    slug: string
+  }>
+}
+
+// Loading skeleton components
+function ProductHeaderSkeleton() {
+  return (
+    <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8 sm:mb-12'>
+      {/* Product Images Skeleton */}
+      <div>
+        <div className='w-full h-64 sm:h-80 lg:h-96 bg-gray-200 rounded-lg animate-pulse'></div>
+      </div>
+
+      {/* Product Info Skeleton */}
+      <div className='space-y-4 sm:space-y-6'>
+        <div>
+          <div className='h-6 sm:h-8 bg-gray-200 rounded w-3/4 mb-2 animate-pulse'></div>
+          <div className='h-4 sm:h-6 bg-gray-200 rounded w-1/2 mb-3 sm:mb-4 animate-pulse'></div>
+          <div className='h-6 sm:h-8 bg-gray-200 rounded w-1/3 animate-pulse'></div>
+        </div>
+
+        <div>
+          <div className='h-3 sm:h-4 bg-gray-200 rounded w-full mb-2 animate-pulse'></div>
+          <div className='h-3 sm:h-4 bg-gray-200 rounded w-3/4 mb-2 animate-pulse'></div>
+          <div className='h-3 sm:h-4 bg-gray-200 rounded w-1/2 animate-pulse'></div>
+        </div>
+
+        <div>
+          <div className='h-10 sm:h-12 bg-gray-200 rounded w-32 animate-pulse'></div>
+        </div>
+
+        <Separator />
+
+        <div className='space-y-3 sm:space-y-4'>
+          <div>
+            <div className='h-5 sm:h-6 bg-gray-200 rounded w-24 mb-2 animate-pulse'></div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4'>
+              <div className='h-3 sm:h-4 bg-gray-200 rounded w-full animate-pulse'></div>
+              <div className='h-3 sm:h-4 bg-gray-200 rounded w-full animate-pulse'></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ReviewsSkeleton() {
+  return (
+    <div className='mb-8 sm:mb-12'>
+      <Separator className='mb-6 sm:mb-8' />
+      <div className='h-6 sm:h-8 bg-gray-200 rounded w-36 sm:w-48 mb-4 sm:mb-6 animate-pulse'></div>
+      <div className='space-y-3 sm:space-y-4'>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className='p-3 sm:p-4 border rounded-lg'>
+            <div className='h-4 sm:h-5 bg-gray-200 rounded w-1/3 mb-2 animate-pulse'></div>
+            <div className='h-3 sm:h-4 bg-gray-200 rounded w-1/4 mb-2 animate-pulse'></div>
+            <div className='h-3 sm:h-4 bg-gray-200 rounded w-full animate-pulse'></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Async components for progressive loading
+async function ProductHeader({ slug }: { slug: string }) {
+  // Direct database query for product
+  const product = await prisma.product.findFirst({
+    where: { 
+      slug, 
+      isPublished: true 
+    }
+  })
+
+  if (!product) {
+    notFound()
+  }
+
+  // Convert Decimal values to numbers for client components
+  // Parse variations if they're stored as JSON string
+  let variations = null
+  if (product.variations) {
+    try {
+      variations = typeof product.variations === 'string' 
+        ? JSON.parse(product.variations)
+        : product.variations
+    } catch (e) {
+      console.error('Error parsing variations:', e)
+      variations = null
+    }
+  }
+  
+  const productData = {
+    ...product,
+    price: Number(product.price),
+    listPrice: Number(product.listPrice),
+    originalPrice: Number(product.originalPrice),
+    avgRating: Number(product.avgRating),
+    numReviews: Number(product.numReviews),
+    variations: variations,
+  }
+
+  return (
+    <>
+      {/* Track browsing history */}
+      <AddToBrowsingHistory 
+        id={productData.id} 
+        category={productData.category}
+        name={productData.name}
+        image={productData.images[0]}
+        slug={productData.slug}
+      />
+      
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8 mb-6 md:mb-8 sm:mb-12'>
+        {/* Product Images */}
+        <div>
+          <ProductGallery images={productData.images} />
+        </div>
+
+        {/* Product Info */}
+        <ProductDetails product={productData} />
+      </div>
+    </>
+  )
+}
+
+async function ReviewsSection({ productId }: { productId: string }) {
+  return (
+    <div className='mb-8 sm:mb-12'>
+      <Separator className='mb-6 sm:mb-8' />
+      <h2 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6'>Customer Reviews</h2>
+      {/* Review List */}
+      <ReviewList productId={productId} />
+    </div>
+  )
+}
+
+export default async function ProductPage({ params }: ProductPageProps) {
+  const { slug } = await params
+
+  // Fetch product once and share ID between components to avoid duplicate query
+  const product = await prisma.product.findFirst({
+    where: { 
+      slug, 
+      isPublished: true 
+    },
+    select: { id: true }
+  })
+
+  if (!product) {
+    notFound()
+  }
+
+  return (
+    <div className='container mx-auto px-4 py-6 sm:py-8' dir="ltr">
+      {/* Product Header - Load first */}
+      <Suspense fallback={<ProductHeaderSkeleton />}>
+        <ProductHeader slug={slug} />
+      </Suspense>
+
+      {/* Reviews Section - Load second */}
+      <Suspense fallback={<ReviewsSkeleton />}>
+        <ReviewsSection productId={product.id} />
+      </Suspense>
+    </div>
+  )
+}

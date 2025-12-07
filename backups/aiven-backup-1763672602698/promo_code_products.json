@@ -1,0 +1,74 @@
+[
+  {
+    "promoCodeId": "cmi22f38r0005ele5h3lrq5xx",
+    "productId": "cmhvbeugj0009ivfnsi60l86v",
+    "maxDiscountAmount": "100.00",
+    "createdAt": "2025-11-16T16:44:47.787Z",
+    "updatedAt": "2025-11-16T16:44:47.787Z",
+    "categoryId": null,
+    "id": "cmi22f38r0006ele5r6bd58li",
+    "variationNames": []
+  },
+  {
+    "promoCodeId": "cmi4zfab10009l3e8oi31v9xi",
+    "productId": "cmhotojnl000fg2e8jnat5lpc",
+    "maxDiscountAmount": "100.00",
+    "createdAt": "2025-11-18T17:44:16.622Z",
+    "updatedAt": "2025-11-18T17:44:16.622Z",
+    "categoryId": null,
+    "id": "cmi4zfab1000al3e8z592azyy",
+    "variationNames": [
+      "Home"
+    ]
+  },
+  {
+    "promoCodeId": "cmi5cz6hc0002k3gwoeixbym6",
+    "productId": "cmhotmbd4000bg2e8b8nxw8me",
+    "maxDiscountAmount": null,
+    "createdAt": "2025-11-19T00:03:39.792Z",
+    "updatedAt": "2025-11-19T00:03:39.792Z",
+    "categoryId": null,
+    "id": "cmi5cz6hc0003k3gwezsccncb",
+    "variationNames": []
+  },
+  {
+    "promoCodeId": "cmi79vue3002hfsedqbultdgf",
+    "productId": null,
+    "maxDiscountAmount": "50.00",
+    "createdAt": "2025-11-20T08:12:37.659Z",
+    "updatedAt": "2025-11-20T08:12:37.659Z",
+    "categoryId": "cmhjrm115000bfnfj04154tea",
+    "id": "cmi79vue3002lfsedkajgays5",
+    "variationNames": []
+  },
+  {
+    "promoCodeId": "cmi79vue3002hfsedqbultdgf",
+    "productId": null,
+    "maxDiscountAmount": "100.00",
+    "createdAt": "2025-11-20T08:12:37.659Z",
+    "updatedAt": "2025-11-20T08:12:37.659Z",
+    "categoryId": "cmhe12swh004lhafl2mcmga7r",
+    "id": "cmi79vue3002kfsedhr9eihfo",
+    "variationNames": []
+  },
+  {
+    "promoCodeId": "cmi79vue3002hfsedqbultdgf",
+    "productId": null,
+    "maxDiscountAmount": "100.00",
+    "createdAt": "2025-11-20T08:12:37.659Z",
+    "updatedAt": "2025-11-20T08:12:37.659Z",
+    "categoryId": "cmhe12sw4004ihafly1k7ttg0",
+    "id": "cmi79vue3002jfsedn1a7wuar",
+    "variationNames": []
+  },
+  {
+    "promoCodeId": "cmi79vue3002hfsedqbultdgf",
+    "productId": null,
+    "maxDiscountAmount": "100.00",
+    "createdAt": "2025-11-20T08:12:37.659Z",
+    "updatedAt": "2025-11-20T08:12:37.659Z",
+    "categoryId": "cmhgrgxxm0003kve7q16s0huh",
+    "id": "cmi79vue3002ifsed18neezyt",
+    "variationNames": []
+  }
+]
