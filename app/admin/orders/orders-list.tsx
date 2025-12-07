@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
+import Image from 'next/image'
 
 type Order = {
   id: string
@@ -32,6 +33,16 @@ type Order = {
     name: string
     email: string
   }
+  orderItems: Array<{
+    id: string
+    name: string
+    quantity: number
+    price: number
+    image: string
+    selectedVariation: string | null
+    size: string | null
+    color: string | null
+  }>
 }
 
 type OrdersListProps = {
@@ -251,6 +262,7 @@ export default function OrdersList({
             <TableRow className="bg-gray-800 border-b-2 border-gray-700">
               <TableHead className='text-left bg-gray-800 text-purple-400 font-semibold py-4 px-4'>Date</TableHead>
               <TableHead className='text-left bg-gray-800 text-purple-400 font-semibold py-4 px-4'>Customer</TableHead>
+              <TableHead className='text-left bg-gray-800 text-purple-400 font-semibold py-4 px-4'>Products</TableHead>
               <TableHead className='text-left bg-gray-800 text-purple-400 font-semibold py-4 px-4'>Total</TableHead>
               <TableHead className='text-left bg-gray-800 text-purple-400 font-semibold py-4 px-4'>Paid</TableHead>
               <TableHead className='text-left bg-gray-800 text-purple-400 font-semibold py-4 px-4'>Delivery</TableHead>
@@ -267,6 +279,40 @@ export default function OrdersList({
                   <div>
                     <div className='font-medium'>{isModerator ? '***' : order.user.name}</div>
                     <div className='text-sm text-gray-500'>{isModerator ? '***' : order.user.email}</div>
+                  </div>
+                </TableCell>
+                <TableCell className='text-left py-4 px-4'>
+                  <div className='space-y-2 max-w-xs'>
+                    {order.orderItems.map((item) => (
+                      <div key={item.id} className='flex items-center gap-2 text-sm'>
+                        <div className='w-10 h-10 rounded overflow-hidden border border-gray-600 flex-shrink-0'>
+                          <Image
+                            src={item.image || '/images/placeholder.jpg'}
+                            alt={item.name}
+                            width={40}
+                            height={40}
+                            className='w-full h-full object-cover'
+                          />
+                        </div>
+                        <div className='flex-1 min-w-0'>
+                          <div className='font-medium text-white truncate' title={item.name}>
+                            {item.name}
+                          </div>
+                          <div className='text-xs text-gray-400'>
+                            {item.selectedVariation && (
+                              <span>{item.selectedVariation}</span>
+                            )}
+                            {item.size && (
+                              <span>{item.selectedVariation ? ' • ' : ''}Size: {item.size}</span>
+                            )}
+                            {item.color && (
+                              <span>{item.size || item.selectedVariation ? ' • ' : ''}Color: {item.color}</span>
+                            )}
+                            <span className='ml-1'>× {item.quantity}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </TableCell>
                 <TableCell className='text-left py-4 px-4'>
@@ -340,6 +386,41 @@ export default function OrdersList({
             <div className="border-t border-gray-700 pt-3">
               <div className="font-medium text-white">{isModerator ? 'Customer' : order.user.name}</div>
               <div className="text-sm text-gray-400">{isModerator ? '***' : order.user.email}</div>
+            </div>
+
+            {/* Products */}
+            <div className="border-t border-gray-700 pt-3">
+              <div className="text-sm text-gray-400 mb-2">Products:</div>
+              <div className="space-y-2">
+                {order.orderItems.map((item) => (
+                  <div key={item.id} className='flex items-center gap-2'>
+                    <div className='w-12 h-12 rounded overflow-hidden border border-gray-600 flex-shrink-0'>
+                      <Image
+                        src={item.image || '/images/placeholder.jpg'}
+                        alt={item.name}
+                        width={48}
+                        height={48}
+                        className='w-full h-full object-cover'
+                      />
+                    </div>
+                    <div className='flex-1 min-w-0'>
+                      <div className='font-medium text-white text-sm'>{item.name}</div>
+                      <div className='text-xs text-gray-400'>
+                        {item.selectedVariation && (
+                          <span>{item.selectedVariation}</span>
+                        )}
+                        {item.size && (
+                          <span>{item.selectedVariation ? ' • ' : ''}Size: {item.size}</span>
+                        )}
+                        {item.color && (
+                          <span>{item.size || item.selectedVariation ? ' • ' : ''}Color: {item.color}</span>
+                        )}
+                        <span className='ml-1'>× {item.quantity}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Order Total */}

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import React from 'react'
 import Header from '@/components/shared/header'
 import Footer from '@/components/shared/footer'
+import HowToUseButton from '@/components/shared/how-to-use-button'
 
 export default async function CheckoutLayout({
   children,
@@ -36,6 +37,7 @@ export default async function CheckoutLayout({
         {children}
       </div>
       <Footer />
+      <HowToUseButton />
     </div>
   )
 }

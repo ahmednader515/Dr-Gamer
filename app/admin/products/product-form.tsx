@@ -31,7 +31,7 @@ import { IProductInput } from '@/types'
 import { UploadButton } from '@/lib/uploadthing'
 import { ProductInputSchema, ProductUpdateSchema } from '@/lib/validator'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getVariationPricing, toSlug, toSlugArabic } from '@/lib/utils'
+import { getVariationPricing, toSlug, toSlugArabic, isValidYouTubeUrl, extractYouTubeVideoId } from '@/lib/utils'
 import { useLoading } from '@/hooks/use-loading'
 import { LoadingSpinner } from '@/components/shared/loading-overlay'
 
@@ -40,6 +40,7 @@ const productDefaultValues: IProductInput = {
   slug: '',
   category: '',
   images: [],
+  videos: [],
   brand: '',
   description: '',
   productType: 'game_code',
@@ -148,6 +149,11 @@ const ProductForm = ({
         }, {} as { [key: string]: string })
       : {}
   )
+  const [variationStocks, setVariationStocks] = useState<{ [key: string]: number }>(
+    product?.variations && Array.isArray(product.variations)
+      ? product.variations.reduce((acc: any, v: any) => ({ ...acc, [v.name]: v.stock || 0 }), {})
+      : {}
+  )
   
   // Check if a variation should have dual pricing (original + discounted)
   const shouldHaveDualPricing = (variationName: string) => {
@@ -170,7 +176,8 @@ const ProductForm = ({
     selectedSet: Set<string>,
     pricesMap: Record<string, number>,
     originalMap: Record<string, number>,
-    expiryMap: Record<string, string>
+    expiryMap: Record<string, string>,
+    stocksMap: Record<string, number>
   ) => {
     return Array.from(selectedSet)
       .map((name) => {
@@ -179,6 +186,7 @@ const ProductForm = ({
         const variation: any = {
           name,
           price,
+          stock: stocksMap[name] || 0,
         }
         if (shouldHaveDualPricing(name) && originalMap[name]) {
           variation.originalPrice = originalMap[name]
@@ -190,16 +198,17 @@ const ProductForm = ({
         }
         return variation
       })
-      .filter((v): v is { name: string; price: number; originalPrice?: number; salePriceExpiresAt?: string } => v !== null)
+      .filter((v): v is { name: string; price: number; stock: number; originalPrice?: number; salePriceExpiresAt?: string } => v !== null)
   }
 
   const updateFormVariationsState = (
     selectedSet: Set<string>,
     pricesMap: Record<string, number>,
     originalMap: Record<string, number>,
-    expiryMap: Record<string, string>
+    expiryMap: Record<string, string>,
+    stocksMap: Record<string, number>
   ) => {
-    const variationsPayload = buildVariationsPayload(selectedSet, pricesMap, originalMap, expiryMap)
+    const variationsPayload = buildVariationsPayload(selectedSet, pricesMap, originalMap, expiryMap, stocksMap)
     form.setValue('variations', variationsPayload)
 
     if (variationsPayload.length > 0) {
@@ -312,6 +321,7 @@ const ProductForm = ({
     )
   }
   const images = form.watch('images')
+  const videos = form.watch('videos') || []
 
   return (
     <div className='ltr' style={{ fontFamily: 'Cairo, sans-serif' }}>
@@ -507,13 +517,14 @@ const ProductForm = ({
                               delete newPrices[variation]
                               delete newOriginalPrices[variation]
                               delete newExpiryDates[variation]
+                              delete variationStocks[variation]
                             }
 
                             setSelectedVariations(newSelected)
                             setVariationPrices(newPrices)
                             setVariationOriginalPrices(newOriginalPrices)
                             setVariationSaleExpiry(newExpiryDates)
-                            updateFormVariationsState(newSelected, newPrices, newOriginalPrices, newExpiryDates)
+                            updateFormVariationsState(newSelected, newPrices, newOriginalPrices, newExpiryDates, variationStocks)
                           }}
                         />
                         <label 
@@ -539,7 +550,7 @@ const ProductForm = ({
                                     const originalPrice = parseFloat(e.target.value) || 0
                                     const newOriginalPrices = { ...variationOriginalPrices, [variation]: originalPrice }
                                     setVariationOriginalPrices(newOriginalPrices)
-                                    updateFormVariationsState(selectedVariations, variationPrices, newOriginalPrices, variationSaleExpiry)
+                                    updateFormVariationsState(selectedVariations, variationPrices, newOriginalPrices, variationSaleExpiry, variationStocks)
                                   }}
                                   className='border-gray-700 bg-gray-800 text-gray-200'
                                 />
@@ -556,7 +567,7 @@ const ProductForm = ({
                                       const price = parseFloat(e.target.value) || 0
                                       const newPrices = { ...variationPrices, [variation]: price }
                                       setVariationPrices(newPrices)
-                                      updateFormVariationsState(selectedVariations, newPrices, variationOriginalPrices, variationSaleExpiry)
+                                      updateFormVariationsState(selectedVariations, newPrices, variationOriginalPrices, variationSaleExpiry, variationStocks)
                                     }}
                                     className='border-gray-700 bg-gray-800 text-gray-200'
                                   />
@@ -579,7 +590,7 @@ const ProductForm = ({
                                         delete newExpiryDates[variation]
                                       }
                                       setVariationSaleExpiry(newExpiryDates)
-                                      updateFormVariationsState(selectedVariations, variationPrices, variationOriginalPrices, newExpiryDates)
+                                      updateFormVariationsState(selectedVariations, variationPrices, variationOriginalPrices, newExpiryDates, variationStocks)
                                     }}
                                     className='border-gray-700 bg-gray-800 text-gray-200'
                                   />
@@ -588,23 +599,65 @@ const ProductForm = ({
                                   </p>
                                 </div>
                               </div>
+                              <div>
+                                <label className='text-gray-400 text-sm mb-2 block'>Stock Quantity</label>
+                                <Input
+                                  type='number'
+                                  step='1'
+                                  min='0'
+                                  placeholder='Enter stock quantity'
+                                  value={variationStocks[variation] || ''}
+                                  onChange={(e) => {
+                                    const stock = parseInt(e.target.value) || 0
+                                    const newStocks = { ...variationStocks, [variation]: stock }
+                                    setVariationStocks(newStocks)
+                                    updateFormVariationsState(selectedVariations, variationPrices, variationOriginalPrices, variationSaleExpiry, newStocks)
+                                  }}
+                                  className='border-gray-700 bg-gray-800 text-gray-200'
+                                />
+                                <p className='text-xs text-gray-500 mt-1'>
+                                  Number of units available for this variation.
+                                </p>
+                              </div>
                             </>
                           ) : (
-                            <div>
-                              <label className='text-gray-400 text-sm mb-2 block'>Price (EGP)</label>
-                              <Input
-                                type='number'
-                                step='0.01'
-                                placeholder='Enter price'
-                                value={variationPrices[variation] || ''}
-                                onChange={(e) => {
-                                  const price = parseFloat(e.target.value) || 0
-                                  const newPrices = { ...variationPrices, [variation]: price }
-                                  setVariationPrices(newPrices)
-                                    updateFormVariationsState(selectedVariations, newPrices, variationOriginalPrices, variationSaleExpiry)
-                                }}
-                                className='border-gray-700 bg-gray-800 text-gray-200'
-                              />
+                            <div className='space-y-3'>
+                              <div>
+                                <label className='text-gray-400 text-sm mb-2 block'>Price (EGP)</label>
+                                <Input
+                                  type='number'
+                                  step='0.01'
+                                  placeholder='Enter price'
+                                  value={variationPrices[variation] || ''}
+                                  onChange={(e) => {
+                                    const price = parseFloat(e.target.value) || 0
+                                    const newPrices = { ...variationPrices, [variation]: price }
+                                    setVariationPrices(newPrices)
+                                    updateFormVariationsState(selectedVariations, newPrices, variationOriginalPrices, variationSaleExpiry, variationStocks)
+                                  }}
+                                  className='border-gray-700 bg-gray-800 text-gray-200'
+                                />
+                              </div>
+                              <div>
+                                <label className='text-gray-400 text-sm mb-2 block'>Stock Quantity</label>
+                                <Input
+                                  type='number'
+                                  step='1'
+                                  min='0'
+                                  placeholder='Enter stock quantity'
+                                  value={variationStocks[variation] || ''}
+                                  onChange={(e) => {
+                                    const stock = parseInt(e.target.value) || 0
+                                    const newStocks = { ...variationStocks, [variation]: stock }
+                                    setVariationStocks(newStocks)
+                                    updateFormVariationsState(selectedVariations, variationPrices, variationOriginalPrices, variationSaleExpiry, newStocks)
+                                  }}
+                                  className='border-gray-700 bg-gray-800 text-gray-200'
+                                />
+                                <p className='text-xs text-gray-500 mt-1'>
+                                  Number of units available for this variation.
+                                </p>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -702,16 +755,20 @@ const ProductForm = ({
                 name='listPrice'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel className='text-white font-semibold block text-left w-full'>List Price (Optional)</FormLabel>
+                    <FormLabel className='text-white font-semibold block text-left w-full'>Discounted Price (Optional)</FormLabel>
                     <FormControl>
                       <Input 
                         {...field}
                         type='number'
                         step='0.01'
                         dir="ltr"
+                        placeholder='Enter discounted price (for products without variations)'
                         className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'
                       />
                     </FormControl>
+                    <p className='text-xs text-gray-400'>
+                      This will be used as the discounted price for products without variations. Leave empty to use the regular price.
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -814,6 +871,136 @@ const ProductForm = ({
                             }}
                           />
                         </FormControl>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className='flex flex-col gap-5 md:flex-row'>
+            <FormField
+              control={form.control}
+              name='videos'
+              render={() => (
+                <FormItem className='w-full'>
+                  <FormLabel className='text-white font-semibold block text-left w-full'>YouTube Videos (Optional)</FormLabel>
+                  <Card>
+                    <CardContent className='space-y-2 mt-2 min-h-48'>
+                      {videos.length === 0 ? (
+                        <div className='flex items-center justify-center h-32 text-gray-400'>
+                          No videos added yet
+                        </div>
+                      ) : (
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                          {videos.map((video: string, index: number) => {
+                            const videoId = extractYouTubeVideoId(video)
+                            const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null
+                            
+                            return (
+                              <div
+                                key={video || `empty-${index}`}
+                                className='relative group border border-gray-700 rounded-lg p-3 bg-gray-800'
+                              >
+                                {thumbnailUrl ? (
+                                  <div className='relative w-full aspect-video mb-2 rounded overflow-hidden'>
+                                    <Image
+                                      src={thumbnailUrl}
+                                      alt={`Video thumbnail ${index + 1}`}
+                                      fill
+                                      className='object-cover'
+                                    />
+                                    <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-30'>
+                                      <div className='w-12 h-12 rounded-full bg-red-600 flex items-center justify-center'>
+                                        <svg className='w-6 h-6 text-white ml-1' fill='currentColor' viewBox='0 0 24 24'>
+                                          <path d='M8 5v14l11-7z' />
+                                        </svg>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className='w-full aspect-video mb-2 bg-gray-700 rounded flex items-center justify-center text-gray-400 text-sm'>
+                                    Invalid YouTube URL
+                                  </div>
+                                )}
+                                <p className='text-xs text-gray-400 truncate mb-2' title={video}>
+                                  {video}
+                                </p>
+                                <button
+                                  type='button'
+                                  onClick={() => {
+                                    const newVideos = videos.filter((_, i) => i !== index)
+                                    form.setValue('videos', newVideos)
+                                  }}
+                                  className='absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100'
+                                >
+                                  ×
+                                </button>
+                                <div className='absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded'>
+                                  Video {index + 1}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                      <div className='flex flex-col items-center pt-4 space-y-2'>
+                        <p className='text-sm text-gray-400 text-center'>
+                          {videos.length === 0 
+                            ? 'Add YouTube video links (optional)' 
+                            : 'Add more videos or remove existing ones'
+                          }
+                        </p>
+                        <FormControl>
+                          <div className='flex gap-2 w-full max-w-md'>
+                            <Input
+                              type='text'
+                              placeholder='Paste YouTube URL here...'
+                              className='border-gray-700 bg-gray-800 text-gray-200 focus:border-purple-500 focus:ring-blue-500 text-left'
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault()
+                                  const input = e.currentTarget
+                                  const url = input.value.trim()
+                                  if (url && isValidYouTubeUrl(url)) {
+                                    form.setValue('videos', [...videos, url])
+                                    input.value = ''
+                                  } else if (url) {
+                                    toast({
+                                      variant: 'destructive',
+                                      description: 'Please enter a valid YouTube URL',
+                                    })
+                                  }
+                                }
+                              }}
+                            />
+                            <Button
+                              type='button'
+                              onClick={(e) => {
+                                const input = e.currentTarget.previousElementSibling as HTMLInputElement
+                                const url = input?.value.trim()
+                                if (url && isValidYouTubeUrl(url)) {
+                                  form.setValue('videos', [...videos, url])
+                                  input.value = ''
+                                } else if (url) {
+                                  toast({
+                                    variant: 'destructive',
+                                    description: 'Please enter a valid YouTube URL',
+                                  })
+                                }
+                              }}
+                              className='bg-purple-600 hover:bg-purple-700 text-white'
+                            >
+                              Add
+                            </Button>
+                          </div>
+                        </FormControl>
+                        <p className='text-xs text-gray-500 text-center'>
+                          Supported formats: youtube.com/watch?v=..., youtu.be/..., youtube.com/embed/...
+                        </p>
                       </div>
                     </CardContent>
                   </Card>

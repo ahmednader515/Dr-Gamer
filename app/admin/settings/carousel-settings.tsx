@@ -6,13 +6,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { toast } from '@/hooks/use-toast'
-import { Plus, Trash2, Upload, Image as ImageIcon } from 'lucide-react'
+import { Plus, Trash2, Upload, Image as ImageIcon, Video } from 'lucide-react'
 import { useUploadThing } from '@/lib/uploadthing'
 
 interface CarouselItem {
   title: string
   buttonCaption: string
-  image: string
+  image?: string
+  video?: string
   url: string
 }
 
@@ -23,7 +24,9 @@ interface CarouselSettingsProps {
 
 export default function CarouselSettings({ carouselItems, onCarouselItemsChange }: CarouselSettingsProps) {
   const [uploadingImages, setUploadingImages] = useState<Set<number>>(new Set())
-  const { startUpload, isUploading } = useUploadThing('imageUploader')
+  const [uploadingVideos, setUploadingVideos] = useState<Set<number>>(new Set())
+  const { startUpload: startImageUpload, isUploading: isImageUploading } = useUploadThing('imageUploader')
+  const { startUpload: startVideoUpload, isUploading: isVideoUploading } = useUploadThing('videoUploader')
 
   const handleCarouselChange = (index: number, field: keyof CarouselItem, value: string) => {
     const newCarouselItems = [...carouselItems]
@@ -47,6 +50,44 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
     }
     
     onCarouselItemsChange([...carouselItems, newItem])
+  }
+
+  const handleVideoUpload = async (index: number, file: File) => {
+    try {
+      setUploadingVideos(prev => new Set(prev).add(index))
+      
+      const uploadResult = await startVideoUpload([file])
+      
+      if (uploadResult && uploadResult[0]) {
+        const videoUrl = uploadResult[0].url
+        
+        const newCarouselItems = [...carouselItems]
+        newCarouselItems[index].video = videoUrl
+        newCarouselItems[index].image = undefined // Remove image if video is uploaded
+        onCarouselItemsChange(newCarouselItems)
+        
+        toast({
+          title: 'Video Updated',
+          description: 'Video uploaded successfully to server',
+          variant: 'default'
+        })
+      } else {
+        throw new Error('Upload failed')
+      }
+    } catch (error) {
+      console.error('Video upload error:', error)
+      toast({
+        title: 'Video Upload Error',
+        description: 'Failed to upload video. Please try again.',
+        variant: 'destructive'
+      })
+    } finally {
+      setUploadingVideos(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(index)
+        return newSet
+      })
+    }
   }
 
   const removeCarouselItem = (index: number) => {
@@ -126,7 +167,7 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
                 <h4 className='font-semibold'>Carousel Item {index + 1}</h4>
-                {(!item.title.trim() || !item.buttonCaption.trim() || !item.image.trim() || !item.url.trim()) && (
+                {(!item.title.trim() || !item.buttonCaption.trim() || (!item.image && !item.video) || !item.url.trim()) && (
                   <span className='text-xs text-orange-500 bg-orange-50 px-2 py-1 rounded'>
                     Incomplete
                   </span>
@@ -179,44 +220,122 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
             
             <div className='space-y-4'>
               <div className='space-y-2'>
-                <Label>Carousel Image</Label>
+                <Label>Carousel Media (Image or Video)</Label>
                 <div className='flex items-center gap-4'>
-                  <div className='w-32 h-20 rounded-lg overflow-hidden border border-gray-200'>
-                    <img
-                      src={item.image}
-                      alt={`Carousel ${index + 1}`}
-                      className='w-full h-full object-cover'
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement
-                        target.src = '/images/placeholder.jpg'
-                      }}
-                    />
-                  </div>
+                  {item.video ? (
+                    <div className='w-32 h-20 rounded-lg overflow-hidden border border-gray-200 bg-black relative'>
+                      <video
+                        src={item.video}
+                        className='w-full h-full object-cover'
+                        muted
+                        playsInline
+                      />
+                      <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-30'>
+                        <Video className='h-6 w-6 text-white' />
+                      </div>
+                    </div>
+                  ) : item.image ? (
+                    <div className='w-32 h-20 rounded-lg overflow-hidden border border-gray-200'>
+                      <img
+                        src={item.image}
+                        alt={`Carousel ${index + 1}`}
+                        className='w-full h-full object-cover'
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.src = '/images/placeholder.jpg'
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className='w-32 h-20 rounded-lg border border-gray-200 flex items-center justify-center bg-gray-100'>
+                      <span className='text-xs text-gray-400'>No media</span>
+                    </div>
+                  )}
                   
-                  <div className='space-y-2'>
-                    <input
-                      type='file'
-                      id={`imageUpload${index}`}
-                      accept='image/*'
-                      className='hidden'
-                      onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) {
-                          handleImageUpload(index, file)
-                        }
-                      }}
-                    />
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={() => document.getElementById(`imageUpload${index}`)?.click()}
-                      disabled={uploadingImages.has(index) || isUploading}
-                    >
-                      <Upload className='h-4 w-4 ml-2' />
-                      {uploadingImages.has(index) || isUploading ? 'Uploading...' : 'Upload New Image'}
-                    </Button>
+                  <div className='space-y-2 flex-1'>
+                    <div className='flex gap-2'>
+                      <input
+                        type='file'
+                        id={`imageUpload${index}`}
+                        accept='image/*'
+                        className='hidden'
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            handleImageUpload(index, file)
+                          }
+                        }}
+                      />
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={() => {
+                          document.getElementById(`imageUpload${index}`)?.click()
+                        }}
+                        disabled={uploadingImages.has(index) || uploadingVideos.has(index) || isImageUploading || isVideoUploading}
+                      >
+                        <ImageIcon className='h-4 w-4 ml-2' />
+                        {uploadingImages.has(index) || isImageUploading ? 'Uploading...' : 'Upload Image'}
+                      </Button>
+                      
+                      <input
+                        type='file'
+                        id={`videoUpload${index}`}
+                        accept='video/*'
+                        className='hidden'
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            handleVideoUpload(index, file)
+                          }
+                        }}
+                      />
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={() => {
+                          document.getElementById(`videoUpload${index}`)?.click()
+                        }}
+                        disabled={uploadingImages.has(index) || uploadingVideos.has(index) || isImageUploading || isVideoUploading}
+                      >
+                        <Video className='h-4 w-4 ml-2' />
+                        {uploadingVideos.has(index) || isVideoUploading ? 'Uploading...' : 'Upload Video'}
+                      </Button>
+                    </div>
+                    {item.video && (
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={() => {
+                          const newCarouselItems = [...carouselItems]
+                          newCarouselItems[index].video = undefined
+                          onCarouselItemsChange(newCarouselItems)
+                        }}
+                        className='text-red-500 hover:text-red-700'
+                      >
+                        Remove Video
+                      </Button>
+                    )}
+                    {item.image && (
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={() => {
+                          const newCarouselItems = [...carouselItems]
+                          newCarouselItems[index].image = undefined
+                          onCarouselItemsChange(newCarouselItems)
+                        }}
+                        className='text-red-500 hover:text-red-700'
+                      >
+                        Remove Image
+                      </Button>
+                    )}
                     <p className='text-xs text-muted-foreground'>
-                      Current image: {item.image.length > 50 ? `${item.image.substring(0, 50)}...` : item.image}
+                      {item.video 
+                        ? `Current video: ${item.video.length > 50 ? `${item.video.substring(0, 50)}...` : item.video}`
+                        : item.image 
+                        ? `Current image: ${item.image.length > 50 ? `${item.image.substring(0, 50)}...` : item.image}`
+                        : 'No media uploaded'}
                     </p>
                   </div>
                 </div>

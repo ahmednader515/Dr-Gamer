@@ -2,14 +2,17 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 interface FAQItemProps {
   question: string
   answer: string
+  images?: string[]
+  videos?: string[]
   isLast?: boolean
 }
 
-export default function FAQItem({ question, answer, isLast }: FAQItemProps) {
+export default function FAQItem({ question, answer, images = [], videos = [], isLast }: FAQItemProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -30,8 +33,44 @@ export default function FAQItem({ question, answer, isLast }: FAQItemProps) {
       </button>
       
       {isOpen && (
-        <div className="px-4 pb-6 text-gray-300 text-base leading-relaxed text-left">
-          {answer}
+        <div className="px-4 pb-6 text-gray-300 text-base leading-relaxed text-left space-y-4">
+          <div className="whitespace-pre-line">{answer}</div>
+          
+          {/* Images */}
+          {images && images.length > 0 && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {images.map((image, index) => (
+                  <div key={index} className="relative w-full aspect-video rounded-lg overflow-hidden border border-gray-700">
+                    <Image
+                      src={image}
+                      alt={`FAQ image ${index + 1}`}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Videos */}
+          {videos && videos.length > 0 && (
+            <div className="space-y-3">
+              {videos.map((video, index) => (
+                <div key={index} className="relative w-full aspect-video rounded-lg overflow-hidden border border-gray-700 bg-black">
+                  <video
+                    src={video}
+                    controls
+                    className="w-full h-full object-contain"
+                    preload="metadata"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

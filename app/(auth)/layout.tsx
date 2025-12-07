@@ -3,6 +3,7 @@ import Image from 'next/image'
 import SeparatorWithOr from '@/components/shared/separator-or'
 import Header from '@/components/shared/header'
 import Footer from '@/components/shared/footer'
+import HowToUseButton from '@/components/shared/how-to-use-button'
 import data from '@/lib/data'
 
 export default async function AuthLayout({
@@ -16,6 +17,7 @@ export default async function AuthLayout({
       <Header />
       <main className='mx-auto w-full min-w-80 p-4 flex-1 flex flex-col items-center justify-center pt-36 md:pt-36'>{children}</main>
       <Footer />
+      <HowToUseButton />
     </div>
   )
 }

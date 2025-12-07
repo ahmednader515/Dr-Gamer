@@ -35,7 +35,7 @@ const categoryTranslations: { [key: string]: string } = {
   'Oral Care': 'العناية بالفم والأسنان'
 };
 
-export default async function Header() {
+export default async function Header({ hasPromoBar = false }: { hasPromoBar?: boolean }) {
   // Get categories from the new category table
   const categories = await prisma.category.findMany({
     where: { isActive: true },
@@ -49,10 +49,10 @@ export default async function Header() {
   const categoryList = categories.map(cat => cat.name);
   
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-gray-900 text-gray-100 font-cairo" dir="ltr">
+    <header className={`fixed left-0 right-0 z-50 bg-gray-900 text-gray-100 font-cairo ${hasPromoBar ? 'top-[32px] md:top-[36px]' : 'top-0'}`} dir="ltr">
       {/* Main Header - Clean Design */}
       <div className="bg-gray-900 border-b border-gray-700">
-        <div className="container mx-auto px-3 md:px-4 lg:px-6 pt-2 md:pt-3 pb-2 md:pb-3">
+        <div className="container mx-auto px-3 md:px-3 lg:px-4 pt-2 md:pt-2 pb-2 md:pb-2">
           {/* Header Row */}
           <div className="flex items-center justify-between gap-2 md:gap-4">
             {/* Left Side - Logo + Dr.GAMER on desktop, Menu + Logo + Dr.GAMER on mobile */}
@@ -81,21 +81,21 @@ export default async function Header() {
               </div>
               
               {/* Desktop: Logo + Dr.GAMER */}
-              <div className="hidden md:flex items-center gap-2 md:gap-3">
-                <Link href="/" className="flex items-center gap-2 md:gap-3">
+              <div className="hidden md:flex items-center gap-2 md:gap-2">
+                <Link href="/" className="flex items-center gap-2 md:gap-2">
                   <Image
                     src={site.logo}
                     width={80}
                     height={80}
                     alt={`${site.name} logo`}
-                    className="w-16 md:w-18 lg:w-20 h-16 md:h-18 lg:h-20"
+                    className="w-16 md:w-12 lg:w-14 h-16 md:h-12 lg:h-14"
                   />
                   <div className="flex flex-col">
-                    <span className="text-white font-bold text-lg md:text-xl lg:text-2xl">
+                    <span className="text-white font-bold text-lg md:text-lg lg:text-xl">
                       <span className="text-white">DR.</span>
                       <span className="text-purple-400">Gamer</span>
                     </span>
-                    <span className="text-xs md:text-sm">
+                    <span className="text-xs md:text-xs lg:text-sm">
                       by <span className="text-blue-400">Mina</span> & <span className="text-green-400">Hamaki</span>
                     </span>
                   </div>
@@ -169,13 +169,13 @@ export default async function Header() {
 
       {/* Categories Section - Hidden on mobile, shown on tablet/desktop */}
       <div className="hidden md:block bg-[#111827] text-white border-b border-gray-700">
-        <div className="container mx-auto px-3 md:px-4 py-2 md:py-3">
+        <div className="container mx-auto px-3 md:px-3 lg:px-4 py-2 md:py-2">
           <div className="flex items-center justify-center">
-            <div className="flex items-center justify-center flex-wrap gap-2 md:gap-3 lg:gap-4">
+            <div className="flex items-center justify-center flex-wrap gap-2 md:gap-2 lg:gap-3">
               {/* Offers Button */}
               <Link
                 href="/#offers"
-                className="px-3 md:px-4 lg:px-5 py-2 md:py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs md:text-sm lg:text-base font-medium transition-colors duration-200 whitespace-nowrap touch-manipulation"
+                className="px-3 md:px-3 lg:px-3.5 py-2 md:py-1.5 lg:py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs md:text-xs lg:text-sm font-medium transition-colors duration-200 whitespace-nowrap touch-manipulation"
               >
                 Offers
               </Link>
@@ -183,7 +183,7 @@ export default async function Header() {
               {/* Home Page Link */}
               <Link
                 href="/"
-                className="px-3 md:px-4 lg:px-5 py-2 md:py-2.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-xs md:text-sm lg:text-base font-medium transition-colors duration-200 whitespace-nowrap touch-manipulation"
+                className="px-3 md:px-3 lg:px-3.5 py-2 md:py-1.5 lg:py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-xs md:text-xs lg:text-sm font-medium transition-colors duration-200 whitespace-nowrap touch-manipulation"
               >
                 Homepage
               </Link>
@@ -193,7 +193,7 @@ export default async function Header() {
                 <Link
                   href={`/search?category=${category}`}
                   key={category}
-                  className="px-3 md:px-4 lg:px-5 py-2 md:py-2.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-xs md:text-sm lg:text-base font-medium transition-colors duration-200 whitespace-nowrap touch-manipulation"
+                  className="px-3 md:px-3 lg:px-3.5 py-2 md:py-1.5 lg:py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-xs md:text-xs lg:text-sm font-medium transition-colors duration-200 whitespace-nowrap touch-manipulation"
                 >
                   {categoryTranslations[category] || category}
                 </Link>
@@ -204,7 +204,7 @@ export default async function Header() {
                 <Link
                   href={`/search?category=${category}`}
                   key={category}
-                  className="hidden lg:inline-flex px-4 lg:px-5 py-2 md:py-2.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-sm lg:text-base font-medium transition-colors duration-200 whitespace-nowrap touch-manipulation"
+                  className="hidden lg:inline-flex px-4 lg:px-3.5 py-2 md:py-1.5 lg:py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-sm lg:text-sm font-medium transition-colors duration-200 whitespace-nowrap touch-manipulation"
                 >
                   {categoryTranslations[category] || category}
                 </Link>

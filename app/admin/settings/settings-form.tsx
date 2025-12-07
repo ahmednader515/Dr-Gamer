@@ -17,7 +17,8 @@ import { useUploadThing } from '@/lib/uploadthing'
 interface CarouselItem {
   title: string
   buttonCaption: string
-  image: string
+  image?: string
+  video?: string
   url: string
 }
 

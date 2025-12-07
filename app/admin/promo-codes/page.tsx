@@ -117,6 +117,7 @@ export default async function PromoCodesPage() {
     id: code.id,
     code: code.code,
     discountPercent: code.discountPercent,
+    minPurchaseAmount: code.minPurchaseAmount ? Number(code.minPurchaseAmount) : null,
     isActive: code.isActive,
     expiresAt: code.expiresAt ? code.expiresAt.toISOString() : null,
     usageLimit: code.usageLimit,

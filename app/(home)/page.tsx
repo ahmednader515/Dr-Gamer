@@ -330,6 +330,195 @@ async function RemainingCategoriesSection({ categories, categoryMap }: { categor
   }
 }
 
+// Featured Products Section
+async function FeaturedProductsSection({ productIds }: { productIds: string[] }) {
+  try {
+    if (!productIds || productIds.length === 0) return null
+
+    const products = await prisma.product.findMany({
+      where: {
+        id: { in: productIds },
+        isPublished: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        images: true,
+        price: true,
+        listPrice: true,
+        originalPrice: true,
+        avgRating: true,
+        numReviews: true,
+        category: true,
+        categoryId: true,
+        productType: true,
+        platformType: true,
+        productCategory: true,
+        variations: true,
+        countInStock: true,
+        brand: true,
+      }
+    })
+
+    // Maintain order from productIds
+    const orderedProducts = productIds
+      .map(id => products.find(p => p.id === id))
+      .filter((p): p is typeof products[0] => p !== undefined)
+      .map(product => {
+        let variations = null
+        if (product.variations) {
+          try {
+            variations = typeof product.variations === 'string' 
+              ? JSON.parse(product.variations)
+              : product.variations
+          } catch (e) {
+            variations = null
+          }
+        }
+        
+        return {
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
+          images: Array.isArray(product.images) ? product.images : [],
+          price: Number(product.price),
+          listPrice: Number(product.listPrice),
+          originalPrice: Number(product.originalPrice),
+          avgRating: Number(product.avgRating),
+          numReviews: Number(product.numReviews),
+          productType: product.productType || 'game_code',
+          platformType: product.platformType,
+          productCategory: product.productCategory,
+          variations: variations,
+          countInStock: product.countInStock,
+          brand: product.brand,
+        }
+      })
+
+    if (orderedProducts.length === 0) return null
+
+    return (
+      <Card className='w-full rounded-xl bg-transparent border-0 shadow-none'>
+        <CardContent className='card-mobile p-0'>
+          <ProductSlider 
+            title="Featured Products" 
+            products={orderedProducts}
+            categoryLink="/search?featured=true"
+          />
+        </CardContent>
+      </Card>
+    )
+  } catch (error) {
+    console.error('Error loading featured products:', error)
+    return null
+  }
+}
+
+// Newly Added Products Section
+async function NewlyAddedProductsSection({ productIds }: { productIds: string[] }) {
+  try {
+    // If no products in settings, auto-populate with latest 20
+    let productsToFetch = productIds
+    if (!productIds || productIds.length === 0) {
+      const latestProducts = await prisma.product.findMany({
+        where: { isPublished: true },
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+        select: { id: true }
+      })
+      productsToFetch = latestProducts.map(p => p.id)
+    }
+
+    if (productsToFetch.length === 0) return null
+
+    const products = await prisma.product.findMany({
+      where: {
+        id: { in: productsToFetch },
+        isPublished: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        images: true,
+        price: true,
+        listPrice: true,
+        originalPrice: true,
+        avgRating: true,
+        numReviews: true,
+        category: true,
+        categoryId: true,
+        productType: true,
+        platformType: true,
+        productCategory: true,
+        variations: true,
+        countInStock: true,
+        brand: true,
+      }
+    })
+
+    // Maintain order from productIds if provided, otherwise use creation date order
+    const orderedProducts = productIds && productIds.length > 0
+      ? productIds
+          .map(id => products.find(p => p.id === id))
+          .filter((p): p is typeof products[0] => p !== undefined)
+      : products
+
+    const formattedProducts = orderedProducts.map(product => {
+      let variations = null
+      if (product.variations) {
+        try {
+          variations = typeof product.variations === 'string' 
+            ? JSON.parse(product.variations)
+            : product.variations
+        } catch (e) {
+          variations = null
+        }
+      }
+      
+      return {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '',
+        images: Array.isArray(product.images) ? product.images : [],
+        price: Number(product.price),
+        listPrice: Number(product.listPrice),
+        originalPrice: Number(product.originalPrice),
+        avgRating: Number(product.avgRating),
+        numReviews: Number(product.numReviews),
+        productType: product.productType || 'game_code',
+        platformType: product.platformType,
+        productCategory: product.productCategory,
+        variations: variations,
+        countInStock: product.countInStock,
+        brand: product.brand,
+      }
+    })
+
+    if (formattedProducts.length === 0) return null
+
+    return (
+      <Card className='w-full rounded-xl bg-transparent border-0 shadow-none'>
+        <CardContent className='card-mobile p-0'>
+          <ProductSlider 
+            title="Newly Added Products" 
+            products={formattedProducts}
+            categoryLink="/search?newlyAdded=true"
+          />
+        </CardContent>
+      </Card>
+    )
+  } catch (error) {
+    console.error('Error loading newly added products:', error)
+    return null
+  }
+}
+
 export default async function HomePage() {
   // Batch fetch categories and settings in parallel
   const [categories, setting] = await Promise.all([
@@ -338,7 +527,13 @@ export default async function HomePage() {
       orderBy: { sortOrder: 'asc' },
       select: { id: true, name: true, image: true },
     }),
-    prisma.setting.findFirst({ select: { carousels: true } })
+    prisma.setting.findFirst({ 
+      select: { 
+        carousels: true,
+        featuredProducts: true,
+        newlyAddedProducts: true,
+      } 
+    })
   ])
 
   const categoryList = categories.map(c => c.name)
@@ -397,6 +592,24 @@ export default async function HomePage() {
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* --- FEATURED PRODUCTS --- */}
+      <div className='py-8'>
+        <div className='max-w-[80%] mx-auto'>
+          <Suspense fallback={<ProductSliderSkeleton title='Featured Products' />}>
+            <FeaturedProductsSection productIds={(setting?.featuredProducts as string[]) || []} />
+          </Suspense>
+        </div>
+      </div>
+
+      {/* --- NEWLY ADDED PRODUCTS --- */}
+      <div className='py-8'>
+        <div className='max-w-[80%] mx-auto'>
+          <Suspense fallback={<ProductSliderSkeleton title='Newly Added Products' />}>
+            <NewlyAddedProductsSection productIds={(setting?.newlyAddedProducts as string[]) || []} />
+          </Suspense>
         </div>
       </div>
 

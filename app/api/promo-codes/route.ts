@@ -45,6 +45,7 @@ const serializePromoCode = (promoCode: any) => ({
   id: promoCode.id,
   code: promoCode.code,
   discountPercent: promoCode.discountPercent,
+  minPurchaseAmount: promoCode.minPurchaseAmount ? Number(promoCode.minPurchaseAmount) : null,
   isActive: promoCode.isActive,
   expiresAt: promoCode.expiresAt ? promoCode.expiresAt.toISOString() : null,
   usageLimit: promoCode.usageLimit,
@@ -151,7 +152,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { code, discountPercent, expiresAt, usageLimit, assignments } = body
+    const { code, discountPercent, minPurchaseAmount, expiresAt, usageLimit, assignments } = body
 
     // Validation
     if (!code || !discountPercent) {
@@ -237,10 +238,20 @@ export async function POST(request: NextRequest) {
           } => Boolean(link))
       : []
 
+    const resolvedMinPurchaseAmount =
+      minPurchaseAmount !== null &&
+      minPurchaseAmount !== undefined &&
+      minPurchaseAmount !== '' &&
+      !Number.isNaN(Number(minPurchaseAmount)) &&
+      Number(minPurchaseAmount) > 0
+        ? new Prisma.Decimal(minPurchaseAmount as Prisma.Decimal.Value)
+        : null
+
     const promoCode = await prisma.promoCode.create({
       data: {
         code: code.toUpperCase(),
         discountPercent: parseInt(discountPercent, 10),
+        minPurchaseAmount: resolvedMinPurchaseAmount,
         expiresAt: expiresAt ? new Date(expiresAt) : null,
         usageLimit: usageLimit ? parseInt(usageLimit, 10) : null,
         applicableProducts: assignmentLinks.length

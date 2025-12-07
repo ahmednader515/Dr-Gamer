@@ -13,17 +13,18 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatDateTime } from '@/lib/utils'
-import { useLoading } from '@/hooks/use-loading'
-import { LoadingSpinner } from '@/components/shared/loading-overlay'
+import ServerPagination from '@/components/shared/server-pagination'
+import UsersSearch from './users-search'
 
 export const metadata: Metadata = {
   title: 'Admin Users',
 }
 
 export default async function AdminUser(props: {
-  searchParams: Promise<{ page: string }>
+  searchParams: Promise<{ page: string; search?: string }>
 }) {
-  const { page = '1' } = await props.searchParams
+  const searchParams = await props.searchParams
+  const { page = '1', search = '' } = searchParams
   
   const session = await auth()
   if (session?.user.role !== 'Admin')
@@ -31,11 +32,15 @@ export default async function AdminUser(props: {
     
   const users = await getAllUsers({
     page: Number(page),
+    search: search || undefined,
   })
   
   return (
     <div className='space-y-4 ltr text-left' style={{ fontFamily: 'Cairo, sans-serif' }}>
       <h1 className='h1-bold'>Users</h1>
+      
+      {/* Search Box */}
+      <UsersSearch initialSearch={search} />
       
       {/* Desktop Table - Hidden on mobile */}
       <div className='hidden md:block overflow-x-auto'>
@@ -50,7 +55,8 @@ export default async function AdminUser(props: {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users?.data.map((user) => (
+            {users?.data && users.data.length > 0 ? (
+              users.data.map((user) => (
               <TableRow key={user.id} className="bg-gray-800 hover:bg-gray-700 border-b border-gray-700">
                 <TableCell className='text-left py-4 px-4'>
                   <div>
@@ -85,14 +91,22 @@ export default async function AdminUser(props: {
                   </Button>
                 </TableCell>
               </TableRow>
-            ))}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className='text-center py-8 text-gray-400'>
+                  {search ? `No users found matching "${search}"` : 'No users found'}
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
 
       {/* Mobile Cards - Visible only on mobile */}
       <div className='md:hidden space-y-4'>
-        {users?.data.map((user) => (
+        {users?.data && users.data.length > 0 ? (
+          users.data.map((user) => (
           <div key={user.id} className="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-4 space-y-3">
             {/* User Header */}
             <div className="flex items-center justify-between">
@@ -130,8 +144,25 @@ export default async function AdminUser(props: {
               </Button>
             </div>
           </div>
-        ))}
+          ))
+        ) : (
+          <div className='text-center py-8 text-gray-400'>
+            {search ? `No users found matching "${search}"` : 'No users found'}
+          </div>
+        )}
       </div>
+      
+      {/* Pagination */}
+      {users?.totalPages && users.totalPages > 1 && (
+        <div className='flex justify-center pt-4'>
+          <ServerPagination
+            currentPage={Number(page)}
+            totalPages={users.totalPages}
+            baseUrl='/admin/users'
+            searchParams={search ? { search } : {}}
+          />
+        </div>
+      )}
     </div>
   )
 }

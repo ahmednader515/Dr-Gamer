@@ -77,12 +77,48 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             )}
           </div>
         ) : (
-          // Product without variations - show single price
-          <div className="text-left">
-            <div className="text-2xl font-bold text-white">
-              {Number(product.price).toFixed(2)} EGP
-            </div>
-          </div>
+          // Product without variations - show price with discount if applicable
+          (() => {
+            const productPrice = Number(product.price) || 0;
+            const productListPrice = Number(product.listPrice) || 0;
+            const productOriginalPrice = Number(product.originalPrice) || 0;
+            
+            // Check if listPrice is set and is less than price (discounted price scenario)
+            const hasListPriceDiscount = productListPrice > 0 && productPrice > 0 && productListPrice < productPrice;
+            // Fallback to originalPrice check if listPrice is not set
+            const hasOriginalPriceDiscount = !hasListPriceDiscount && productOriginalPrice > 0 && productPrice > 0 && productOriginalPrice > productPrice;
+            
+            const hasDiscount = hasListPriceDiscount || hasOriginalPriceDiscount;
+            const discountedPrice = hasListPriceDiscount ? productListPrice : (hasOriginalPriceDiscount ? productPrice : productPrice);
+            const originalPrice = hasListPriceDiscount ? productPrice : (hasOriginalPriceDiscount ? productOriginalPrice : 0);
+            const discountPercentage = hasDiscount && originalPrice > 0
+              ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+              : 0;
+            
+            return (
+              <div className="text-left">
+                {hasDiscount ? (
+                  <div className="flex flex-col gap-1 items-start">
+                    <div className="flex items-center gap-2">
+                      <div className="text-2xl font-bold text-white">
+                        {discountedPrice.toFixed(2)} EGP
+                      </div>
+                      <span className='px-2 py-1 bg-red-500 text-white text-xs rounded-md font-bold'>
+                        -{discountPercentage}%
+                      </span>
+                    </div>
+                    <span className='text-sm text-gray-400 line-through'>
+                      {originalPrice.toFixed(2)} EGP
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-2xl font-bold text-white">
+                    {productPrice.toFixed(2)} EGP
+                  </div>
+                )}
+              </div>
+            );
+          })()
         )}
       </div>
 

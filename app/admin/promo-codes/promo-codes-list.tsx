@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,8 +28,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { X } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { X, Search, Loader2, Plus } from 'lucide-react'
 import ProductPrice from '@/components/shared/product/product-price'
+import { getAllProductsForAdmin } from '@/lib/actions/product.actions'
 
 const ALL_CATEGORIES_VALUE = '__all__'
 const UNCATEGORIZED_VALUE = '__uncategorized__'
@@ -52,6 +54,7 @@ type PromoCode = {
   id: string
   code: string
   discountPercent: number
+  minPurchaseAmount: number | null
   isActive: boolean
   expiresAt: string | null
   usageLimit: number | null
@@ -100,13 +103,22 @@ export default function PromoCodesList({
   const [formData, setFormData] = useState({
     code: '',
     discountPercent: '',
+    minPurchaseAmount: '',
     expiresAt: '',
     usageLimit: '',
   })
   const [selectedProductId, setSelectedProductId] = useState('')
   const [selectedEntries, setSelectedEntries] = useState<SelectedEntry[]>([])
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(ALL_CATEGORIES_VALUE)
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([])
   const [bulkCategoryId, setBulkCategoryId] = useState<string>('')
+  
+  // Product search states
+  const [productSearchQuery, setProductSearchQuery] = useState('')
+  const [productSuggestions, setProductSuggestions] = useState<any[]>([])
+  const [isLoadingProductSuggestions, setIsLoadingProductSuggestions] = useState(false)
+  const [showProductSuggestions, setShowProductSuggestions] = useState(false)
+  const productSearchInputRef = useRef<HTMLInputElement>(null)
+  const productSuggestionsRef = useRef<HTMLDivElement>(null)
 
   const createSelectedProductEntry = (product: ProductOption): SelectedEntry => ({
     id: `product-${product.id}`,
@@ -142,26 +154,124 @@ export default function PromoCodesList({
     ]
   }, [categories, products])
 
+  // Debounced search for product suggestions
+  const debouncedProductSearch = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout
+      return (query: string) => {
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(async () => {
+          if (query.trim().length >= 2) {
+            setIsLoadingProductSuggestions(true)
+            try {
+              const result = await getAllProductsForAdmin({
+                query: query.trim(),
+                page: 1,
+                sort: 'latest',
+                limit: 10,
+              })
+
+              // Filter out already selected products
+              const filtered = result.products.filter((p: any) => {
+                const isAlreadySelected = selectedEntries.some(
+                  (entry) => entry.type === 'product' && entry.product.id === p.id
+                )
+                return !isAlreadySelected && p.isPublished
+              })
+              
+              // Map to ProductOption format
+              const mapped = filtered.map((p: any) => {
+                // Safely extract category name as string
+                let categoryName: string | null = null
+                if (typeof p.category === 'string') {
+                  categoryName = p.category
+                } else if (p.category?.name && typeof p.category.name === 'string') {
+                  categoryName = p.category.name
+                } else if (p.categoryRelation?.name && typeof p.categoryRelation.name === 'string') {
+                  categoryName = p.categoryRelation.name
+                }
+                
+                // Normalize variations - ensure they're always an array of strings or objects
+                let variations: any[] = []
+                if (p.variations) {
+                  try {
+                    if (Array.isArray(p.variations)) {
+                      variations = p.variations
+                    } else if (typeof p.variations === 'string') {
+                      variations = JSON.parse(p.variations)
+                    }
+                  } catch (e) {
+                    variations = []
+                  }
+                }
+                
+                return {
+                  id: p.id,
+                  name: String(p.name || ''),
+                  price: Number(p.price) || 0,
+                  categoryId: p.categoryId || null,
+                  categoryName: categoryName,
+                  variations: variations,
+                }
+              })
+              
+              setProductSuggestions(mapped)
+              setShowProductSuggestions(true)
+            } catch (error) {
+              console.error('Product suggestions error:', error)
+              setProductSuggestions([])
+            } finally {
+              setIsLoadingProductSuggestions(false)
+            }
+          } else {
+            setProductSuggestions([])
+            setShowProductSuggestions(false)
+          }
+        }, 300) // 300ms debounce
+      }
+    })(),
+    [selectedEntries]
+  )
+
+  // Handle product search query change with suggestions
+  useEffect(() => {
+    if (productSearchQuery.trim().length >= 2) {
+      debouncedProductSearch(productSearchQuery)
+    } else {
+      setProductSuggestions([])
+      setShowProductSuggestions(false)
+    }
+  }, [productSearchQuery, debouncedProductSearch])
+
+  // Close product suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        productSuggestionsRef.current &&
+        !productSuggestionsRef.current.contains(event.target as Node) &&
+        productSearchInputRef.current &&
+        !productSearchInputRef.current.contains(event.target as Node)
+      ) {
+        setShowProductSuggestions(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
   const filteredProducts = useMemo(() => {
-    if (selectedCategoryId === ALL_CATEGORIES_VALUE) {
+    if (selectedCategoryIds.length === 0) {
       return products
     }
 
     return products.filter((product) => {
       const normalizedCategory = product.categoryId ?? UNCATEGORIZED_VALUE
-      return normalizedCategory === selectedCategoryId
+      return selectedCategoryIds.includes(normalizedCategory)
     })
-  }, [products, selectedCategoryId])
-
-  useEffect(() => {
-    if (!selectedProductId) return
-    const stillAvailable = filteredProducts.some(
-      (product) => product.id === selectedProductId,
-    )
-    if (!stillAvailable) {
-      setSelectedProductId('')
-    }
-  }, [filteredProducts, selectedProductId])
+  }, [products, selectedCategoryIds])
 
   const categoryBulkOptions = useMemo(
     () => categorySelectOptions.filter((option) => option.id !== ALL_CATEGORIES_VALUE),
@@ -238,7 +348,7 @@ export default function PromoCodesList({
           description: result.message,
         })
         setPromoCodes([result.data, ...promoCodes])
-        setFormData({ code: '', discountPercent: '', expiresAt: '', usageLimit: '' })
+        setFormData({ code: '', discountPercent: '', minPurchaseAmount: '', expiresAt: '', usageLimit: '' })
         setSelectedEntries([])
         setSelectedProductId('')
         setBulkCategoryId('')
@@ -260,12 +370,11 @@ export default function PromoCodesList({
     }
   }
 
-  const handleAddProduct = () => {
-    if (!selectedProductId) return
-    const product = products.find((p) => p.id === selectedProductId)
-    if (!product) return
+  const handleAddProduct = (product?: ProductOption) => {
+    const productToAdd = product || products.find((p) => p.id === selectedProductId)
+    if (!productToAdd) return
     const exists = selectedEntries.some(
-      (entry) => entry.type === 'product' && entry.product.id === product.id,
+      (entry) => entry.type === 'product' && entry.product.id === productToAdd.id,
     )
     if (exists) {
       toast({
@@ -274,8 +383,11 @@ export default function PromoCodesList({
       })
       return
     }
-    setSelectedEntries((prev) => [...prev, createSelectedProductEntry(product)])
+    setSelectedEntries((prev) => [...prev, createSelectedProductEntry(productToAdd)])
     setSelectedProductId('')
+    setProductSearchQuery('')
+    setShowProductSuggestions(false)
+    setProductSuggestions([])
   }
 
   const handleRemoveEntry = (entryId: string) => {
@@ -376,57 +488,68 @@ export default function PromoCodesList({
     }
   }
 
+  const handleCategoryToggle = (categoryId: string) => {
+    if (categoryId === ALL_CATEGORIES_VALUE) {
+      // Toggle all categories
+      if (selectedCategoryIds.length === categoryBulkOptions.length) {
+        setSelectedCategoryIds([])
+      } else {
+        setSelectedCategoryIds(categoryBulkOptions.map(c => c.id))
+      }
+    } else {
+      // Toggle individual category
+      setSelectedCategoryIds((prev) => {
+        if (prev.includes(categoryId)) {
+          return prev.filter(id => id !== categoryId)
+        } else {
+          return [...prev, categoryId]
+        }
+      })
+    }
+  }
+
   const handleAddCategoryEntry = () => {
-    if (!bulkCategoryId) {
+    if (selectedCategoryIds.length === 0) {
       toast({
         title: 'Notice',
-        description: 'Please choose a category to add.',
+        description: 'Please select at least one category to add.',
       })
       return
     }
 
-    const exists = selectedEntries.some(
-      (entry) => entry.type === 'category' && entry.category.id === bulkCategoryId,
-    )
+    // Add all selected categories that aren't already added
+    const categoriesToAdd = selectedCategoryIds
+      .map(categoryId => categorySelectOptions.find(opt => opt.id === categoryId))
+      .filter((category): category is CategoryOption => {
+        if (!category || category.id === ALL_CATEGORIES_VALUE || category.id === UNCATEGORIZED_VALUE) {
+          return false
+        }
+        // Check if already added
+        return !selectedEntries.some(
+          (entry) => entry.type === 'category' && entry.category.id === category.id
+        )
+      })
 
-    if (exists) {
+    if (categoriesToAdd.length === 0) {
       toast({
         title: 'Notice',
-        description: 'This category is already added to the promo code.',
+        description: 'All selected categories are already added to the promo code.',
       })
       return
     }
 
-    const category =
-      categorySelectOptions.find((option) => option.id === bulkCategoryId) ?? null
-
-    if (!category || category.id === ALL_CATEGORIES_VALUE) {
-      toast({
-        title: 'Notice',
-        description: 'Please choose a specific category.',
-      })
-      return
-    }
-
-    if (category.id === UNCATEGORIZED_VALUE) {
-      toast({
-        title: 'Notice',
-        description: 'Uncategorized products cannot be selected as a category.',
-      })
-      return
-    }
-
-    setSelectedEntries((prev) => [...prev, createSelectedCategoryEntry(category)])
-
-    const categoryName =
-      categorySelectOptions.find((option) => option.id === bulkCategoryId)?.name ??
-      'Selected category'
+    // Add all categories at once to avoid multiple state updates
+    setSelectedEntries((prev) => [
+      ...prev,
+      ...categoriesToAdd.map(category => createSelectedCategoryEntry(category))
+    ])
 
     toast({
-      title: 'Category Added',
-      description: `Added category ${categoryName}.`,
+      title: 'Categories Added',
+      description: `Added ${categoriesToAdd.length} categor${categoriesToAdd.length === 1 ? 'y' : 'ies'}.`,
     })
 
+    setSelectedCategoryIds([])
     setBulkCategoryId('')
   }
 
@@ -471,6 +594,23 @@ export default function PromoCodesList({
               </div>
 
               <div className='space-y-2'>
+                <Label htmlFor='minPurchaseAmount' className='text-white'>Minimum Purchase Amount (EGP) (Optional)</Label>
+                <Input
+                  id='minPurchaseAmount'
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={formData.minPurchaseAmount}
+                  onChange={(e) => setFormData({ ...formData, minPurchaseAmount: e.target.value })}
+                  placeholder='Example: 100 or 500'
+                  className='bg-gray-800 text-white border-gray-700'
+                />
+                <p className='text-xs text-gray-400'>
+                  Minimum total purchase amount required to use this code. Leave empty for no minimum.
+                </p>
+              </div>
+
+              <div className='space-y-2'>
                 <Label htmlFor='expiresAt' className='text-white'>Expiry Date (Optional)</Label>
                 <Input
                   id='expiresAt'
@@ -501,99 +641,150 @@ export default function PromoCodesList({
                 <p className='text-xs text-gray-400'>
                   Select one or more products that this promo code should work with. Leave empty to allow the code for any product.
                 </p>
-                <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-                  <div className='flex flex-col sm:flex-row gap-2 sm:flex-1'>
-                    <Select
-                      value={selectedCategoryId}
-                      onValueChange={setSelectedCategoryId}
-                    >
-                      <SelectTrigger className='bg-gray-800 text-white border-gray-700 sm:w-64'>
-                        <SelectValue placeholder='All Categories' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categorySelectOptions.map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
+                
+                {/* Category Multi-Select */}
+                <div className='space-y-2'>
+                  <Label className='text-sm text-gray-300'>Filter by Categories (optional)</Label>
+                  <div className='bg-gray-800 border border-gray-700 rounded-lg p-3 max-h-48 overflow-y-auto'>
+                    <div className='space-y-2'>
+                      <div className='flex items-center space-x-2'>
+                        <Checkbox
+                          id='select-all-categories'
+                          checked={selectedCategoryIds.length === categoryBulkOptions.length && categoryBulkOptions.length > 0}
+                          onCheckedChange={() => handleCategoryToggle(ALL_CATEGORIES_VALUE)}
+                          className='border-gray-600 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600'
+                        />
+                        <Label
+                          htmlFor='select-all-categories'
+                          className='text-sm font-medium text-white cursor-pointer'
+                        >
+                          Select All Categories
+                        </Label>
+                      </div>
+                      {categoryBulkOptions.map((category) => (
+                        <div key={category.id} className='flex items-center space-x-2'>
+                          <Checkbox
+                            id={`category-${category.id}`}
+                            checked={selectedCategoryIds.includes(category.id)}
+                            onCheckedChange={() => handleCategoryToggle(category.id)}
+                            className='border-gray-600 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600'
+                          />
+                          <Label
+                            htmlFor={`category-${category.id}`}
+                            className='text-sm text-gray-300 cursor-pointer'
+                          >
                             {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select
-                      value={selectedProductId}
-                      onValueChange={setSelectedProductId}
-                    >
-                      <SelectTrigger className='bg-gray-800 text-white border-gray-700 sm:w-80'>
-                        <SelectValue placeholder='Select a product' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {filteredProducts.length === 0 ? (
-                          <SelectItem value='__no-products__' disabled>
-                            No products in this category
-                          </SelectItem>
-                        ) : (
-                          filteredProducts.map((product) => {
-                            const isSelected = selectedEntries.some(
-                              (entry) =>
-                                entry.type === 'product' &&
-                                entry.product.id === product.id,
-                            )
-                            return (
-                              <SelectItem
-                                key={product.id}
-                                value={product.id}
-                                disabled={isSelected}
-                              >
-                                {product.categoryName
-                                  ? `${product.name} — ${product.categoryName}`
-                                  : product.name}
-                              </SelectItem>
-                            )
-                          })
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      className='bg-purple-600/20 border-purple-600 text-purple-200 hover:bg-purple-600/30'
-                      onClick={handleAddProduct}
-                      disabled={!selectedProductId || filteredProducts.length === 0}
-                    >
-                      Add Product
-                    </Button>
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className='flex flex-col sm:flex-row gap-2 sm:justify-end sm:ml-0'>
-                    <Select
-                      value={bulkCategoryId}
-                      onValueChange={setBulkCategoryId}
-                    >
-                      <SelectTrigger className='bg-gray-800 text-white border-gray-700 sm:w-64'>
-                        <SelectValue placeholder='Add entire category' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categoryBulkOptions.length === 0 ? (
-                          <SelectItem value='__no-categories__' disabled>
-                            No categories available
-                          </SelectItem>
-                        ) : (
-                          categoryBulkOptions.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name}
-                            </SelectItem>
-                          ))
+                </div>
+
+                {/* Product Search Bar */}
+                <div className='space-y-2'>
+                  <Label className='text-sm text-gray-300'>Search and Add Products</Label>
+                  <div className='relative'>
+                    <div className='flex gap-2'>
+                      <div className='relative flex-1'>
+                        <Input
+                          ref={productSearchInputRef}
+                          placeholder='Type to search products (suggestions will appear)...'
+                          value={productSearchQuery}
+                          onChange={(e) => {
+                            setProductSearchQuery(e.target.value)
+                            if (e.target.value.trim().length >= 2) {
+                              setShowProductSuggestions(true)
+                            }
+                          }}
+                          onFocus={() => {
+                            if (productSuggestions.length > 0) {
+                              setShowProductSuggestions(true)
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              if (productSuggestions.length > 0 && showProductSuggestions) {
+                                handleAddProduct(productSuggestions[0])
+                              }
+                            } else if (e.key === 'Escape') {
+                              setShowProductSuggestions(false)
+                            }
+                          }}
+                          className='bg-gray-800 text-white border-gray-700 pr-10'
+                        />
+                        {isLoadingProductSuggestions && (
+                          <div className='absolute right-3 top-1/2 -translate-y-1/2'>
+                            <Loader2 className='h-4 w-4 animate-spin text-gray-400' />
+                          </div>
                         )}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      className='bg-green-600/20 border-green-600 text-green-200 hover:bg-green-600/30'
-                      onClick={handleAddCategoryEntry}
-                      disabled={!bulkCategoryId}
-                    >
-                      Add Category
-                    </Button>
+                      </div>
+                    </div>
+
+                    {/* Product Suggestions Dropdown */}
+                    {showProductSuggestions && productSuggestions.length > 0 && (
+                      <div
+                        ref={productSuggestionsRef}
+                        className='absolute z-50 w-full mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-lg max-h-80 overflow-y-auto'
+                      >
+                        <div className='p-2'>
+                          <div className='flex items-center justify-between mb-2 px-2'>
+                            <Label className='text-xs text-gray-400'>Suggestions</Label>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              className='h-6 w-6 p-0 text-gray-400 hover:text-white hover:bg-gray-800'
+                              onClick={() => {
+                                setShowProductSuggestions(false)
+                                setProductSearchQuery('')
+                              }}
+                            >
+                              <X className='h-3 w-3' />
+                            </Button>
+                          </div>
+                          {productSuggestions.map((product) => (
+                            <button
+                              key={product.id}
+                              type='button'
+                              onClick={() => handleAddProduct(product)}
+                              className='w-full flex items-center justify-between p-2 rounded hover:bg-gray-800 transition-colors text-left'
+                            >
+                              <div className='flex-1 min-w-0'>
+                                <p className='font-medium text-sm truncate text-white'>{product.name}</p>
+                                <p className='text-xs text-gray-400 truncate'>
+                                  {String(product.categoryName || 'Uncategorized')} • {Number(product.price).toFixed(2)} EGP
+                                </p>
+                              </div>
+                              <Plus className='h-4 w-4 ml-2 flex-shrink-0 text-gray-400' />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* No suggestions message */}
+                    {showProductSuggestions && !isLoadingProductSuggestions && productSuggestions.length === 0 && productSearchQuery.trim().length >= 2 && (
+                      <div className='absolute z-50 w-full mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-lg p-4'>
+                        <p className='text-sm text-gray-400 text-center'>
+                          No products found. Try a different search term.
+                        </p>
+                      </div>
+                    )}
                   </div>
+                </div>
+
+                {/* Add Categories Button */}
+                <div className='flex flex-col sm:flex-row gap-2 sm:justify-end'>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    className='bg-green-600/20 border-green-600 text-green-200 hover:bg-green-600/30'
+                    onClick={handleAddCategoryEntry}
+                    disabled={selectedCategoryIds.length === 0}
+                  >
+                    Add Selected Categories ({selectedCategoryIds.length})
+                  </Button>
                 </div>
               </div>
 
@@ -611,7 +802,7 @@ export default function PromoCodesList({
                             <div>
                               <p className='text-white font-medium'>{product.name}</p>
                               <p className='text-xs text-gray-400'>
-                                Category: {product.categoryName ?? 'Uncategorized'}
+                                Category: {String(product.categoryName ?? 'Uncategorized')}
                               </p>
                               <p className='text-xs text-gray-400'>
                                 Price:{' '}
@@ -657,11 +848,20 @@ export default function PromoCodesList({
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value='__all__'>All variations</SelectItem>
-                              {product.variations.map((variationName) => (
-                                <SelectItem key={variationName} value={variationName}>
-                                  {variationName}
-                                </SelectItem>
-                              ))}
+                              {product.variations.map((variation: any, varIndex: number) => {
+                                // Handle both string and object variations
+                                const variationName = typeof variation === 'string' 
+                                  ? variation 
+                                  : (variation?.name || String(variation))
+                                const variationValue = typeof variation === 'string'
+                                  ? variation
+                                  : (variation?.name || String(variation))
+                                return (
+                                  <SelectItem key={`${variationValue}-${varIndex}`} value={variationValue}>
+                                    {variationName}
+                                  </SelectItem>
+                                )
+                              })}
                               {product.variations.length === 0 && (
                                 <SelectItem value='__no_variations__' disabled>
                                   No variations defined
@@ -761,6 +961,7 @@ export default function PromoCodesList({
                 <TableRow className='bg-gray-800 border-b-2 border-gray-700'>
                   <TableHead className='text-left text-purple-400'>Code</TableHead>
                   <TableHead className='text-left text-purple-400'>Discount</TableHead>
+                  <TableHead className='text-left text-purple-400'>Min Purchase</TableHead>
                   <TableHead className='text-left text-purple-400'>Products</TableHead>
                   <TableHead className='text-left text-purple-400'>Status</TableHead>
                   <TableHead className='text-left text-purple-400'>Usage</TableHead>
@@ -779,16 +980,16 @@ export default function PromoCodesList({
                         <span className='text-sm text-gray-400'>All products</span>
                       ) : (
                         <div className='space-y-2'>
-                          {code.assignments.map((assignment) => {
+                          {code.assignments.map((assignment, index) => {
                             if (assignment.type === 'product' && assignment.product) {
                               return (
-                                <div key={assignment.id} className='flex flex-col text-sm gap-1'>
+                                <div key={assignment.id || `product-${assignment.product.id}-${index}`} className='flex flex-col text-sm gap-1'>
                                   <span className='font-medium text-white'>
                                     {assignment.product.name}
                                   </span>
                                   <span className='text-xs text-gray-400'>
                                     Category:{' '}
-                                    {assignment.product.categoryName ?? 'Uncategorized'}
+                                    {String(assignment.product.categoryName ?? 'Uncategorized')}
                                   </span>
                                   <span className='text-xs text-gray-400'>
                                     Price:{' '}
@@ -820,7 +1021,7 @@ export default function PromoCodesList({
 
                             if (assignment.type === 'category' && assignment.category) {
                               return (
-                                <div key={assignment.id} className='flex flex-col text-sm gap-1'>
+                                <div key={assignment.id || `category-${assignment.category.id}-${index}`} className='flex flex-col text-sm gap-1'>
                                   <span className='font-medium text-white'>
                                     Category: {assignment.category.name}
                                   </span>

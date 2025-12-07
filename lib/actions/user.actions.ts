@@ -405,9 +405,11 @@ export const SignOut = async () => {
 export async function getAllUsers({
   limit,
   page,
+  search,
 }: {
   limit?: number
   page: number
+  search?: string
 }) {
   const {
     common: { pageSize },
@@ -416,19 +418,30 @@ export async function getAllUsers({
 
   const skipAmount = (Number(page) - 1) * limit
   
+  // Build where clause for search
+  const where: any = {}
+  if (search && search.trim() !== '') {
+    where.email = {
+      contains: search.trim(),
+      mode: 'insensitive' as const,
+    }
+  }
+  
   // Batch fetch users and count in parallel
   const [users, usersCount] = await Promise.all([
     prisma.user.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
       skip: skipAmount,
       take: limit
     }),
-    prisma.user.count()
+    prisma.user.count({ where })
   ])
   
   return {
     data: JSON.parse(JSON.stringify(users)),
     totalPages: Math.ceil(usersCount / limit),
+    totalUsers: usersCount,
   }
 }
 

@@ -25,6 +25,7 @@ import {
   deliverOrder,
   requestOrderRefund,
   updateOrderToPaid,
+  sendOrderUpdateToCustomer,
 } from '@/lib/actions/order.actions'
 import { UploadButton } from '@/lib/uploadthing'
 import { useToast } from '@/hooks/use-toast'
@@ -67,6 +68,7 @@ export default function OrderDetailsForm({
     refundProcessedAt,
     isCancelled,
     cancelledAt,
+    orderUpdates,
   } = order
 
   const [refundRequestedState, setRefundRequestedState] = useState<boolean>(refundRequested ?? false)
@@ -78,6 +80,8 @@ export default function OrderDetailsForm({
   const [isCancelledState, setIsCancelledState] = useState<boolean>(isCancelled ?? false)
   const [cancelledAtState, setCancelledAtState] = useState<string | null>(cancelledAt || null)
   const [adminAction, setAdminAction] = useState<'approve' | 'reject' | 'pending' | null>(null)
+  const [updateMessage, setUpdateMessage] = useState<string>('')
+  const [isSendingUpdate, setIsSendingUpdate] = useState<boolean>(false)
 
   const canRequestRefund = isPaid && !isCancelledState
 
@@ -123,6 +127,31 @@ export default function OrderDetailsForm({
         toast({ description: res.message, variant: 'destructive' })
       }
     })
+  }
+
+  const handleSendUpdate = async () => {
+    if (!updateMessage.trim()) {
+      toast({
+        description: 'Please enter an update message.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setIsSendingUpdate(true)
+    try {
+      const res = await sendOrderUpdateToCustomer(order.id, updateMessage.trim())
+      if (res.success) {
+        toast({ description: res.message })
+        setUpdateMessage('')
+      } else {
+        toast({ description: res.message, variant: 'destructive' })
+      }
+    } catch (error) {
+      toast({ description: 'Failed to send update. Please try again.', variant: 'destructive' })
+    } finally {
+      setIsSendingUpdate(false)
+    }
   }
 
   const handleAdminRefundDecision = (decision: 'approve' | 'reject' | 'pending') => {
@@ -243,6 +272,29 @@ export default function OrderDetailsForm({
             )}
           </CardContent>
         </Card>
+
+        {/* Order Updates Card */}
+        {orderUpdates && Array.isArray(orderUpdates) && orderUpdates.length > 0 && (
+          <Card>
+            <CardContent className='p-4 gap-4'>
+              <h2 className='text-xl pb-4'>Order Updates</h2>
+              <div className='space-y-4'>
+                {orderUpdates.map((update: any, index: number) => (
+                  <div key={index} className='border-l-4 border-purple-500 pl-4 py-2 bg-gray-800 rounded-r-lg'>
+                    <div className='flex items-start justify-between mb-2'>
+                      <div className='flex-1'>
+                        <p className='text-sm text-gray-400 mb-1'>
+                          {update.sentBy || 'Admin'} • {update.sentAt ? formatDateTime(new Date(update.sentAt)).dateTime : 'Unknown date'}
+                        </p>
+                        <p className='text-white whitespace-pre-wrap'>{update.message}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Payment Method Card */}
         <Card>
@@ -771,6 +823,40 @@ export default function OrderDetailsForm({
                       )}
                     </Button>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {isAdminOrModerator && (
+              <div className='border-t border-gray-700 pt-4 space-y-4'>
+                <h3 className='text-lg font-semibold'>Send Customer Update</h3>
+                <p className='text-sm text-gray-400'>
+                  Send an update message to the customer via email. This will notify them about their order status.
+                </p>
+                <div className='space-y-3'>
+                  <div>
+                    <label className='text-sm text-gray-400 block mb-1'>Update Message</label>
+                    <Textarea
+                      value={updateMessage}
+                      onChange={(event) => setUpdateMessage(event.target.value)}
+                      placeholder='Enter the update message to send to the customer...'
+                      className='min-h-[120px]'
+                    />
+                  </div>
+                  <Button
+                    className='w-full bg-purple-600 hover:bg-purple-700 text-white'
+                    onClick={handleSendUpdate}
+                    disabled={isSendingUpdate || !updateMessage.trim()}
+                  >
+                    {isSendingUpdate ? (
+                      <span className='flex items-center gap-2 justify-center'>
+                        <Loader2 className='h-4 w-4 animate-spin' />
+                        Sending...
+                      </span>
+                    ) : (
+                      'Send Update Email'
+                    )}
+                  </Button>
                 </div>
               </div>
             )}

@@ -42,6 +42,8 @@ export default async function FAQPage() {
                   key={faq.id || index}
                   question={faq.question}
                   answer={faq.answer}
+                  images={faq.images || []}
+                  videos={faq.videos || []}
                   isLast={index === (category.questions?.length || 0) - 1}
                 />
               ))}

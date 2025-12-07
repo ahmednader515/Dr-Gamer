@@ -14,7 +14,8 @@ import 'swiper/css/pagination'
 import 'swiper/css/effect-fade'
 
 interface CarouselItem {
-  image: string
+  image?: string
+  video?: string
   title: string
   url: string
   buttonCaption: string
@@ -62,7 +63,16 @@ export default function HomeCarousel({ carousels }: HomeCarouselProps) {
           {carousels.map((carousel, index) => (
             <SwiperSlide key={index}>
               <div className="relative h-full w-full">
-                {carousel.image ? (
+                {carousel.video ? (
+                  <video
+                    src={carousel.video}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                ) : carousel.image ? (
                   <Image
                     src={carousel.image}
                     alt={carousel.title}
@@ -72,7 +82,7 @@ export default function HomeCarousel({ carousels }: HomeCarouselProps) {
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-gray-500 text-lg">No Image</span>
+                    <span className="text-gray-500 text-lg">No Media</span>
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black bg-opacity-40">

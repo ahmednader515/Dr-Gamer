@@ -17,6 +17,10 @@ interface SearchPageProps {
     sort?: string
     page?: string
     tag?: string | string[]
+    platformType?: string
+    productCategory?: string
+    featured?: string
+    newlyAdded?: string
   }>
 }
 
@@ -77,10 +81,65 @@ async function SearchHeader({ params, translations }: {
     tag = '',
     platformType = '',
     productCategory = '',
+    featured = '',
+    newlyAdded = '',
   } = params
 
   // Build the same where clause to get the count - reuse category lookup logic
   const where: any = { isPublished: true }
+
+  // Handle featured products
+  if (featured === 'true') {
+    const setting = await prisma.setting.findFirst({
+      select: { featuredProducts: true }
+    })
+    const featuredIds = (setting?.featuredProducts as string[]) || []
+    if (featuredIds.length > 0) {
+      where.id = { in: featuredIds }
+    } else {
+      // If no featured products in settings, return empty
+      return (
+        <div className='text-center py-8 sm:py-12'>
+          <h3 className='text-base sm:text-lg font-semibold mb-2'>{translations.noProductsFound}</h3>
+          <p className='text-sm sm:text-base text-muted-foreground px-4'>
+            No featured products have been configured yet.
+          </p>
+        </div>
+      )
+    }
+  }
+
+  // Handle newly added products
+  if (newlyAdded === 'true') {
+    const setting = await prisma.setting.findFirst({
+      select: { newlyAddedProducts: true }
+    })
+    let productIds = (setting?.newlyAddedProducts as string[]) || []
+    
+    // If no products in settings, auto-populate with latest 20
+    if (productIds.length === 0) {
+      const latestProducts = await prisma.product.findMany({
+        where: { isPublished: true },
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+        select: { id: true }
+      })
+      productIds = latestProducts.map(p => p.id)
+    }
+    
+    if (productIds.length > 0) {
+      where.id = { in: productIds }
+    } else {
+      return (
+        <div className='text-center py-8 sm:py-12'>
+          <h3 className='text-base sm:text-lg font-semibold mb-2'>{translations.noProductsFound}</h3>
+          <p className='text-sm sm:text-base text-muted-foreground px-4'>
+            No newly added products available.
+          </p>
+        </div>
+      )
+    }
+  }
   
   if (q && q !== 'all') {
     where.name = { contains: q, mode: 'insensitive' }
@@ -171,7 +230,11 @@ async function SearchHeader({ params, translations }: {
 
   // Determine what to display in the heading
   let displayTitle = ''
-  if (q) {
+  if (featured === 'true') {
+    displayTitle = 'Featured Products'
+  } else if (newlyAdded === 'true') {
+    displayTitle = 'Newly Added Products'
+  } else if (q) {
     displayTitle = `${translations.searchResults} "${q}"`
   } else if (validCategories.length > 0) {
     // Show multiple categories
@@ -214,6 +277,8 @@ async function ProductResults({ params, translations }: {
     tag = '',
     platformType = '',
     productCategory = '',
+    featured = '',
+    newlyAdded = '',
   } = params
 
   const currentPage = parseInt(page)
@@ -222,6 +287,59 @@ async function ProductResults({ params, translations }: {
 
   // Build Prisma where clause
   const where: any = { isPublished: true }
+
+  // Handle featured products
+  if (featured === 'true') {
+    const setting = await prisma.setting.findFirst({
+      select: { featuredProducts: true }
+    })
+    const featuredIds = (setting?.featuredProducts as string[]) || []
+    if (featuredIds.length > 0) {
+      where.id = { in: featuredIds }
+    } else {
+      // Return empty if no featured products
+      return {
+        products: [],
+        totalPages: 0,
+        totalProducts: 0,
+        from: 0,
+        to: 0,
+        currentPage: 1,
+      }
+    }
+  }
+
+  // Handle newly added products
+  if (newlyAdded === 'true') {
+    const setting = await prisma.setting.findFirst({
+      select: { newlyAddedProducts: true }
+    })
+    let productIds = (setting?.newlyAddedProducts as string[]) || []
+    
+    // If no products in settings, auto-populate with latest 20
+    if (productIds.length === 0) {
+      const latestProducts = await prisma.product.findMany({
+        where: { isPublished: true },
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+        select: { id: true }
+      })
+      productIds = latestProducts.map(p => p.id)
+    }
+    
+    if (productIds.length > 0) {
+      where.id = { in: productIds }
+    } else {
+      return {
+        products: [],
+        totalPages: 0,
+        totalProducts: 0,
+        from: 0,
+        to: 0,
+        currentPage: 1,
+      }
+    }
+  }
   
   if (q && q !== 'all') {
     where.name = { contains: q, mode: 'insensitive' }
@@ -297,24 +415,63 @@ async function ProductResults({ params, translations }: {
   }
 
   // Build order by clause
+  // For featured/newlyAdded, maintain the order from settings if possible
   let orderBy: any = { createdAt: 'desc' }
-  if (sort === 'best-selling') {
-    orderBy = { numSales: 'desc' }
-  } else if (sort === 'price-low-to-high') {
-    orderBy = { price: 'asc' }
-  } else if (sort === 'price-high-to-low') {
-    orderBy = { price: 'desc' }
-  } else if (sort === 'avg-customer-review') {
-    orderBy = { avgRating: 'desc' }
+  if (featured === 'true' || newlyAdded === 'true') {
+    // Keep original order from settings, but allow sorting
+    if (sort === 'best-selling') {
+      orderBy = { numSales: 'desc' }
+    } else if (sort === 'price-low-to-high') {
+      orderBy = { price: 'asc' }
+    } else if (sort === 'price-high-to-low') {
+      orderBy = { price: 'desc' }
+    } else if (sort === 'avg-customer-review') {
+      orderBy = { avgRating: 'desc' }
+    } else {
+      // Default to creation date for newly added, or maintain featured order
+      orderBy = { createdAt: 'desc' }
+    }
+  } else {
+    if (sort === 'best-selling') {
+      orderBy = { numSales: 'desc' }
+    } else if (sort === 'price-low-to-high') {
+      orderBy = { price: 'asc' }
+    } else if (sort === 'price-high-to-low') {
+      orderBy = { price: 'desc' }
+    } else if (sort === 'avg-customer-review') {
+      orderBy = { avgRating: 'desc' }
+    }
   }
 
   // Direct database queries
-  const products = await (prisma as any).product.findMany({
+  let products = await (prisma as any).product.findMany({
     where,
     orderBy,
     skip,
     take: limit,
   })
+  
+  // For featured/newlyAdded, maintain order from settings
+  if ((featured === 'true' || newlyAdded === 'true') && sort === 'newest') {
+    const setting = await prisma.setting.findFirst({
+      select: { 
+        featuredProducts: featured === 'true',
+        newlyAddedProducts: newlyAdded === 'true',
+      }
+    })
+    const productIds = featured === 'true' 
+      ? (setting?.featuredProducts as string[]) || []
+      : (setting?.newlyAddedProducts as string[]) || []
+    
+    if (productIds.length > 0) {
+      // Reorder products to match settings order
+      const productMap = new Map(products.map((p: any) => [p.id, p]))
+      products = productIds
+        .map(id => productMap.get(id))
+        .filter((p): p is any => p !== undefined)
+        .slice(skip, skip + limit)
+    }
+  }
   
   const totalProducts = await (prisma as any).product.count({ where })
 
@@ -493,6 +650,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     platformType = '',
     productCategory = '',
     tag = '',
+    featured = '',
+    newlyAdded = '',
   } = params
 
   // Check if we have any valid search criteria
@@ -513,14 +672,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     ? tag.some((value) => value && value !== '' && value !== 'all')
     : Boolean(tag && tag !== '' && tag !== 'all')
   
-  // Allow "all" as a valid search to show all products
+  // Allow "all" as a valid search to show all products, or featured/newlyAdded
   if (
     !q &&
     !hasCategory &&
     !platformType &&
     !productCategory &&
     !hasPriceFilter &&
-    !hasTagFilter
+    !hasTagFilter &&
+    featured !== 'true' &&
+    newlyAdded !== 'true'
   ) {
     notFound()
   }

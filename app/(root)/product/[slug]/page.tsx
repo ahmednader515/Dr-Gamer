@@ -127,7 +127,7 @@ async function ProductHeader({ slug }: { slug: string }) {
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8 mb-6 md:mb-8 sm:mb-12'>
         {/* Product Images */}
         <div>
-          <ProductGallery images={productData.images} />
+          <ProductGallery images={productData.images} videos={productData.videos || []} />
         </div>
 
         {/* Product Info */}

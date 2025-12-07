@@ -63,6 +63,7 @@ model Product {
   categoryId         String?
   category           String      // Keep for backward compatibility
   images             String[]
+  videos             String[]    @default([]) // YouTube video URLs
   brand              String
   description        String
   productType        String      @default("game_code") // game_account, subscription, game_code
@@ -153,6 +154,7 @@ model Order {
   refundProcessedAt    DateTime?
   isCancelled          Boolean               @default(false)
   cancelledAt          DateTime?
+  orderUpdates         Json?                 // Array of { message: string, sentAt: string, sentBy: string }
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
   orderItems           OrderItem[]
@@ -223,6 +225,9 @@ model Setting {
   defaultPaymentMethod    String
   availableDeliveryDates  Json
   defaultDeliveryDate     String
+  featuredProducts        Json?    @default("[]")
+  newlyAddedProducts      Json?    @default("[]")
+  howToUseVideo           String?
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 
@@ -245,6 +250,7 @@ model PromoCode {
   id              String   @id @default(cuid())
   code            String   @unique
   discountPercent Int
+  minPurchaseAmount Decimal? @db.Decimal(10, 2) // Minimum purchase amount required
   isActive        Boolean  @default(true)
   expiresAt       DateTime?
   usageLimit      Int?
@@ -292,6 +298,8 @@ model FAQQuestion {
   categoryId  String
   question    String
   answer      String
+  images      String[]     @default([])
+  videos      String[]     @default([])
   sortOrder   Int          @default(0)
   isActive    Boolean      @default(true)
   createdAt   DateTime     @default(now())

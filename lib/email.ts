@@ -743,3 +743,103 @@ DR.Gamer Support Team
   }
 }
 
+export async function sendOrderUpdateEmail({
+  order,
+  userName,
+  userEmail,
+  updateMessage,
+}: OrderEmailParams & { updateMessage: string }) {
+  console.log('📧 Sending order update email to:', userEmail)
+
+  try {
+    const orderDetailsUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/account/orders/${order.id}`
+    
+    const result = await resend.emails.send({
+      from: `DR.Gamer <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`,
+      to: userEmail,
+      replyTo: process.env.RESEND_REPLY_TO || 'support@dr-gamer.net',
+      subject: `Order Update - #${order.id.slice(-8)} - DR.Gamer`,
+      text: `Hello ${userName},
+
+We have an update regarding your order #${order.id.slice(-8).toUpperCase()}.
+
+${updateMessage}
+
+View your order details: ${orderDetailsUrl}
+
+If you have any questions, please contact us at support@dr-gamer.net.
+
+Thank you,
+DR.Gamer Support Team
+`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Order Update</title>
+          </head>
+          <body style="margin:0;padding:0;font-family:Arial,sans-serif;background-color:#0f0a1f;color:#d1d5db;">
+            <table role="presentation" style="width:100%;border-collapse:collapse;">
+              <tr>
+                <td align="center" style="padding:40px 0;">
+                  <table role="presentation" style="width:600px;border-collapse:collapse;background-color:#1a0f2e;border-radius:12px;overflow:hidden;">
+                    <tr>
+                      <td style="padding:40px;text-align:center;background:linear-gradient(135deg,#2d1a5f 0%,#1f0a4d 100%);">
+                        <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:bold;">DR.Gamer</h1>
+                        <p style="margin:10px 0 0 0;color:#a78bfa;font-size:14px;">The Xbox world at your fingertips</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="center" style="padding:30px 40px 10px 40px;">
+                        <div style="width:64px;height:64px;background-color:rgba(59,130,246,0.15);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:32px;">📬</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:0 40px 40px 40px;text-align:left;">
+                        <h2 style="margin:0 0 20px 0;color:#ffffff;font-size:24px;text-align:center;">Order Update</h2>
+                        <p style="margin:0 0 16px 0;font-size:16px;line-height:1.6;">Hello <strong style="color:#ffffff;">${userName}</strong>,</p>
+                        <p style="margin:0 0 24px 0;font-size:16px;line-height:1.6;">We have an update regarding your order <strong style="color:#8b5cf6;">#${order.id.slice(-8).toUpperCase()}</strong>.</p>
+                        <div style="background-color:#2d1a5f;border-radius:8px;padding:24px;margin-bottom:24px;border-left:4px solid #3b82f6;">
+                          <p style="margin:0;font-size:15px;line-height:1.8;color:#d1d5db;white-space:pre-wrap;">${updateMessage.replace(/\n/g, '<br>')}</p>
+                        </div>
+                        <table role="presentation" style="margin:30px auto;">
+                          <tr>
+                            <td align="center">
+                              <a href="${orderDetailsUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#8b5cf6 0%,#6d28d9 100%);color:#ffffff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:bold;box-shadow:0 4px 6px rgba(139,92,246,0.3);">View Order Details</a>
+                            </td>
+                          </tr>
+                        </table>
+                        <div style="margin:24px 0 0 0;padding:20px;border-radius:8px;border-left:4px solid #8b5cf6;background-color:#2d1a5f;">
+                          <p style="margin:0 0 10px 0;color:#ffffff;font-size:15px;font-weight:bold;">Need Assistance?</p>
+                          <p style="margin:0;font-size:14px;line-height:1.6;">If you have any questions or need support, reply to this email or reach out to <a href="mailto:support@dr-gamer.net" style="color:#a78bfa;text-decoration:none;">support@dr-gamer.net</a>.</p>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:30px 40px;background-color:#0f0a1f;text-align:center;border-top:1px solid #2d1a5f;">
+                        <p style="margin:0 0 10px 0;color:#9ca3af;font-size:14px;">DR.Gamer - Your Gaming Destination</p>
+                        <p style="margin:0;color:#6b7280;font-size:12px;">Questions? Contact us at support@dr-gamer.net</p>
+                        <p style="margin:10px 0 0 0;color:#6b7280;font-size:12px;">This is an automated email. Please do not reply to this message.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `,
+    })
+
+    console.log('✅ Order update email sent successfully!')
+    console.log('📧 Resend response:', JSON.stringify(result, null, 2))
+    return { success: true }
+  } catch (error) {
+    console.error('❌ Error sending order update email:', error)
+    console.error('❌ Error details:', JSON.stringify(error, null, 2))
+    return { success: false, error: 'Failed to send email' }
+  }
+}
+

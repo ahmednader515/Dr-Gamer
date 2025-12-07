@@ -92,6 +92,18 @@ export default async function OrdersPage(props: {
             name: true,
             email: true,
           }
+        },
+        orderItems: {
+          select: {
+            id: true,
+            name: true,
+            quantity: true,
+            price: true,
+            image: true,
+            selectedVariation: true,
+            size: true,
+            color: true,
+          }
         }
       }
     }),
@@ -106,6 +118,10 @@ export default async function OrdersPage(props: {
     taxPrice: Number(order.taxPrice),
     totalPrice: Number(order.totalPrice),
     discountAmount: order.discountAmount ? Number(order.discountAmount) : undefined,
+    orderItems: order.orderItems.map(item => ({
+      ...item,
+      price: Number(item.price),
+    })),
   }))
 
   const totalPages = Math.ceil(totalOrders / pageSize)

@@ -13,11 +13,15 @@ import DeliverySettings from './delivery-settings'
 import TaxSettings from './tax-settings'
 import PricingSettings from './pricing-settings'
 import PaymentSettings from './payment-settings'
+import FeaturedProductsSettings from './featured-products-settings'
+import NewlyAddedProductsSettings from './newly-added-products-settings'
+import HowToUseSettings from './how-to-use-settings'
 
 interface CarouselItem {
   title: string
   buttonCaption: string
-  image: string
+  image?: string
+  video?: string
   url: string
 }
 
@@ -51,7 +55,7 @@ interface ProductPricing {
 
 interface SettingsTabsContentProps {
   setting: any
-  tab: 'carousel' | 'delivery' | 'tax' | 'pricing' | 'payments'
+  tab: 'carousel' | 'delivery' | 'tax' | 'pricing' | 'payments' | 'featured' | 'newlyAdded' | 'howToUse'
 }
 
 const PAYMENT_METHOD_TYPES = ['wallet', 'instapay', 'bank', 'link', 'other'] as const
@@ -214,6 +218,9 @@ export default function SettingsTabsContent({ setting, tab }: SettingsTabsConten
   })
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
   const [defaultPaymentMethod, setDefaultPaymentMethod] = useState('')
+  const [featuredProducts, setFeaturedProducts] = useState<string[]>([])
+  const [newlyAddedProducts, setNewlyAddedProducts] = useState<string[]>([])
+  const [howToUseVideo, setHowToUseVideo] = useState<string | null>(null)
 
   // Initialize settings from props
   useEffect(() => {
@@ -248,6 +255,15 @@ export default function SettingsTabsContent({ setting, tab }: SettingsTabsConten
       }
       if (settings.productPricing) {
         setProductPricing(settings.productPricing)
+      }
+      if (settings.featuredProducts) {
+        setFeaturedProducts(settings.featuredProducts)
+      }
+      if (settings.newlyAddedProducts) {
+        setNewlyAddedProducts(settings.newlyAddedProducts)
+      }
+      if (settings.howToUseVideo) {
+        setHowToUseVideo(settings.howToUseVideo)
       }
     }
   }, [setting])
@@ -320,6 +336,9 @@ export default function SettingsTabsContent({ setting, tab }: SettingsTabsConten
         deliverySettings,
         taxSettings,
         productPricing,
+        featuredProducts,
+        newlyAddedProducts,
+        howToUseVideo,
       } as any
 
       const res = await updateSetting(newSetting)
@@ -386,6 +405,27 @@ export default function SettingsTabsContent({ setting, tab }: SettingsTabsConten
             defaultPaymentMethod={defaultPaymentMethod}
             onPaymentMethodsChange={setPaymentMethods}
             onDefaultPaymentMethodChange={setDefaultPaymentMethod}
+          />
+        )
+      case 'featured':
+        return (
+          <FeaturedProductsSettings
+            featuredProducts={featuredProducts}
+            onFeaturedProductsChange={setFeaturedProducts}
+          />
+        )
+      case 'newlyAdded':
+        return (
+          <NewlyAddedProductsSettings
+            newlyAddedProducts={newlyAddedProducts}
+            onNewlyAddedProductsChange={setNewlyAddedProducts}
+          />
+        )
+      case 'howToUse':
+        return (
+          <HowToUseSettings
+            howToUseVideo={howToUseVideo}
+            onHowToUseVideoChange={setHowToUseVideo}
           />
         )
       default:

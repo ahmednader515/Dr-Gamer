@@ -21,7 +21,8 @@ export default function ServerPagination({
   if (totalPages <= 1) return null
 
   const getVisiblePages = () => {
-    const delta = window.innerWidth < 768 ? 1 : 2 // Show fewer pages on mobile
+    // Use a fixed delta for server-side rendering, will be adjusted on client if needed
+    const delta = 2 // Show fewer pages on mobile (will be handled by CSS)
     const range = []
     const rangeWithDots = []
 
@@ -67,7 +68,7 @@ export default function ServerPagination({
         className='hidden sm:flex'
       >
         <Link href={createPageUrl(1)}>
-          <ChevronsRight className='h-3 w-3 sm:h-4 sm:w-4' />
+          <ChevronsLeft className='h-3 w-3 sm:h-4 sm:w-4' />
           <span className='sr-only'>First page</span>
         </Link>
       </Button>
@@ -80,7 +81,7 @@ export default function ServerPagination({
         className='h-8 w-8 sm:h-9 sm:w-9 p-0'
       >
         <Link href={createPageUrl(currentPage - 1)}>
-          <ChevronRight className='h-3 w-3 sm:h-4 sm:w-4' />
+          <ChevronLeft className='h-3 w-3 sm:h-4 sm:w-4' />
           <span className='sr-only'>Previous page</span>
         </Link>
       </Button>
@@ -112,7 +113,7 @@ export default function ServerPagination({
         className='h-8 w-8 sm:h-9 sm:w-9 p-0'
       >
         <Link href={createPageUrl(currentPage + 1)}>
-          <ChevronLeft className='h-3 w-3 sm:h-4 sm:w-4' />
+          <ChevronRight className='h-3 w-3 sm:h-4 sm:w-4' />
           <span className='sr-only'>Next page</span>
         </Link>
       </Button>
@@ -126,7 +127,7 @@ export default function ServerPagination({
         className='hidden sm:flex'
       >
         <Link href={createPageUrl(totalPages)}>
-          <ChevronsLeft className='h-3 w-3 sm:h-4 sm:w-4' />
+          <ChevronsRight className='h-3 w-3 sm:h-4 sm:w-4' />
           <span className='sr-only'>Last page</span>
         </Link>
       </Button>

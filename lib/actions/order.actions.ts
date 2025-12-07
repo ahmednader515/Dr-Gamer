@@ -12,6 +12,7 @@ import {
   sendOrderConfirmationEmail,
   sendOrderDeliveredEmail,
   sendOrderPaidEmail,
+  sendOrderUpdateEmail,
 } from '@/lib/email'
 
 import { DateRange } from 'react-day-picker'
@@ -512,6 +513,73 @@ export async function requestOrderRefund(orderId: string, reason: string, transa
   }
 }
 
+export async function sendOrderUpdateToCustomer(orderId: string, updateMessage: string) {
+  try {
+    const session = await auth()
+    if (!session || (session.user.role !== 'Admin' && session.user.role !== 'Moderator')) {
+      return { success: false, message: 'Unauthorized' }
+    }
+
+    if (!updateMessage || !updateMessage.trim()) {
+      return { success: false, message: 'Update message is required' }
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: {
+          select: { email: true, name: true }
+        },
+        orderItems: true,
+      },
+    })
+
+    if (!order) {
+      return { success: false, message: 'Order not found' }
+    }
+
+    if (!order.user?.email) {
+      return { success: false, message: 'Customer email not found' }
+    }
+
+    // Send email
+    const emailResult = await sendOrderUpdateEmail({
+      order,
+      userName: order.user.name || 'Customer',
+      userEmail: order.user.email,
+      updateMessage: updateMessage.trim(),
+    })
+
+    if (!emailResult.success) {
+      return { success: false, message: emailResult.error || 'Failed to send email' }
+    }
+
+    // Save update to database
+    const existingUpdates = Array.isArray(order.orderUpdates) ? order.orderUpdates : []
+    const newUpdate = {
+      message: updateMessage.trim(),
+      sentAt: new Date().toISOString(),
+      sentBy: session.user.name || session.user.email || 'Admin',
+    }
+    const updatedUpdates = [...existingUpdates, newUpdate]
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        orderUpdates: updatedUpdates,
+      },
+    })
+
+    revalidatePath(`/admin/orders/${orderId}`)
+    revalidatePath(`/account/orders/${orderId}`)
+    
+    return { success: true, message: 'Update email sent successfully to customer' }
+  } catch (err) {
+    console.error('Error sending order update:', err)
+    return { success: false, message: formatError(err) }
+  }
+}
+
 export async function adminCancelOrder(
   orderId: string,
   reason?: string,
@@ -851,6 +919,7 @@ export async function getOrderById(orderId: string) {
       refundProcessedAt: true,
       isCancelled: true,
       cancelledAt: true,
+      orderUpdates: true,
       createdAt: true,
       updatedAt: true,
       shippingAddress: true,

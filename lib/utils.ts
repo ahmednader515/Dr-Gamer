@@ -466,3 +466,50 @@ export const formatPrice = (price: any): string => {
   if (isNaN(numPrice)) return '0.00'
   return numPrice.toFixed(2)
 }
+
+/**
+ * Extracts YouTube video ID from various YouTube URL formats
+ * Supports:
+ * - https://www.youtube.com/watch?v=VIDEO_ID
+ * - https://youtu.be/VIDEO_ID
+ * - https://www.youtube.com/embed/VIDEO_ID
+ * - https://youtube.com/watch?v=VIDEO_ID
+ */
+export const extractYouTubeVideoId = (url: string): string | null => {
+  if (!url || typeof url !== 'string') return null
+  
+  const trimmedUrl = url.trim()
+  if (!trimmedUrl) return null
+  
+  // Regular expression to match YouTube video IDs
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    /^([a-zA-Z0-9_-]{11})$/ // Direct video ID
+  ]
+  
+  for (const pattern of patterns) {
+    const match = trimmedUrl.match(pattern)
+    if (match && match[1]) {
+      return match[1]
+    }
+  }
+  
+  return null
+}
+
+/**
+ * Validates if a string is a valid YouTube URL
+ */
+export const isValidYouTubeUrl = (url: string): boolean => {
+  return extractYouTubeVideoId(url) !== null
+}
+
+/**
+ * Converts a YouTube URL to embed URL format (default controls and overlay)
+ */
+export const getYouTubeEmbedUrl = (url: string): string | null => {
+  const videoId = extractYouTubeVideoId(url)
+  if (!videoId) return null
+  // Return simple embed URL with default YouTube controls and overlay
+  return `https://www.youtube.com/embed/${videoId}`
+}

@@ -33,6 +33,9 @@ export async function getSetting(): Promise<ISettingInput> {
           defaultPaymentMethod: data.settings[0].defaultPaymentMethod,
           availableDeliveryDates: data.settings[0].availableDeliveryDates as any,
           defaultDeliveryDate: data.settings[0].defaultDeliveryDate,
+          featuredProducts: [],
+          newlyAddedProducts: [],
+          howToUseVideo: null,
         },
       })
       // Invalidate settings cache after seed
@@ -65,6 +68,9 @@ export async function updateSetting(newSetting: ISettingInput) {
           defaultPaymentMethod: newSetting.defaultPaymentMethod,
           availableDeliveryDates: newSetting.availableDeliveryDates as any,
           defaultDeliveryDate: newSetting.defaultDeliveryDate,
+          featuredProducts: (newSetting as any).featuredProducts || [],
+          newlyAddedProducts: (newSetting as any).newlyAddedProducts || [],
+          howToUseVideo: (newSetting as any).howToUseVideo || null,
         },
       })
     } else {
@@ -82,6 +88,9 @@ export async function updateSetting(newSetting: ISettingInput) {
           defaultPaymentMethod: newSetting.defaultPaymentMethod,
           availableDeliveryDates: newSetting.availableDeliveryDates as any,
           defaultDeliveryDate: newSetting.defaultDeliveryDate,
+          featuredProducts: (newSetting as any).featuredProducts || [],
+          newlyAddedProducts: (newSetting as any).newlyAddedProducts || [],
+          howToUseVideo: (newSetting as any).howToUseVideo || null,
         },
       })
     }

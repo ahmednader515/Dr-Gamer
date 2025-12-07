@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react'
 
 import DeleteDialog from '@/components/shared/delete-dialog'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -33,6 +34,8 @@ type Product = {
   id: string
   name: string
   price: number
+  listPrice?: number
+  originalPrice?: number
   category: string
   countInStock: number
   avgRating: number
@@ -40,6 +43,13 @@ type Product = {
   images: string[]
   slug: string
   updatedAt: Date
+  variations?: Array<{
+    name: string
+    price: number
+    stock?: number
+    originalPrice?: number
+    salePriceExpiresAt?: string
+  }> | null
 }
 
 type ProductListProps = {
@@ -310,20 +320,82 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
                         {product.name}
                       </Link>
                     </TableCell>
-                    <TableCell className='text-left py-4 px-4 font-semibold text-purple-700'>
-                      {product.price.toFixed(2)} EGP
+                    <TableCell className='text-left py-4 px-4'>
+                      {(() => {
+                        const productPrice = Number(product.price) || 0;
+                        const productListPrice = product.listPrice ? Number(product.listPrice) : 0;
+                        const productOriginalPrice = product.originalPrice ? Number(product.originalPrice) : 0;
+                        
+                        // Check if listPrice is set and is less than price (discounted price scenario)
+                        const hasListPriceDiscount = productListPrice > 0 && productPrice > 0 && productListPrice < productPrice;
+                        // Fallback to originalPrice check if listPrice is not set
+                        const hasOriginalPriceDiscount = !hasListPriceDiscount && productOriginalPrice > 0 && productPrice > 0 && productOriginalPrice > productPrice;
+                        
+                        const hasDiscount = hasListPriceDiscount || hasOriginalPriceDiscount;
+                        const discountedPrice = hasListPriceDiscount ? productListPrice : (hasOriginalPriceDiscount ? productPrice : productPrice);
+                        const originalPrice = hasListPriceDiscount ? productPrice : (hasOriginalPriceDiscount ? productOriginalPrice : 0);
+                        const discountPercentage = hasDiscount && originalPrice > 0
+                          ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+                          : 0;
+                        
+                        return (
+                          <div className="flex flex-col gap-1">
+                            {hasDiscount ? (
+                              <>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-white">
+                                    {discountedPrice.toFixed(2)} EGP
+                                  </span>
+                                  <Badge variant="destructive" className="text-xs">
+                                    -{discountPercentage}%
+                                  </Badge>
+                                </div>
+                                <span className="text-xs text-gray-400 line-through">
+                                  {originalPrice.toFixed(2)} EGP
+                                </span>
+                              </>
+                            ) : (
+                              <span className="font-semibold text-white">
+                                {productPrice.toFixed(2)} EGP
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell className='text-left py-4 px-4'>
                       {resolveCategory(product.category)}
                     </TableCell>
                     <TableCell className='text-left py-4 px-4'>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
-                        product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {product.countInStock}
-                      </span>
+                      {product.variations && Array.isArray(product.variations) && product.variations.length > 0 ? (
+                        <div className='space-y-1'>
+                          {product.variations.map((variation, idx) => {
+                            const stock = variation.stock ?? 0
+                            return (
+                              <div key={idx} className='flex items-center gap-2'>
+                                <span className='text-xs text-gray-400 truncate max-w-[80px]' title={variation.name}>
+                                  {variation.name}:
+                                </span>
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                  stock > 10 ? 'bg-purple-100 text-purple-800' : 
+                                  stock > 0 ? 'bg-yellow-100 text-yellow-800' : 
+                                  'bg-red-100 text-red-800'
+                                }`}>
+                                  {stock}
+                                </span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      ) : (
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
+                          product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {product.countInStock}
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell className='text-left py-4 px-4'>
                       <span className="flex items-center gap-1">
@@ -398,19 +470,81 @@ const ProductList = ({ initialProducts, totalProducts }: ProductListProps) => {
 
                 {/* Product Details */}
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">Price:</span>
-                    <span className="font-semibold text-purple-400">{product.price.toFixed(2)} EGP</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-400">Price:</span>
+                      {(() => {
+                        const productPrice = Number(product.price) || 0;
+                        const productListPrice = product.listPrice ? Number(product.listPrice) : 0;
+                        const productOriginalPrice = product.originalPrice ? Number(product.originalPrice) : 0;
+                        
+                        // Check if listPrice is set and is less than price (discounted price scenario)
+                        const hasListPriceDiscount = productListPrice > 0 && productPrice > 0 && productListPrice < productPrice;
+                        // Fallback to originalPrice check if listPrice is not set
+                        const hasOriginalPriceDiscount = !hasListPriceDiscount && productOriginalPrice > 0 && productPrice > 0 && productOriginalPrice > productPrice;
+                        
+                        const hasDiscount = hasListPriceDiscount || hasOriginalPriceDiscount;
+                        const discountedPrice = hasListPriceDiscount ? productListPrice : (hasOriginalPriceDiscount ? productPrice : productPrice);
+                        const originalPrice = hasListPriceDiscount ? productPrice : (hasOriginalPriceDiscount ? productOriginalPrice : 0);
+                        const discountPercentage = hasDiscount && originalPrice > 0
+                          ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+                          : 0;
+                        
+                        return (
+                          <>
+                            {hasDiscount ? (
+                              <>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-white">
+                                    {discountedPrice.toFixed(2)} EGP
+                                  </span>
+                                  <Badge variant="destructive" className="text-xs">
+                                    -{discountPercentage}%
+                                  </Badge>
+                                </div>
+                                <span className="text-xs text-gray-500 line-through ml-16">
+                                  {originalPrice.toFixed(2)} EGP
+                                </span>
+                              </>
+                            ) : (
+                              <span className="font-semibold text-white">
+                                {productPrice.toFixed(2)} EGP
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col gap-2">
                     <span className="text-sm text-gray-400">Stock:</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
-                      product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {product.countInStock}
-                    </span>
+                    {product.variations && Array.isArray(product.variations) && product.variations.length > 0 ? (
+                      <div className='space-y-1 pl-2'>
+                        {product.variations.map((variation, idx) => {
+                          const stock = variation.stock ?? 0
+                          return (
+                            <div key={idx} className='flex items-center gap-2'>
+                              <span className='text-xs text-gray-500'>{variation.name}:</span>
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                stock > 10 ? 'bg-purple-100 text-purple-800' : 
+                                stock > 0 ? 'bg-yellow-100 text-yellow-800' : 
+                                'bg-red-100 text-red-800'
+                              }`}>
+                                {stock}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        product.countInStock > 10 ? 'bg-purple-100 text-purple-800' : 
+                        product.countInStock > 0 ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {product.countInStock}
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-400">Rating:</span>

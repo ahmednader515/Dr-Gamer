@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { formatNumberWithDecimal } from './utils'
+import { formatNumberWithDecimal, isValidYouTubeUrl } from './utils'
 
 // Common
 const MongoId = z
@@ -42,6 +42,12 @@ export const ProductVariationSchema = z.object({
       },
       { message: 'Expiry date must be a valid date' }
     ),
+  stock: z.coerce
+    .number()
+    .int()
+    .nonnegative('Stock must be a non-negative integer')
+    .optional()
+    .default(0),
 })
 
 export const ProductInputSchema = z.object({
@@ -49,6 +55,10 @@ export const ProductInputSchema = z.object({
   slug: z.string().min(3, 'Slug must be at least 3 characters'),
   category: z.string().nullable().optional(),
   images: z.array(z.string()).min(1, 'Product must have at least one image'),
+  videos: z.array(z.string().refine(
+    (url) => isValidYouTubeUrl(url),
+    { message: 'Each video must be a valid YouTube URL' }
+  )).optional().default([]),
   brand: z.string().min(1, 'Brand is required'),
   description: z.string().min(1, 'Description is required'),
   productType: z.enum(['game_account', 'subscription', 'game_code']).default('game_code'),
@@ -57,7 +67,7 @@ export const ProductInputSchema = z.object({
   variations: z.array(ProductVariationSchema).optional().default([]),
   isPublished: z.boolean(),
   price: Price('Price'),
-  listPrice: Price('List price'),
+  listPrice: Price('Discounted price'),
   countInStock: z.coerce
     .number()
     .int()
@@ -271,9 +281,16 @@ export const SiteLanguageSchema = z.object({
 export const CarouselSchema = z.object({
   title: z.string().min(1, 'title is required'),
   url: z.string().min(1, 'url is required'),
-  image: z.string().min(1, 'image is required'),
+  image: z.string().optional(),
+  video: z.string().optional(),
   buttonCaption: z.string().min(1, 'buttonCaption is required'),
-})
+}).refine(
+  (data) => data.image || data.video,
+  {
+    message: 'Either image or video is required',
+    path: ['image'],
+  }
+)
 
 export const SiteCurrencySchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -378,4 +395,7 @@ export const SettingInputSchema = z.object({
       applicableCategories: z.array(z.string()).default([]),
     })).default([]),
   }),
+  featuredProducts: z.array(z.string()).default([]), // Array of product IDs
+  newlyAddedProducts: z.array(z.string()).default([]), // Array of product IDs (auto-populated with latest 20, but editable)
+  howToUseVideo: z.string().url().optional().nullable(),
 })

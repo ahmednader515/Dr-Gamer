@@ -22,6 +22,8 @@ export default async function AdminProduct() {
       id: true,
       name: true,
       price: true,
+      listPrice: true,
+      originalPrice: true,
       category: true,
       countInStock: true,
       avgRating: true,
@@ -29,15 +31,32 @@ export default async function AdminProduct() {
       images: true,
       slug: true,
       updatedAt: true,
+      variations: true,
     }
   })
 
-  // Convert Decimal values to numbers for client components
-  const normalizedProducts = products.map(product => ({
-    ...product,
-    price: Number(product.price),
-    avgRating: Number(product.avgRating),
-  }))
+  // Convert Decimal values to numbers for client components and parse variations
+  const normalizedProducts = products.map(product => {
+    let parsedVariations = null
+    if (product.variations) {
+      try {
+        parsedVariations = typeof product.variations === 'string' 
+          ? JSON.parse(product.variations)
+          : product.variations
+      } catch (e) {
+        parsedVariations = null
+      }
+    }
+    
+    return {
+      ...product,
+      price: Number(product.price),
+      listPrice: product.listPrice ? Number(product.listPrice) : undefined,
+      originalPrice: product.originalPrice ? Number(product.originalPrice) : undefined,
+      avgRating: Number(product.avgRating),
+      variations: parsedVariations,
+    }
+  })
 
   // Get total count for pagination
   const totalProducts = await prisma.product.count()

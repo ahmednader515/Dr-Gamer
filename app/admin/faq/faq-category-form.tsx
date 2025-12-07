@@ -20,9 +20,11 @@ import { createFAQCategory, updateFAQCategory } from '@/lib/actions/faq.actions'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toSlug } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Trash2, Plus, ChevronDown, ChevronUp } from 'lucide-react'
+import { Trash2, Plus, ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useState } from 'react'
 import { createFAQQuestion, deleteFAQQuestion, updateFAQQuestion } from '@/lib/actions/faq.actions'
+import { UploadButton } from '@/lib/uploadthing'
+import Image from 'next/image'
 
 const FAQCategoryFormSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -49,7 +51,13 @@ const FAQCategoryForm = ({
 }) => {
   const router = useRouter()
   const { toast } = useToast()
-  const [questions, setQuestions] = useState<any[]>(category?.questions || [])
+  const [questions, setQuestions] = useState<any[]>(
+    (category?.questions || []).map((q: any) => ({
+      ...q,
+      images: q.images || [],
+      videos: q.videos || [],
+    }))
+  )
   const [expandedQuestions, setExpandedQuestions] = useState<{ [key: string]: boolean }>({})
 
   const form = useForm<z.infer<typeof FAQCategoryFormSchema>>({
@@ -74,6 +82,8 @@ const FAQCategoryForm = ({
       id: `temp-${Date.now()}`,
       question: '',
       answer: '',
+      images: [] as string[],
+      videos: [] as string[],
       sortOrder: questions.length,
       isActive: true,
       isNew: true,
@@ -121,6 +131,8 @@ const FAQCategoryForm = ({
               categoryId: result.categoryId,
               question: question.question,
               answer: question.answer,
+              images: question.images || [],
+              videos: question.videos || [],
               sortOrder: question.sortOrder,
               isActive: question.isActive,
             })
@@ -150,6 +162,8 @@ const FAQCategoryForm = ({
             categoryId,
             question: question.question,
             answer: question.answer,
+            images: question.images || [],
+            videos: question.videos || [],
             sortOrder: question.sortOrder,
             isActive: question.isActive,
           })
@@ -158,6 +172,8 @@ const FAQCategoryForm = ({
           await updateFAQQuestion(question.id, {
             question: question.question,
             answer: question.answer,
+            images: question.images || [],
+            videos: question.videos || [],
             sortOrder: question.sortOrder,
             isActive: question.isActive,
           })
@@ -337,6 +353,134 @@ const FAQCategoryForm = ({
                             className='w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 min-h-[100px]'
                             placeholder='Enter answer...'
                           />
+                        </div>
+
+                        {/* Images Section */}
+                        <div>
+                          <label className='block text-sm font-medium text-gray-300 mb-2'>
+                            Images
+                          </label>
+                          <div className='space-y-2'>
+                            {question.images && question.images.length > 0 && (
+                              <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2'>
+                                {question.images.map((image: string, imgIndex: number) => (
+                                  <div key={imgIndex} className='relative group'>
+                                    <div className='relative w-full h-24 border border-gray-700 rounded-lg overflow-hidden'>
+                                      <Image
+                                        src={image}
+                                        alt={`Image ${imgIndex + 1}`}
+                                        fill
+                                        className='object-cover'
+                                      />
+                                    </div>
+                                    <Button
+                                      type='button'
+                                      variant='destructive'
+                                      size='sm'
+                                      className='absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity'
+                                      onClick={() => {
+                                        const newImages = (question.images || []).filter((_: string, i: number) => i !== imgIndex)
+                                        updateQuestion(question.id, 'images', newImages)
+                                      }}
+                                    >
+                                      <X className='h-3 w-3' />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            <UploadButton
+                              endpoint='imageUploader'
+                              onClientUploadComplete={(res) => {
+                                if (res && res[0]) {
+                                  const currentImages = question.images || []
+                                  updateQuestion(question.id, 'images', [...currentImages, res[0].url])
+                                  toast({
+                                    title: 'Image Uploaded',
+                                    description: 'Image has been added successfully',
+                                  })
+                                }
+                              }}
+                              onUploadError={(error: Error) => {
+                                toast({
+                                  title: 'Upload Error',
+                                  description: `Failed to upload image: ${error.message}`,
+                                  variant: 'destructive'
+                                })
+                              }}
+                              appearance={{
+                                button: 'ut-ready:bg-purple-500 ut-ready:bg-opacity-20 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-500 ut-uploading:bg-opacity-20 bg-gray-800 text-white border border-gray-700 cursor-pointer rounded-lg px-4 py-2 text-sm',
+                                container: 'w-full',
+                                allowedContent: 'text-gray-400 text-xs mt-2',
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Videos Section */}
+                        <div>
+                          <label className='block text-sm font-medium text-gray-300 mb-2'>
+                            Videos
+                          </label>
+                          <div className='space-y-2'>
+                            {question.videos && question.videos.length > 0 && (
+                              <div className='space-y-2'>
+                                {question.videos.map((video: string, vidIndex: number) => (
+                                  <div key={vidIndex} className='relative group border border-gray-700 rounded-lg p-2 bg-gray-800'>
+                                    <div className='flex items-center justify-between'>
+                                      <div className='flex-1 min-w-0'>
+                                        <video
+                                          src={video}
+                                          className='w-full max-w-md rounded'
+                                          controls
+                                          preload='metadata'
+                                        >
+                                          Your browser does not support the video tag.
+                                        </video>
+                                      </div>
+                                      <Button
+                                        type='button'
+                                        variant='destructive'
+                                        size='sm'
+                                        className='ml-2 h-8 w-8 p-0'
+                                        onClick={() => {
+                                          const newVideos = (question.videos || []).filter((_: string, i: number) => i !== vidIndex)
+                                          updateQuestion(question.id, 'videos', newVideos)
+                                        }}
+                                      >
+                                        <X className='h-4 w-4' />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            <UploadButton
+                              endpoint='videoUploader'
+                              onClientUploadComplete={(res) => {
+                                if (res && res[0]) {
+                                  const currentVideos = question.videos || []
+                                  updateQuestion(question.id, 'videos', [...currentVideos, res[0].url])
+                                  toast({
+                                    title: 'Video Uploaded',
+                                    description: 'Video has been added successfully',
+                                  })
+                                }
+                              }}
+                              onUploadError={(error: Error) => {
+                                toast({
+                                  title: 'Upload Error',
+                                  description: `Failed to upload video: ${error.message}`,
+                                  variant: 'destructive'
+                                })
+                              }}
+                              appearance={{
+                                button: 'ut-ready:bg-purple-500 ut-ready:bg-opacity-20 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-500 ut-uploading:bg-opacity-20 bg-gray-800 text-white border border-gray-700 cursor-pointer rounded-lg px-4 py-2 text-sm',
+                                container: 'w-full',
+                                allowedContent: 'text-gray-400 text-xs mt-2',
+                              }}
+                            />
+                          </div>
                         </div>
 
                         <div className='flex gap-4'>

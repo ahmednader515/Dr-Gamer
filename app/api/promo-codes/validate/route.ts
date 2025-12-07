@@ -105,6 +105,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check minimum purchase amount
+    const cartItems = Array.isArray(items) ? items : []
+    const totalCartValue = cartItems.reduce((sum: number, item: any) => {
+      const price = Number(item?.price || 0)
+      const quantity = Number(item?.quantity || 0)
+      return sum + (price * quantity)
+    }, 0)
+
+    if (promoCode.minPurchaseAmount && Number(promoCode.minPurchaseAmount) > 0) {
+      const minAmount = Number(promoCode.minPurchaseAmount)
+      if (totalCartValue < minAmount) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Minimum purchase amount of ${minAmount.toFixed(2)} EGP required. Your cart total is ${totalCartValue.toFixed(2)} EGP.`,
+          },
+          { status: 400 }
+        )
+      }
+    }
+
     const assignmentsRaw = promoCode.applicableProducts || []
     if (assignmentsRaw.length > 0) {
       const cartItems = Array.isArray(items) ? items : []
@@ -171,6 +192,7 @@ export async function POST(request: NextRequest) {
       data: {
         code: promoCode.code,
         discountPercent: promoCode.discountPercent,
+        minPurchaseAmount: promoCode.minPurchaseAmount ? Number(promoCode.minPurchaseAmount) : null,
         assignments: serializeAssignments(assignmentsRaw),
       },
     })

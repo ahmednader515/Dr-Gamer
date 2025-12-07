@@ -146,6 +146,8 @@ export async function createFAQQuestion(data: {
   categoryId: string
   question: string
   answer: string
+  images?: string[]
+  videos?: string[]
   sortOrder?: number
   isActive?: boolean
 }) {
@@ -155,6 +157,8 @@ export async function createFAQQuestion(data: {
         categoryId: data.categoryId,
         question: data.question,
         answer: data.answer,
+        images: data.images || [],
+        videos: data.videos || [],
         sortOrder: data.sortOrder ?? 0,
         isActive: data.isActive ?? true,
       }
@@ -175,13 +179,19 @@ export async function updateFAQQuestion(id: string, data: {
   categoryId?: string
   question?: string
   answer?: string
+  images?: string[]
+  videos?: string[]
   sortOrder?: number
   isActive?: boolean
 }) {
   try {
     await prisma.fAQQuestion.update({
       where: { id },
-      data
+      data: {
+        ...data,
+        images: data.images !== undefined ? data.images : undefined,
+        videos: data.videos !== undefined ? data.videos : undefined,
+      }
     })
     revalidatePath('/faq')
     revalidatePath('/admin/faq')

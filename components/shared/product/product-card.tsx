@@ -67,6 +67,21 @@ const ProductCard = ({
           })
         );
       }
+    } else {
+      // For products without variations (like Steam), check product-level discount
+      // Use listPrice as discounted price if set, otherwise check originalPrice
+      const productPrice = Number(product.price) || 0;
+      const productListPrice = Number(product.listPrice) || 0;
+      const productOriginalPrice = Number(product.originalPrice) || 0;
+      
+      // Check if listPrice is set and is less than price (discounted price scenario)
+      if (productListPrice > 0 && productPrice > 0 && productListPrice < productPrice) {
+        maxDiscountPercentage = Math.round(((productPrice - productListPrice) / productPrice) * 100);
+      } 
+      // Fallback to originalPrice check if listPrice is not set
+      else if (productOriginalPrice > 0 && productPrice > 0 && productOriginalPrice > productPrice) {
+        maxDiscountPercentage = Math.round(((productOriginalPrice - productPrice) / productOriginalPrice) * 100);
+      }
     }
 
     return (
@@ -195,6 +210,27 @@ const ProductCard = ({
       } else if (pricingDetails.length > 0) {
         lowestDiscountedPrice = Math.min(...currentPrices);
         highestOriginalPrice = Math.max(...currentPrices);
+      }
+    } else {
+      // For products without variations (like Steam), check product-level discount
+      // Use listPrice as discounted price if set, otherwise check originalPrice
+      const productPrice = Number(product.price) || 0;
+      const productListPrice = Number(product.listPrice) || 0;
+      const productOriginalPrice = Number(product.originalPrice) || 0;
+      
+      // Check if listPrice is set and is less than price (discounted price scenario)
+      if (productListPrice > 0 && productPrice > 0 && productListPrice < productPrice) {
+        hasAnyDiscount = true;
+        lowestDiscountedPrice = productListPrice;
+        highestOriginalPrice = productPrice;
+        maxDiscountPercentage = Math.round(((productPrice - productListPrice) / productPrice) * 100);
+      } 
+      // Fallback to originalPrice check if listPrice is not set
+      else if (productOriginalPrice > 0 && productPrice > 0 && productOriginalPrice > productPrice) {
+        hasAnyDiscount = true;
+        lowestDiscountedPrice = productPrice;
+        highestOriginalPrice = productOriginalPrice;
+        maxDiscountPercentage = Math.round(((productOriginalPrice - productPrice) / productOriginalPrice) * 100);
       }
     }
 

@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "faq_questions" ADD COLUMN IF NOT EXISTS "images" TEXT[] DEFAULT ARRAY[]::TEXT[];
+ALTER TABLE "faq_questions" ADD COLUMN IF NOT EXISTS "videos" TEXT[] DEFAULT ARRAY[]::TEXT[];
+

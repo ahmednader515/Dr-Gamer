@@ -38,6 +38,23 @@ export const ourFileRouter = {
       // Return the file URL for the client (using ufsUrl instead of deprecated url)
       return { url: file.ufsUrl }
     }),
+
+  // Video uploader for carousel videos
+  videoUploader: f({ video: { maxFileSize: '100MB' } })
+    .middleware(async () => {
+      // This code runs on your server before upload
+      const session = await auth()
+
+      // If you throw, the user will not be able to upload
+      if (!session) throw new UploadThingError('Unauthorized')
+
+      // Whatever is returned here is accessible in onUploadComplete as `metadata`
+      return { userId: session?.user?.id }
+    })
+    .onUploadComplete(async ({ metadata }) => {
+      // This code RUNS ON YOUR SERVER after upload
+      return { uploadedBy: metadata.userId }
+    }),
 } satisfies FileRouter
 
 export type OurFileRouter = typeof ourFileRouter
