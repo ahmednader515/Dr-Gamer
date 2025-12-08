@@ -250,7 +250,9 @@ model PromoCode {
   id              String   @id @default(cuid())
   code            String   @unique
   discountPercent Int
-  minPurchaseAmount Decimal? @db.Decimal(10, 2) // Minimum purchase amount required
+  minPurchaseAmount Decimal? @db.Decimal(10, 2) // Minimum purchase amount required (OR condition with minProductCount)
+  minProductCount Int?     // Minimum number of eligible products required (OR condition with minPurchaseAmount)
+  maxDiscountAmount Decimal? @db.Decimal(10, 2) // Maximum total discount cap for the entire promo code
   isActive        Boolean  @default(true)
   expiresAt       DateTime?
   usageLimit      Int?

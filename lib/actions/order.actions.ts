@@ -1,7 +1,7 @@
 'use server'
 
 import { Cart, OrderItem, ShippingAddress } from '@/types'
-import { formatError, round2, calculatePromoDiscount } from '../utils'
+import { formatError, round2, calculatePromoDiscount, recalculateCartItemPrice, getVariationPricing } from '../utils'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
@@ -134,20 +134,89 @@ export const createOrderFromCart = async (
       throw new Error('Promo code usage limit reached')
     }
 
+    // Build assignments for checking eligibility
+    const assignmentsForCheck = promo.applicableProducts.map((target) => ({
+      type: target.productId ? 'product' : 'category',
+      productId: target.productId || undefined,
+      categoryId: target.categoryId || undefined,
+      categoryName: target.category?.name || undefined,
+      maxDiscountAmount: target.maxDiscountAmount
+        ? Number(target.maxDiscountAmount)
+        : null,
+      variationNames: Array.isArray(target.variationNames)
+        ? target.variationNames
+        : [],
+    }))
+
+    // Helper function to check if an item is eligible
+    const isItemEligible = (item: any): boolean => {
+      if (assignmentsForCheck.length === 0) return true
+
+      const productId = String(item?.product || item?.productId || item?.id || '').trim()
+      if (!productId) return false
+
+      const categoryId = item?.categoryId ? String(item.categoryId).trim() : ''
+      const categoryName = item?.categoryName
+        ? String(item.categoryName).trim().toLowerCase()
+        : item?.category
+        ? String(item.category).trim().toLowerCase()
+        : ''
+      const selectedVariation = item?.selectedVariation
+        ? String(item.selectedVariation).trim().toLowerCase()
+        : ''
+
+      return assignmentsForCheck.some((assignment) => {
+        if (assignment.type === 'product' && assignment.productId) {
+          if (assignment.productId !== productId) return false
+          if (assignment.variationNames.length === 0) return true
+          return assignment.variationNames.includes(selectedVariation)
+        }
+        if (assignment.type === 'category') {
+          if (assignment.categoryId && categoryId) {
+            return assignment.categoryId === categoryId
+          }
+          if (assignment.categoryName && categoryName) {
+            return assignment.categoryName === categoryName
+          }
+        }
+        return false
+      })
+    }
+
+    // Validate minimum requirements (only eligible items count)
+    const eligibleCartItems = cartItems.filter(isItemEligible)
+    const eligibleProductCount = eligibleCartItems.reduce((count: number, item: any) => {
+      return count + Number(item?.quantity || 0)
+    }, 0)
+    const eligibleCartValue = eligibleCartItems.reduce((sum: number, item: any) => {
+      const price = Number(item?.price || 0)
+      const quantity = Number(item?.quantity || 0)
+      return sum + (price * quantity)
+    }, 0)
+
+    const minProductCount = promo.minProductCount ?? null
+    const minPurchaseAmount = promo.minPurchaseAmount ? Number(promo.minPurchaseAmount) : null
+
+    if (minProductCount !== null || minPurchaseAmount !== null) {
+      const meetsProductCount = minProductCount === null || eligibleProductCount >= minProductCount
+      const meetsPurchaseAmount = minPurchaseAmount === null || eligibleCartValue >= minPurchaseAmount
+
+      if (!meetsProductCount && !meetsPurchaseAmount) {
+        const requirements: string[] = []
+        if (minProductCount !== null) {
+          requirements.push(`${minProductCount} eligible product${minProductCount !== 1 ? 's' : ''}`)
+        }
+        if (minPurchaseAmount !== null) {
+          requirements.push(`${minPurchaseAmount.toFixed(2)} EGP in eligible items`)
+        }
+        throw new Error(`This promo code requires either ${requirements.join(' OR ')}. You have ${eligibleProductCount} eligible product${eligibleProductCount !== 1 ? 's' : ''} worth ${eligibleCartValue.toFixed(2)} EGP.`)
+      }
+    }
+
     const promoConfig = {
       discountPercent: promo.discountPercent,
-      assignments: promo.applicableProducts.map((target) => ({
-        type: target.productId ? 'product' : 'category',
-        productId: target.productId || undefined,
-        categoryId: target.categoryId || undefined,
-        categoryName: target.category?.name || undefined,
-        maxDiscountAmount: target.maxDiscountAmount
-          ? Number(target.maxDiscountAmount)
-          : null,
-        variationNames: Array.isArray(target.variationNames)
-          ? target.variationNames
-          : [],
-      })),
+      maxDiscountAmount: promo.maxDiscountAmount ? Number(promo.maxDiscountAmount) : null,
+      assignments: assignmentsForCheck,
     }
 
     const { discount, eligibleItems } = calculatePromoDiscount(
@@ -316,7 +385,13 @@ export async function updateOrderToPaid(orderId: string) {
           id: true,
           isPaid: true,
           user: { select: { email: true, name: true } },
-          orderItems: { select: { productId: true, quantity: true } }
+          orderItems: { 
+            select: { 
+              productId: true, 
+              quantity: true,
+              selectedVariation: true
+            } 
+          }
         }
       })
       
@@ -338,16 +413,52 @@ export async function updateOrderToPaid(orderId: string) {
       
       // Batch update all products in parallel within transaction
       await Promise.all(
-        existingOrder.orderItems.map(item =>
-          tx.product.update({
+        existingOrder.orderItems.map(async (item) => {
+          // Get current product data
+          const product = await tx.product.findUnique({
             where: { id: item.productId },
-            data: {
-              countInStock: {
-                decrement: item.quantity
-              }
-            }
+            select: { variations: true }
           })
-        )
+
+          if (!product) return
+
+          // Prepare update data
+          const updateData: any = {
+            countInStock: {
+              decrement: item.quantity
+            }
+          }
+
+          // If item has a selected variation, also decrement variation stock
+          if (item.selectedVariation && product.variations) {
+            let variations: any[] = []
+            try {
+              variations = typeof product.variations === 'string'
+                ? JSON.parse(product.variations as string)
+                : product.variations
+            } catch (e) {
+              variations = []
+            }
+
+            // Find and update the variation stock
+            const variationIndex = variations.findIndex(
+              (v: any) => v.name === item.selectedVariation
+            )
+
+            if (variationIndex !== -1 && variations[variationIndex].stock !== undefined) {
+              const currentStock = Number(variations[variationIndex].stock) || 0
+              const newStock = Math.max(0, currentStock - item.quantity)
+              variations[variationIndex].stock = newStock
+              updateData.variations = variations
+            }
+          }
+
+          // Update product with both countInStock and variations (if modified)
+          await tx.product.update({
+            where: { id: item.productId },
+            data: updateData
+          })
+        })
       )
       
       return updatedOrder
@@ -377,14 +488,23 @@ const updateProductStock = async (orderId: string) => {
   try {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
-      select: { orderItems: { select: { productId: true, quantity: true } } }
+      select: { 
+        orderItems: { 
+          select: { 
+            productId: true, 
+            quantity: true,
+            selectedVariation: true
+          } 
+        } 
+      }
     })
     if (!order) throw new Error('Order not found')
 
     // Batch update all products in parallel instead of sequential N+1 queries
     await Promise.all(
-      order.orderItems.map(item =>
-        prisma.product.update({
+      order.orderItems.map(async (item) => {
+        // Always decrement product stock
+        await prisma.product.update({
           where: { id: item.productId },
           data: {
             countInStock: {
@@ -392,7 +512,45 @@ const updateProductStock = async (orderId: string) => {
             }
           }
         })
-      )
+
+        // If item has a selected variation, also decrement variation stock
+        if (item.selectedVariation) {
+          const product = await prisma.product.findUnique({
+            where: { id: item.productId },
+            select: { variations: true }
+          })
+
+          if (product && product.variations) {
+            let variations: any[] = []
+            try {
+              variations = typeof product.variations === 'string'
+                ? JSON.parse(product.variations as string)
+                : product.variations
+            } catch (e) {
+              variations = []
+            }
+
+            // Find and update the variation stock
+            const variationIndex = variations.findIndex(
+              (v: any) => v.name === item.selectedVariation
+            )
+
+            if (variationIndex !== -1 && variations[variationIndex].stock !== undefined) {
+              const currentStock = Number(variations[variationIndex].stock) || 0
+              const newStock = Math.max(0, currentStock - item.quantity)
+              variations[variationIndex].stock = newStock
+
+              // Update product with modified variations
+              await prisma.product.update({
+                where: { id: item.productId },
+                data: {
+                  variations: variations
+                }
+              })
+            }
+          }
+        }
+      })
     )
     return true
   } catch (error) {
@@ -990,8 +1148,87 @@ export const calcDeliveryDateAndPrice = async ({
   shippingAddress?: ShippingAddress
 }) => {
   const { availableDeliveryDates } = data.settings[0];
+  
+  // Fetch current product data to validate prices
+  const productIds = items.map(item => item.product).filter(Boolean)
+  const currentProducts = productIds.length > 0
+    ? await prisma.product.findMany({
+        where: { id: { in: productIds } },
+        select: {
+          id: true,
+          price: true,
+          listPrice: true,
+          originalPrice: true,
+          variations: true,
+        },
+      })
+    : []
+  
+  const productMap = new Map(
+    currentProducts.map(p => {
+      // Parse variations if they're stored as JSON string
+      let variations = null
+      if (p.variations) {
+        try {
+          variations = typeof p.variations === 'string' 
+            ? JSON.parse(p.variations as string)
+            : p.variations
+        } catch (e) {
+          variations = null
+        }
+      }
+      
+      return [p.id, {
+        price: Number(p.price),
+        listPrice: Number(p.listPrice),
+        originalPrice: Number(p.originalPrice),
+        variations,
+      }]
+    })
+  )
+  
+  // Recalculate prices based on current product data
+  const itemsWithRecalculatedPrices = items.map(item => {
+    const currentProduct = productMap.get(item.product)
+    if (!currentProduct) {
+      // Product not found, use stored price
+      return { ...item, price: recalculateCartItemPrice(item) }
+    }
+    
+    // Check if item has a selected variation
+    if (item.selectedVariation && currentProduct.variations) {
+      const variation = currentProduct.variations.find((v: any) => v.name === item.selectedVariation)
+      if (variation) {
+        const pricing = getVariationPricing(variation)
+        return { ...item, price: pricing.currentPrice }
+      }
+    }
+    
+    // For products without variations, check current product pricing
+    // If listPrice is set and is less than price, use listPrice as discounted price
+    // Otherwise use price
+    const productListPrice = currentProduct.listPrice || 0
+    const productPrice = currentProduct.price || 0
+    const productOriginalPrice = currentProduct.originalPrice || 0
+    
+    // Determine current price: listPrice if it's a discount, otherwise price
+    let currentPrice = productPrice
+    if (productListPrice > 0 && productListPrice < productPrice) {
+      // listPrice is the discounted price
+      currentPrice = productListPrice
+    } else if (productOriginalPrice > 0 && productPrice < productOriginalPrice) {
+      // price is discounted compared to originalPrice
+      currentPrice = productPrice
+    } else {
+      // No discount, use regular price
+      currentPrice = productPrice
+    }
+    
+    return { ...item, price: currentPrice }
+  })
+  
   const itemsPrice = round2(
-    items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    itemsWithRecalculatedPrices.reduce((acc, item) => acc + item.price * item.quantity, 0)
   )
 
   const deliveryDate =
@@ -1021,6 +1258,8 @@ export const calcDeliveryDateAndPrice = async ({
     shippingPrice,
     taxPrice,
     totalPrice,
+    // Return updated items with recalculated prices
+    updatedItems: itemsWithRecalculatedPrices,
   }
 }
 

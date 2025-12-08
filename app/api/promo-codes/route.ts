@@ -46,6 +46,8 @@ const serializePromoCode = (promoCode: any) => ({
   code: promoCode.code,
   discountPercent: promoCode.discountPercent,
   minPurchaseAmount: promoCode.minPurchaseAmount ? Number(promoCode.minPurchaseAmount) : null,
+  minProductCount: promoCode.minProductCount ?? null,
+  maxDiscountAmount: promoCode.maxDiscountAmount ? Number(promoCode.maxDiscountAmount) : null,
   isActive: promoCode.isActive,
   expiresAt: promoCode.expiresAt ? promoCode.expiresAt.toISOString() : null,
   usageLimit: promoCode.usageLimit,
@@ -152,7 +154,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { code, discountPercent, minPurchaseAmount, expiresAt, usageLimit, assignments } = body
+    const { code, discountPercent, minPurchaseAmount, minProductCount, maxDiscountAmount, expiresAt, usageLimit, assignments } = body
 
     // Validation
     if (!code || !discountPercent) {
@@ -247,11 +249,31 @@ export async function POST(request: NextRequest) {
         ? new Prisma.Decimal(minPurchaseAmount as Prisma.Decimal.Value)
         : null
 
+    const resolvedMaxDiscountAmount =
+      maxDiscountAmount !== null &&
+      maxDiscountAmount !== undefined &&
+      maxDiscountAmount !== '' &&
+      !Number.isNaN(Number(maxDiscountAmount)) &&
+      Number(maxDiscountAmount) > 0
+        ? new Prisma.Decimal(maxDiscountAmount as Prisma.Decimal.Value)
+        : null
+
+    const resolvedMinProductCount =
+      minProductCount !== null &&
+      minProductCount !== undefined &&
+      minProductCount !== '' &&
+      !Number.isNaN(Number(minProductCount)) &&
+      Number(minProductCount) > 0
+        ? parseInt(minProductCount, 10)
+        : null
+
     const promoCode = await prisma.promoCode.create({
       data: {
         code: code.toUpperCase(),
         discountPercent: parseInt(discountPercent, 10),
         minPurchaseAmount: resolvedMinPurchaseAmount,
+        minProductCount: resolvedMinProductCount,
+        maxDiscountAmount: resolvedMaxDiscountAmount,
         expiresAt: expiresAt ? new Date(expiresAt) : null,
         usageLimit: usageLimit ? parseInt(usageLimit, 10) : null,
         applicableProducts: assignmentLinks.length

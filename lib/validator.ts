@@ -125,6 +125,12 @@ export const OrderItemSchema = z.object({
   accountPassword: z.string().optional(),
   accountBackupCode: z.string().optional(),
   disableTwoStepVerified: z.boolean().optional(),
+  // Variation pricing info for discount expiration handling
+  variationOriginalPrice: z.coerce.number().nonnegative().optional(),
+  variationSalePriceExpiresAt: z.string().optional(),
+  // Product-level pricing info for discount handling (products without variations)
+  productListPrice: z.coerce.number().nonnegative().optional(),
+  productOriginalPrice: z.coerce.number().nonnegative().optional(),
 })
 export const ShippingAddressSchema = z.object({
   street: z.string().min(1, 'Street address is required'),

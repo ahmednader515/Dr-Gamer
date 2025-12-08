@@ -142,25 +142,39 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 : null
               const hasExpiry =
                 !!expiryDate && !Number.isNaN(expiryDate.getTime())
+              
+              // Check if variation is out of stock
+              const variationStock = variation.stock !== undefined ? Number(variation.stock) : null
+              const isOutOfStock = variationStock !== null && variationStock <= 0
 
               return (
                 <button
                   key={variation.name}
                   className={`w-full px-4 py-3 border rounded-lg text-sm sm:text-base transition-all text-left ${
-                    selectedVariation === variation.name
+                    isOutOfStock
+                      ? 'border-red-600 bg-red-900/20 text-gray-400 cursor-not-allowed opacity-60'
+                      : selectedVariation === variation.name
                       ? 'border-purple-500 bg-purple-500/20 text-white ring-2 ring-purple-500'
                       : 'border-gray-600 bg-gray-800/50 hover:border-purple-400 hover:bg-gray-800'
                   }`}
-                  onClick={() => setSelectedVariation(variation.name)}
+                  onClick={() => !isOutOfStock && setSelectedVariation(variation.name)}
+                  disabled={isOutOfStock}
                 >
                   <div className='flex justify-between items-center'>
                     <div className='flex-1'>
-                      <span className='font-medium'>{variation.name}</span>
-                      {hasDiscount && (
-                        <span className='ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-md font-bold'>
-                          -{discountPercentage}%
-                        </span>
-                      )}
+                      <div className='flex items-center gap-2'>
+                        <span className='font-medium'>{variation.name}</span>
+                        {isOutOfStock && (
+                          <span className='px-2 py-0.5 bg-red-600 text-white text-xs rounded-md font-bold'>
+                            Out of Stock
+                          </span>
+                        )}
+                        {hasDiscount && !isOutOfStock && (
+                          <span className='px-2 py-0.5 bg-red-500 text-white text-xs rounded-md font-bold'>
+                            -{discountPercentage}%
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className='text-right'>
                       {hasDiscount && pricing.originalPrice > 0 && (

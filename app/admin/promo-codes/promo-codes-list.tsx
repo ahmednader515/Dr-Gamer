@@ -55,6 +55,8 @@ type PromoCode = {
   code: string
   discountPercent: number
   minPurchaseAmount: number | null
+  minProductCount: number | null
+  maxDiscountAmount: number | null
   isActive: boolean
   expiresAt: string | null
   usageLimit: number | null
@@ -104,6 +106,8 @@ export default function PromoCodesList({
     code: '',
     discountPercent: '',
     minPurchaseAmount: '',
+    minProductCount: '',
+    maxDiscountAmount: '',
     expiresAt: '',
     usageLimit: '',
   })
@@ -317,7 +321,13 @@ export default function PromoCodesList({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
+          code: formData.code,
+          discountPercent: formData.discountPercent,
+          minPurchaseAmount: formData.minPurchaseAmount || null,
+          minProductCount: formData.minProductCount || null,
+          maxDiscountAmount: formData.maxDiscountAmount || null,
+          expiresAt: formData.expiresAt || null,
+          usageLimit: formData.usageLimit || null,
           assignments: selectedEntries.map((entry) => {
             if (entry.type === 'product') {
               return {
@@ -348,7 +358,7 @@ export default function PromoCodesList({
           description: result.message,
         })
         setPromoCodes([result.data, ...promoCodes])
-        setFormData({ code: '', discountPercent: '', minPurchaseAmount: '', expiresAt: '', usageLimit: '' })
+        setFormData({ code: '', discountPercent: '', minPurchaseAmount: '', minProductCount: '', maxDiscountAmount: '', expiresAt: '', usageLimit: '' })
         setSelectedEntries([])
         setSelectedProductId('')
         setBulkCategoryId('')
@@ -404,14 +414,43 @@ export default function PromoCodesList({
     )
   }
 
-  const handleVariationSelect = (entryId: string, value: string) => {
+  const handleVariationToggle = (entryId: string, variationName: string) => {
     setSelectedEntries((prev) =>
       prev.map((entry) => {
         if (entry.id !== entryId || entry.type !== 'product') return entry
-        if (value === '__all__') {
-          return { ...entry, selectedVariations: [] }
+        
+        const currentVariations = entry.selectedVariations
+        const isSelected = currentVariations.includes(variationName)
+        
+        if (isSelected) {
+          // Remove the variation
+          return { ...entry, selectedVariations: currentVariations.filter(v => v !== variationName) }
+        } else {
+          // Add the variation
+          return { ...entry, selectedVariations: [...currentVariations, variationName] }
         }
-        return { ...entry, selectedVariations: [value] }
+      }),
+    )
+  }
+
+  const handleSelectAllVariations = (entryId: string, product: ProductOption) => {
+    setSelectedEntries((prev) =>
+      prev.map((entry) => {
+        if (entry.id !== entryId || entry.type !== 'product') return entry
+        
+        const allVariationNames = product.variations.map((v: any) => 
+          typeof v === 'string' ? v : (v?.name || String(v))
+        )
+        const currentVariations = entry.selectedVariations
+        
+        // If all are selected, deselect all. Otherwise, select all.
+        const allSelected = allVariationNames.length > 0 && 
+          allVariationNames.every(v => currentVariations.includes(v))
+        
+        return { 
+          ...entry, 
+          selectedVariations: allSelected ? [] : allVariationNames 
+        }
       }),
     )
   }
@@ -606,7 +645,41 @@ export default function PromoCodesList({
                   className='bg-gray-800 text-white border-gray-700'
                 />
                 <p className='text-xs text-gray-400'>
-                  Minimum total purchase amount required to use this code. Leave empty for no minimum.
+                  Minimum total value of eligible items required. Leave empty if using minimum product count instead.
+                </p>
+              </div>
+
+              <div className='space-y-2'>
+                <Label htmlFor='minProductCount' className='text-white'>Minimum Product Count (Optional)</Label>
+                <Input
+                  id='minProductCount'
+                  type='number'
+                  min='1'
+                  step='1'
+                  value={formData.minProductCount}
+                  onChange={(e) => setFormData({ ...formData, minProductCount: e.target.value })}
+                  placeholder='Example: 2 or 3'
+                  className='bg-gray-800 text-white border-gray-700'
+                />
+                <p className='text-xs text-gray-400'>
+                  Minimum number of eligible products required. Leave empty if using minimum purchase amount instead. Only eligible items (selected products/categories/variants) count toward this requirement.
+                </p>
+              </div>
+
+              <div className='space-y-2'>
+                <Label htmlFor='maxDiscountAmount' className='text-white'>Maximum Discount Cap (EGP) (Optional)</Label>
+                <Input
+                  id='maxDiscountAmount'
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={formData.maxDiscountAmount}
+                  onChange={(e) => setFormData({ ...formData, maxDiscountAmount: e.target.value })}
+                  placeholder='Example: 150'
+                  className='bg-gray-800 text-white border-gray-700'
+                />
+                <p className='text-xs text-gray-400'>
+                  Maximum total discount that can be applied by this promo code. Leave empty for no cap.
                 </p>
               </div>
 
@@ -831,48 +904,76 @@ export default function PromoCodesList({
                         </div>
                         <div className='space-y-1 sm:flex-1'>
                           <Label className='text-sm text-gray-300'>
-                            Restrict to Variation
+                            Restrict to Variations (Multiple Selection)
                           </Label>
-                          <Select
-                            value={
-                              entry.selectedVariations.length > 0
-                                ? entry.selectedVariations[0]
-                                : '__all__'
-                            }
-                            onValueChange={(value) =>
-                              handleVariationSelect(entry.id, value)
-                            }
-                          >
-                            <SelectTrigger className='bg-gray-900 border-gray-700 text-white'>
-                              <SelectValue placeholder='All variations' />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value='__all__'>All variations</SelectItem>
-                              {product.variations.map((variation: any, varIndex: number) => {
-                                // Handle both string and object variations
-                                const variationName = typeof variation === 'string' 
-                                  ? variation 
-                                  : (variation?.name || String(variation))
-                                const variationValue = typeof variation === 'string'
-                                  ? variation
-                                  : (variation?.name || String(variation))
-                                return (
-                                  <SelectItem key={`${variationValue}-${varIndex}`} value={variationValue}>
-                                    {variationName}
-                                  </SelectItem>
-                                )
-                              })}
-                              {product.variations.length === 0 && (
-                                <SelectItem value='__no_variations__' disabled>
-                                  No variations defined
-                                </SelectItem>
-                              )}
-                            </SelectContent>
-                          </Select>
-                          <p className='text-xs text-gray-500'>
-                            Select a specific variation to limit the promo discount, or leave
-                            as "All variations".
+                          {product.variations.length > 0 ? (
+                            <div className='bg-gray-900 border border-gray-700 rounded-lg p-3 max-h-48 overflow-y-auto'>
+                              <div className='space-y-2'>
+                                <div className='flex items-center space-x-2'>
+                                  <Checkbox
+                                    id={`select-all-${entry.id}`}
+                                    checked={
+                                      product.variations.length > 0 &&
+                                      product.variations.every((v: any) => {
+                                        const variationName = typeof v === 'string' 
+                                          ? v 
+                                          : (v?.name || String(v))
+                                        return entry.selectedVariations.includes(variationName)
+                                      })
+                                    }
+                                    onCheckedChange={() => handleSelectAllVariations(entry.id, product)}
+                                    className='border-gray-600 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600'
+                                  />
+                                  <Label
+                                    htmlFor={`select-all-${entry.id}`}
+                                    className='text-sm font-medium text-white cursor-pointer'
+                                  >
+                                    Select All Variations
+                                  </Label>
+                                </div>
+                                {product.variations.map((variation: any, varIndex: number) => {
+                                  // Handle both string and object variations
+                                  const variationName = typeof variation === 'string' 
+                                    ? variation 
+                                    : (variation?.name || String(variation))
+                                  const variationValue = typeof variation === 'string'
+                                    ? variation
+                                    : (variation?.name || String(variation))
+                                  const isSelected = entry.selectedVariations.includes(variationName)
+                                  
+                                  return (
+                                    <div key={`${variationValue}-${varIndex}`} className='flex items-center space-x-2'>
+                                      <Checkbox
+                                        id={`variation-${entry.id}-${varIndex}`}
+                                        checked={isSelected}
+                                        onCheckedChange={() => handleVariationToggle(entry.id, variationName)}
+                                        className='border-gray-600 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600'
+                                      />
+                                      <Label
+                                        htmlFor={`variation-${entry.id}-${varIndex}`}
+                                        className='text-sm text-gray-300 cursor-pointer'
+                                      >
+                                        {variationName}
+                                      </Label>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className='bg-gray-900 border border-gray-700 rounded-lg p-3'>
+                              <p className='text-sm text-gray-400'>No variations defined for this product</p>
+                            </div>
+                          )}
+                          <p className='text-xs text-gray-500 mt-1'>
+                            Select one or more specific variations to limit the promo discount. 
+                            Leave all unchecked for "All variations".
                           </p>
+                          {entry.selectedVariations.length > 0 && (
+                            <p className='text-xs text-purple-400 mt-1'>
+                              {entry.selectedVariations.length} variation{entry.selectedVariations.length !== 1 ? 's' : ''} selected
+                            </p>
+                          )}
                         </div>
                         <Button
                           type='button'
@@ -961,7 +1062,8 @@ export default function PromoCodesList({
                 <TableRow className='bg-gray-800 border-b-2 border-gray-700'>
                   <TableHead className='text-left text-purple-400'>Code</TableHead>
                   <TableHead className='text-left text-purple-400'>Discount</TableHead>
-                  <TableHead className='text-left text-purple-400'>Min Purchase</TableHead>
+                  <TableHead className='text-left text-purple-400'>Requirements</TableHead>
+                  <TableHead className='text-left text-purple-400'>Max Cap</TableHead>
                   <TableHead className='text-left text-purple-400'>Products</TableHead>
                   <TableHead className='text-left text-purple-400'>Status</TableHead>
                   <TableHead className='text-left text-purple-400'>Usage</TableHead>
@@ -975,6 +1077,30 @@ export default function PromoCodesList({
                   <TableRow key={code.id} className='bg-gray-800 hover:bg-gray-700 border-b border-gray-700'>
                     <TableCell className='font-bold text-white'>{code.code}</TableCell>
                     <TableCell className='text-purple-400'>{code.discountPercent}%</TableCell>
+                    <TableCell className='text-gray-300'>
+                      <div className='space-y-1 text-sm'>
+                        {code.minProductCount !== null && (
+                          <div className='text-purple-300'>
+                            Min: {code.minProductCount} product{code.minProductCount !== 1 ? 's' : ''}
+                          </div>
+                        )}
+                        {code.minPurchaseAmount !== null && (
+                          <div className='text-purple-300'>
+                            Min: <ProductPrice price={formatProductPrice(code.minPurchaseAmount)} plain />
+                          </div>
+                        )}
+                        {code.minProductCount === null && code.minPurchaseAmount === null && (
+                          <span className='text-xs text-gray-400'>No minimum</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className='text-gray-300'>
+                      {code.maxDiscountAmount !== null ? (
+                        <ProductPrice price={formatProductPrice(code.maxDiscountAmount)} plain />
+                      ) : (
+                        <span className='text-xs text-gray-400'>No cap</span>
+                      )}
+                    </TableCell>
                     <TableCell className='text-gray-300'>
                       {code.assignments.length === 0 ? (
                         <span className='text-sm text-gray-400'>All products</span>

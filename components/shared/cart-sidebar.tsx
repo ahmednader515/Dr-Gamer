@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -17,17 +17,37 @@ import useCartStore from '@/hooks/use-cart-store'
 import ProductPrice from '@/components/shared/product/product-price'
 import { useLoading } from '@/hooks/use-loading'
 import { LoadingSpinner } from '@/components/shared/loading-overlay'
-import data from '@/lib/data'
 
 export default function CartSidebar() {
   const {
     cart: { items, itemsPrice },
     updateItem,
     removeItem,
+    recalculatePrices,
   } = useCartStore()
-  const {
-    common: { freeShippingMinPrice },
-  } = data.settings[0];
+  const [hasPromoCodes, setHasPromoCodes] = useState(false)
+
+  // Check if promo bar exists by checking for the promo bar element
+  useEffect(() => {
+    const checkPromoBar = () => {
+      const promoBar = document.querySelector('[data-promo-bar]')
+      setHasPromoCodes(!!promoBar)
+    }
+    
+    checkPromoBar()
+    // Check again after a short delay to account for async rendering
+    const timeout = setTimeout(checkPromoBar, 100)
+    
+    return () => clearTimeout(timeout)
+  }, [])
+
+  // Recalculate prices when the sidebar is displayed
+  useEffect(() => {
+    if (items.length > 0) {
+      recalculatePrices()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only run on mount to recalculate prices based on current product data
 
   const { isLoading: isUpdating, withLoading } = useLoading()
 
@@ -48,18 +68,13 @@ export default function CartSidebar() {
   }
 
   return (
-    <div className='w-32 bg-gray-900 border-l border-gray-700 shadow-lg flex-shrink-0 fixed right-0 top-0 bottom-0 pt-36 md:pt-36 z-40' style={{ direction: 'ltr' }}>
+    <div className={`w-32 bg-gray-900 border-l border-gray-700 shadow-lg flex-shrink-0 fixed right-0 ${hasPromoCodes ? 'top-[216px] md:top-[204px]' : 'top-[172px] md:top-[159px]'} bottom-0 z-40`} style={{ direction: 'ltr' }}>
       <div className='p-3 h-full flex flex-col gap-3 justify-start items-center'>
         <div className='text-center space-y-2 w-full'>
           <div className='text-sm font-medium text-gray-300'>Subtotal</div>
           <div className='font-bold text-base text-white'>
             <ProductPrice price={itemsPrice} plain />
           </div>
-          {itemsPrice > freeShippingMinPrice && (
-            <div className='text-center text-xs text-purple-400 bg-purple-900/30 border border-purple-700 p-2 rounded-md'>
-              Your order qualifies for free shipping
-            </div>
-          )}
 
           <Link
             className={`rounded-full hover:no-underline w-full text-sm btn-mobile bg-purple-600 hover:bg-purple-700 text-white py-2 px-3 block text-center transition-colors`}

@@ -53,6 +53,30 @@ export default function AddToCart({ product, className }: AddToCartProps) {
       })
       return
     }
+
+    // Check if selected variation is out of stock
+    if (hasVariations && selectedVariation) {
+      const variation = variations.find((v: any) => v.name === selectedVariation)
+      if (variation && variation.stock !== undefined) {
+        const variationStock = Number(variation.stock) || 0
+        if (variationStock <= 0) {
+          toast({
+            title: 'Out of Stock',
+            description: `The selected variation "${selectedVariation}" is currently out of stock`,
+            variant: 'destructive',
+          })
+          return
+        }
+        if (variationStock < quantity) {
+          toast({
+            title: 'Insufficient Stock',
+            description: `Only ${variationStock} item${variationStock !== 1 ? 's' : ''} available for "${selectedVariation}"`,
+            variant: 'destructive',
+          })
+          return
+        }
+      }
+    }
     
     if ((product.colors.length > 1 || product.sizes.length > 1) && !selectedVariant) {
       toast({
@@ -70,6 +94,25 @@ export default function AddToCart({ product, className }: AddToCartProps) {
           (product as any).productCategory ||
           (product as any).platformType ||
           'General'
+
+        // Get variation pricing info if variation is selected
+        let variationOriginalPrice: number | undefined
+        let variationSalePriceExpiresAt: string | undefined
+        if (hasVariations && selectedVariation) {
+          const variation = variations.find((v: any) => v.name === selectedVariation)
+          if (variation) {
+            variationOriginalPrice = variation.originalPrice ? Number(variation.originalPrice) : undefined
+            variationSalePriceExpiresAt = variation.salePriceExpiresAt || undefined
+          }
+        }
+        
+        // Get product-level pricing info for products without variations
+        let productListPrice: number | undefined
+        let productOriginalPrice: number | undefined
+        if (!hasVariations) {
+          productListPrice = (product as any).listPrice ? Number((product as any).listPrice) : undefined
+          productOriginalPrice = (product as any).originalPrice ? Number((product as any).originalPrice) : undefined
+        }
 
         await addItem({
           product: product.id,
@@ -94,6 +137,12 @@ export default function AddToCart({ product, className }: AddToCartProps) {
           accountBackupCode: undefined,
           disableTwoStepVerified: false,
           clientId: `${product.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          // Variation pricing info for discount expiration handling
+          variationOriginalPrice,
+          variationSalePriceExpiresAt,
+          // Product-level pricing info for discount handling (products without variations)
+          productListPrice,
+          productOriginalPrice,
         }, quantity)
 
         toast({
@@ -179,20 +228,37 @@ export default function AddToCart({ product, className }: AddToCartProps) {
         </Button>
       </div>
 
-      <Button
-        onClick={handleAddToCart}
-        className="w-full rounded-full font-bold"
-        disabled={isAddingToCart}
-      >
-        {isAddingToCart ? (
-          <LoadingSpinner size="sm" text="Adding..." />
-        ) : (
-          <>
-            <ShoppingCart className="ml-2 h-4 w-4" />
-            Add to Cart
-          </>
-        )}
-      </Button>
+      {(() => {
+        // Check if product or selected variation is out of stock
+        const isOutOfStock = hasVariations && selectedVariation
+          ? (() => {
+              const variation = variations.find((v: any) => v.name === selectedVariation)
+              if (variation && variation.stock !== undefined) {
+                return Number(variation.stock) <= 0
+              }
+              return product.countInStock === 0
+            })()
+          : product.countInStock === 0
+
+        return (
+          <Button
+            onClick={handleAddToCart}
+            className="w-full rounded-full font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isAddingToCart || isOutOfStock}
+          >
+            {isAddingToCart ? (
+              <LoadingSpinner size="sm" text="Adding..." />
+            ) : isOutOfStock ? (
+              'Out of Stock'
+            ) : (
+              <>
+                <ShoppingCart className="ml-2 h-4 w-4" />
+                Add to Cart
+              </>
+            )}
+          </Button>
+        )
+      })()}
     </div>
   )
 }

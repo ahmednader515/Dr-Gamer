@@ -7,7 +7,7 @@ export async function getActivePromoCodes() {
   try {
     const now = new Date()
     
-    // Get all active promo codes
+    // Get all active promo codes with their assignments
     const allPromoCodes = await prisma.promoCode.findMany({
       where: {
         isActive: true,
@@ -23,6 +23,22 @@ export async function getActivePromoCodes() {
         expiresAt: true,
         usageLimit: true,
         usageCount: true,
+        applicableProducts: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     })
@@ -35,8 +51,34 @@ export async function getActivePromoCodes() {
       return promo.usageCount < promo.usageLimit
     })
 
+    // Serialize the promo codes with assignments
+    const serializedPromoCodes = activePromoCodes.map((promo) => ({
+      id: promo.id,
+      code: promo.code,
+      discountPercent: promo.discountPercent,
+      assignments: promo.applicableProducts.map((link) => ({
+        id: link.id,
+        type: link.productId ? 'product' : 'category',
+        product: link.product
+          ? {
+              id: link.product.id,
+              name: link.product.name,
+            }
+          : null,
+        category: link.category
+          ? {
+              id: link.category.id,
+              name: link.category.name,
+            }
+          : null,
+        variationNames: Array.isArray(link.variationNames)
+          ? link.variationNames
+          : [],
+      })),
+    }))
+
     // Return all active promo codes (no limit)
-    return JSON.parse(JSON.stringify(activePromoCodes))
+    return JSON.parse(JSON.stringify(serializedPromoCodes))
   } catch (error) {
     console.error('Error getting active promo codes:', error)
     return []

@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 
 import { Cart, OrderItem, ShippingAddress } from '@/types'
 import { calcDeliveryDateAndPrice } from '@/lib/actions/order.actions'
+import { recalculateCartItemPrice } from '@/lib/utils'
 
 const initialState: Cart = {
   items: [],
@@ -23,6 +24,7 @@ interface CartState {
   cart: Cart
   cleanupInvalidItems: () => void
   regenerateClientIds: () => void
+  recalculatePrices: () => Promise<void>
   addItem: (item: OrderItem, quantity: number) => Promise<string>
   updateItem: (item: OrderItem, quantity: number) => Promise<void>
   removeItem: (item: OrderItem) => void
@@ -100,24 +102,39 @@ const useCartStore = create(
           }
         }
 
+        // Add new item or update existing
         const updatedCartItems = existItem
-          ? items.map((x) =>
-              x.product === item.product &&
-              x.color === item.color &&
-              x.size === item.size
-                ? { ...existItem, quantity: existItem.quantity + quantity }
-                : x
-            )
+          ? items.map((x) => {
+              if (x.product === item.product &&
+                  x.color === item.color &&
+                  x.size === item.size) {
+                // Update quantity
+                return { ...existItem, quantity: existItem.quantity + quantity }
+              }
+              return x
+            })
           : [...items, { ...item, quantity, price: Number(item.price || 0) }] // Ensure price is a number
+
+        // Recalculate prices based on current product data
+        const priceCalcResult = await calcDeliveryDateAndPrice({
+          items: updatedCartItems,
+          shippingAddress,
+        })
+        
+        // Update cart items with recalculated prices
+        const finalCartItems = priceCalcResult.updatedItems || updatedCartItems
 
         set({
           cart: {
             ...get().cart,
-            items: updatedCartItems,
-            ...(await calcDeliveryDateAndPrice({
-              items: updatedCartItems,
-              shippingAddress,
-            })),
+            items: finalCartItems,
+            itemsPrice: priceCalcResult.itemsPrice,
+            shippingPrice: priceCalcResult.shippingPrice,
+            taxPrice: priceCalcResult.taxPrice,
+            totalPrice: priceCalcResult.totalPrice,
+            availableDeliveryDates: priceCalcResult.availableDeliveryDates,
+            deliveryDateIndex: priceCalcResult.deliveryDateIndex,
+            expectedDeliveryDate: priceCalcResult.expectedDeliveryDate,
           },
         })
         const foundItem = updatedCartItems.find(
@@ -140,21 +157,37 @@ const useCartStore = create(
             x.size === item.size
         )
         if (!exist) return
-        const updatedCartItems = items.map((x) =>
-          x.product === item.product &&
-          x.color === item.color &&
-          x.size === item.size
-            ? { ...exist, quantity: quantity }
-            : x
-        )
+        
+        // Update quantity
+        const updatedCartItems = items.map((x) => {
+          if (x.product === item.product &&
+              x.color === item.color &&
+              x.size === item.size) {
+            return { ...exist, quantity: quantity }
+          }
+          return x
+        })
+        
+        // Recalculate prices based on current product data
+        const priceCalcResult = await calcDeliveryDateAndPrice({
+          items: updatedCartItems,
+          shippingAddress,
+        })
+        
+        // Update cart items with recalculated prices
+        const finalCartItems = priceCalcResult.updatedItems || updatedCartItems
+        
         set({
           cart: {
             ...get().cart,
-            items: updatedCartItems,
-            ...(await calcDeliveryDateAndPrice({
-              items: updatedCartItems,
-              shippingAddress,
-            })),
+            items: finalCartItems,
+            itemsPrice: priceCalcResult.itemsPrice,
+            shippingPrice: priceCalcResult.shippingPrice,
+            taxPrice: priceCalcResult.taxPrice,
+            totalPrice: priceCalcResult.totalPrice,
+            availableDeliveryDates: priceCalcResult.availableDeliveryDates,
+            deliveryDateIndex: priceCalcResult.deliveryDateIndex,
+            expectedDeliveryDate: priceCalcResult.expectedDeliveryDate,
           },
         })
       },
@@ -166,27 +199,54 @@ const useCartStore = create(
             x.color !== item.color ||
             x.size !== item.size
         )
+        
+        // Recalculate prices based on current product data
+        const priceCalcResult = await calcDeliveryDateAndPrice({
+          items: updatedCartItems,
+          shippingAddress,
+        })
+        
+        // Update cart items with recalculated prices
+        const finalCartItems = priceCalcResult.updatedItems || updatedCartItems
+        
         set({
           cart: {
             ...get().cart,
-            items: updatedCartItems,
-            ...(await calcDeliveryDateAndPrice({
-              items: updatedCartItems,
-              shippingAddress,
-            })),
+            items: finalCartItems,
+            itemsPrice: priceCalcResult.itemsPrice,
+            shippingPrice: priceCalcResult.shippingPrice,
+            taxPrice: priceCalcResult.taxPrice,
+            totalPrice: priceCalcResult.totalPrice,
+            availableDeliveryDates: priceCalcResult.availableDeliveryDates,
+            deliveryDateIndex: priceCalcResult.deliveryDateIndex,
+            expectedDeliveryDate: priceCalcResult.expectedDeliveryDate,
           },
         })
       },
       setShippingAddress: async (shippingAddress: ShippingAddress) => {
         const { items } = get().cart
+        
+        // Recalculate prices based on current product data
+        const priceCalcResult = await calcDeliveryDateAndPrice({
+          items,
+          shippingAddress,
+        })
+        
+        // Update cart items with recalculated prices
+        const finalCartItems = priceCalcResult.updatedItems || items
+        
         set({
           cart: {
             ...get().cart,
             shippingAddress,
-            ...(await calcDeliveryDateAndPrice({
-              items,
-              shippingAddress,
-            })),
+            items: finalCartItems,
+            itemsPrice: priceCalcResult.itemsPrice,
+            shippingPrice: priceCalcResult.shippingPrice,
+            taxPrice: priceCalcResult.taxPrice,
+            totalPrice: priceCalcResult.totalPrice,
+            availableDeliveryDates: priceCalcResult.availableDeliveryDates,
+            deliveryDateIndex: priceCalcResult.deliveryDateIndex,
+            expectedDeliveryDate: priceCalcResult.expectedDeliveryDate,
           },
         })
       },
@@ -232,15 +292,55 @@ const useCartStore = create(
       },
       setDeliveryDateIndex: async (index: number) => {
         const { items, shippingAddress } = get().cart
+        
+        // Recalculate prices based on current product data
+        const priceCalcResult = await calcDeliveryDateAndPrice({
+          items,
+          shippingAddress,
+          deliveryDateIndex: index,
+        })
+        
+        // Update cart items with recalculated prices
+        const finalCartItems = priceCalcResult.updatedItems || items
 
         set({
           cart: {
             ...get().cart,
-            ...(await calcDeliveryDateAndPrice({
-              items,
-              shippingAddress,
-              deliveryDateIndex: index,
-            })),
+            items: finalCartItems,
+            itemsPrice: priceCalcResult.itemsPrice,
+            shippingPrice: priceCalcResult.shippingPrice,
+            taxPrice: priceCalcResult.taxPrice,
+            totalPrice: priceCalcResult.totalPrice,
+            availableDeliveryDates: priceCalcResult.availableDeliveryDates,
+            deliveryDateIndex: priceCalcResult.deliveryDateIndex,
+            expectedDeliveryDate: priceCalcResult.expectedDeliveryDate,
+          },
+        })
+      },
+      recalculatePrices: async () => {
+        const { items, shippingAddress } = get().cart
+        if (items.length === 0) return
+        
+        // Recalculate prices based on current product data
+        const priceCalcResult = await calcDeliveryDateAndPrice({
+          items,
+          shippingAddress,
+        })
+        
+        // Update cart items with recalculated prices
+        const finalCartItems = priceCalcResult.updatedItems || items
+        
+        set({
+          cart: {
+            ...get().cart,
+            items: finalCartItems,
+            itemsPrice: priceCalcResult.itemsPrice,
+            shippingPrice: priceCalcResult.shippingPrice,
+            taxPrice: priceCalcResult.taxPrice,
+            totalPrice: priceCalcResult.totalPrice,
+            availableDeliveryDates: priceCalcResult.availableDeliveryDates,
+            deliveryDateIndex: priceCalcResult.deliveryDateIndex,
+            expectedDeliveryDate: priceCalcResult.expectedDeliveryDate,
           },
         })
       },

@@ -316,6 +316,25 @@ const ProductCard = ({
           })()
         : Number(product.price);
 
+      // Get variation pricing info if variation is selected
+      let variationOriginalPrice: number | undefined
+      let variationSalePriceExpiresAt: string | undefined
+      if (hasVariations && selectedVariation) {
+        const variation = product.variations.find((v: any) => v.name === selectedVariation);
+        if (variation) {
+          variationOriginalPrice = variation.originalPrice ? Number(variation.originalPrice) : undefined
+          variationSalePriceExpiresAt = variation.salePriceExpiresAt || undefined
+        }
+      }
+      
+      // Get product-level pricing info for products without variations
+      let productListPrice: number | undefined
+      let productOriginalPrice: number | undefined
+      if (!hasVariations) {
+        productListPrice = (product as any).listPrice ? Number((product as any).listPrice) : undefined
+        productOriginalPrice = (product as any).originalPrice ? Number((product as any).originalPrice) : undefined
+      }
+
       await withLoading(
         async () => {
           await addItem({
@@ -341,6 +360,12 @@ const ProductCard = ({
             accountBackupCode: undefined,
             disableTwoStepVerified: false,
             clientId: `${product.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            // Variation pricing info for discount expiration handling
+            variationOriginalPrice,
+            variationSalePriceExpiresAt,
+            // Product-level pricing info for discount handling (products without variations)
+            productListPrice,
+            productOriginalPrice,
           }, 1);
 
           toast({

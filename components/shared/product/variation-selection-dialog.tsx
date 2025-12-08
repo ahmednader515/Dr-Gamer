@@ -31,10 +31,27 @@ export default function VariationSelectionDialog({
   
   const hasVariations = product.variations && Array.isArray(product.variations) && product.variations.length > 0
   
+  // Check if selected variation is out of stock
+  const isSelectedOutOfStock = hasVariations && selectedVariation
+    ? (() => {
+        const variation = product.variations.find((v: any) => v.name === selectedVariation)
+        if (variation && variation.stock !== undefined) {
+          return Number(variation.stock) <= 0
+        }
+        return false
+      })()
+    : false
+  
   const handleConfirm = () => {
     if (!selectedVariation && hasVariations) {
       return
     }
+    
+    // Check if selected variation is out of stock
+    if (isSelectedOutOfStock) {
+      return // Don't allow adding out of stock items
+    }
+    
     onConfirm(selectedVariation)
     onClose()
   }
@@ -101,24 +118,38 @@ export default function VariationSelectionDialog({
                     : null
                   const hasExpiry = expiryDate && !Number.isNaN(expiryDate.getTime())
                   
+                  // Check if variation is out of stock
+                  const variationStock = variation.stock !== undefined ? Number(variation.stock) : null
+                  const isOutOfStock = variationStock !== null && variationStock <= 0
+                  
                   return (
                     <button
                       key={variation.name}
                       className={`w-full px-4 py-3 border rounded-lg text-sm transition-all text-left ${
-                        selectedVariation === variation.name 
+                        isOutOfStock
+                          ? 'border-red-600 bg-red-900/20 text-gray-400 cursor-not-allowed opacity-60'
+                          : selectedVariation === variation.name 
                           ? 'border-purple-500 bg-purple-500/20 text-white ring-2 ring-purple-500' 
                           : 'border-gray-600 bg-gray-800/50 hover:border-purple-400 hover:bg-gray-700'
                       }`}
-                      onClick={() => setSelectedVariation(variation.name)}
+                      onClick={() => !isOutOfStock && setSelectedVariation(variation.name)}
+                      disabled={isOutOfStock}
                     >
                       <div className='flex justify-between items-center'>
                         <div className='flex-1'>
-                          <span className='font-medium'>{variation.name}</span>
-                          {hasDiscount && (
-                            <span className='ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-md font-bold'>
-                              -{discountPercentage}%
-                            </span>
-                          )}
+                          <div className='flex items-center gap-2'>
+                            <span className='font-medium'>{variation.name}</span>
+                            {isOutOfStock && (
+                              <span className='px-2 py-0.5 bg-red-600 text-white text-xs rounded-md font-bold'>
+                                Out of Stock
+                              </span>
+                            )}
+                            {hasDiscount && !isOutOfStock && (
+                              <span className='px-2 py-0.5 bg-red-500 text-white text-xs rounded-md font-bold'>
+                                -{discountPercentage}%
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className='text-right'>
                           {hasDiscount && pricing.originalPrice > 0 && (
@@ -154,10 +185,14 @@ export default function VariationSelectionDialog({
             </Button>
             <Button
               onClick={handleConfirm}
-              disabled={hasVariations && !selectedVariation}
+              disabled={(hasVariations && !selectedVariation) || isSelectedOutOfStock}
               className='flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed'
             >
-              {actionType === 'add' ? 'Add to Cart' : 'Buy Now'}
+              {isSelectedOutOfStock 
+                ? 'Out of Stock' 
+                : actionType === 'add' 
+                ? 'Add to Cart' 
+                : 'Buy Now'}
             </Button>
           </div>
         </div>

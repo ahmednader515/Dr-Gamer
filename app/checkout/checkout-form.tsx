@@ -211,6 +211,7 @@ export default function CheckoutForm() {
   type AppliedPromo = {
     code: string
     discountPercent: number
+    maxDiscountAmount: number | null
     assignments: AppliedPromoAssignment[]
   }
 
@@ -219,6 +220,7 @@ export default function CheckoutForm() {
   const promoCalculationInput = appliedPromo
     ? {
         discountPercent: appliedPromo.discountPercent,
+        maxDiscountAmount: appliedPromo.maxDiscountAmount ?? null,
         assignments: appliedPromo.assignments.map((assignment) => ({
           type: assignment.type,
           productId: assignment.product?.id,

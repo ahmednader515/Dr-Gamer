@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -13,8 +13,16 @@ import { useLoading } from '@/hooks/use-loading'
 import { LoadingSpinner } from '@/components/shared/loading-overlay'
 
 export default function CartPage() {
-  const { cart: { items, itemsPrice }, updateItem, removeItem, clearCart } = useCartStore()
+  const { cart: { items, itemsPrice }, updateItem, removeItem, clearCart, recalculatePrices } = useCartStore()
   const { isLoading: isUpdating, withLoading } = useLoading()
+
+  // Recalculate prices when the cart page loads
+  useEffect(() => {
+    if (items.length > 0) {
+      recalculatePrices()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only run on mount to recalculate prices based on current product data
 
   const handleQuantityChange = async (item: any, newQuantity: number) => {
     if (newQuantity < 1) return

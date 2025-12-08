@@ -105,75 +105,63 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check minimum purchase amount
     const cartItems = Array.isArray(items) ? items : []
-    const totalCartValue = cartItems.reduce((sum: number, item: any) => {
-      const price = Number(item?.price || 0)
-      const quantity = Number(item?.quantity || 0)
-      return sum + (price * quantity)
-    }, 0)
+    const assignmentsRaw = promoCode.applicableProducts || []
+    
+    // Build assignments for checking eligibility
+    const assignmentsForCheck = assignmentsRaw.length > 0
+      ? assignmentsRaw.map((assignment) => ({
+          type: assignment.productId ? 'product' : 'category',
+          productId: assignment.productId || undefined,
+          categoryId: assignment.categoryId || undefined,
+          categoryName: assignment.category?.name || undefined,
+          variationNames: Array.isArray(assignment.variationNames)
+            ? assignment.variationNames.map((name: any) =>
+                typeof name === 'string' ? name.trim().toLowerCase() : '',
+              )
+            : [],
+        }))
+      : []
 
-    if (promoCode.minPurchaseAmount && Number(promoCode.minPurchaseAmount) > 0) {
-      const minAmount = Number(promoCode.minPurchaseAmount)
-      if (totalCartValue < minAmount) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: `Minimum purchase amount of ${minAmount.toFixed(2)} EGP required. Your cart total is ${totalCartValue.toFixed(2)} EGP.`,
-          },
-          { status: 400 }
-        )
-      }
+    // Helper function to check if an item is eligible
+    const isItemEligible = (item: any): boolean => {
+      // If no assignments, all items are eligible
+      if (assignmentsForCheck.length === 0) return true
+
+      const productId = String(
+        item?.productId || item?.product || item?.id || '',
+      ).trim()
+      if (!productId) return false
+
+      const categoryId = item?.categoryId ? String(item.categoryId).trim() : ''
+      const categoryName = item?.categoryName
+        ? String(item.categoryName).trim().toLowerCase()
+        : ''
+      const selectedVariation = item?.selectedVariation
+        ? String(item.selectedVariation).trim().toLowerCase()
+        : ''
+
+      return assignmentsForCheck.some((assignment) => {
+        if (assignment.type === 'product' && assignment.productId) {
+          if (assignment.productId !== productId) return false
+          if (assignment.variationNames.length === 0) return true
+          return assignment.variationNames.includes(selectedVariation)
+        }
+        if (assignment.type === 'category') {
+          if (assignment.categoryId && categoryId) {
+            return assignment.categoryId === categoryId
+          }
+          if (assignment.categoryName && categoryName) {
+            return assignment.categoryName === categoryName
+          }
+        }
+        return false
+      })
     }
 
-    const assignmentsRaw = promoCode.applicableProducts || []
-    if (assignmentsRaw.length > 0) {
-      const cartItems = Array.isArray(items) ? items : []
-
-      const assignmentsForCheck = assignmentsRaw.map((assignment) => ({
-        type: assignment.productId ? 'product' : 'category',
-        productId: assignment.productId || undefined,
-        categoryId: assignment.categoryId || undefined,
-        categoryName: assignment.category?.name || undefined,
-        variationNames: Array.isArray(assignment.variationNames)
-          ? assignment.variationNames.map((name: any) =>
-              typeof name === 'string' ? name.trim().toLowerCase() : '',
-            )
-          : [],
-      }))
-
-      const hasEligibleItem = cartItems.some((item: any) => {
-        const productId = String(
-          item?.productId || item?.product || item?.id || '',
-        ).trim()
-        if (!productId) return false
-
-        const categoryId = item?.categoryId ? String(item.categoryId).trim() : ''
-        const categoryName = item?.categoryName
-          ? String(item.categoryName).trim().toLowerCase()
-          : ''
-        const selectedVariation = item?.selectedVariation
-          ? String(item.selectedVariation).trim().toLowerCase()
-          : ''
-
-        return assignmentsForCheck.some((assignment) => {
-          if (assignment.type === 'product' && assignment.productId) {
-            if (assignment.productId !== productId) return false
-            if (assignment.variationNames.length === 0) return true
-            return assignment.variationNames.includes(selectedVariation)
-          }
-          if (assignment.type === 'category') {
-            if (assignment.categoryId && categoryId) {
-              return assignment.categoryId === categoryId
-            }
-            if (assignment.categoryName && categoryName) {
-              return assignment.categoryName === categoryName
-            }
-          }
-          return false
-        })
-      })
-
+    // Check if there are any eligible items
+    if (assignmentsForCheck.length > 0) {
+      const hasEligibleItem = cartItems.some(isItemEligible)
       if (!hasEligibleItem) {
         return NextResponse.json(
           {
@@ -186,6 +174,44 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Calculate eligible items only (for minimum requirements)
+    const eligibleItems = cartItems.filter(isItemEligible)
+    const eligibleProductCount = eligibleItems.reduce((count: number, item: any) => {
+      return count + Number(item?.quantity || 0)
+    }, 0)
+    const eligibleCartValue = eligibleItems.reduce((sum: number, item: any) => {
+      const price = Number(item?.price || 0)
+      const quantity = Number(item?.quantity || 0)
+      return sum + (price * quantity)
+    }, 0)
+
+    // Check minimum requirements (OR condition: minProductCount OR minPurchaseAmount)
+    const minProductCount = promoCode.minProductCount ? Number(promoCode.minProductCount) : null
+    const minPurchaseAmount = promoCode.minPurchaseAmount ? Number(promoCode.minPurchaseAmount) : null
+
+    if (minProductCount !== null || minPurchaseAmount !== null) {
+      const meetsProductCount = minProductCount === null || eligibleProductCount >= minProductCount
+      const meetsPurchaseAmount = minPurchaseAmount === null || eligibleCartValue >= minPurchaseAmount
+
+      if (!meetsProductCount && !meetsPurchaseAmount) {
+        const requirements: string[] = []
+        if (minProductCount !== null) {
+          requirements.push(`${minProductCount} eligible product${minProductCount !== 1 ? 's' : ''}`)
+        }
+        if (minPurchaseAmount !== null) {
+          requirements.push(`${minPurchaseAmount.toFixed(2)} EGP in eligible items`)
+        }
+        
+        return NextResponse.json(
+          {
+            success: false,
+            message: `This promo code requires either ${requirements.join(' OR ')}. You have ${eligibleProductCount} eligible product${eligibleProductCount !== 1 ? 's' : ''} worth ${eligibleCartValue.toFixed(2)} EGP.`,
+          },
+          { status: 400 }
+        )
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: `${promoCode.discountPercent}% discount applied`,
@@ -193,6 +219,8 @@ export async function POST(request: NextRequest) {
         code: promoCode.code,
         discountPercent: promoCode.discountPercent,
         minPurchaseAmount: promoCode.minPurchaseAmount ? Number(promoCode.minPurchaseAmount) : null,
+        minProductCount: promoCode.minProductCount ?? null,
+        maxDiscountAmount: promoCode.maxDiscountAmount ? Number(promoCode.maxDiscountAmount) : null,
         assignments: serializeAssignments(assignmentsRaw),
       },
     })

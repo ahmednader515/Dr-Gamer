@@ -38,6 +38,7 @@ type PromoAssignmentResponse = {
 type AppliedPromo = {
   code: string
   discountPercent: number
+  maxDiscountAmount: number | null
   assignments: PromoAssignmentResponse[]
 }
 
@@ -94,10 +95,12 @@ export default function PromoCodeInput({
         const applied: AppliedPromo = {
           code: result.data.code,
           discountPercent: result.data.discountPercent,
+          maxDiscountAmount: result.data.maxDiscountAmount ?? null,
           assignments: result.data.assignments || [],
         }
         const { discount, eligibleItems } = calculatePromoDiscount(cartItems, {
           discountPercent: applied.discountPercent,
+          maxDiscountAmount: result.data.maxDiscountAmount ?? null,
           assignments: applied.assignments.map((assignment: PromoAssignmentResponse) => ({
             type: assignment.type,
             productId: assignment.product?.id,

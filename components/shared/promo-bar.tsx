@@ -11,7 +11,7 @@ export default async function PromoBar() {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg">
+    <div className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg" data-promo-bar>
       {/* Mobile Layout - Clickable "Promo Codes" text that opens sidebar */}
       <div className="md:hidden h-8">
         <PromoBarMobile promoCodes={activePromoCodes} />
