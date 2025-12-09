@@ -355,6 +355,57 @@ export const createOrderFromCart = async (
           })
         }
 
+        // Decrement stock for all products in the order (within transaction)
+        await Promise.all(
+          orderData.items.map(async (item) => {
+            // Get current product data
+            const product = await tx.product.findUnique({
+              where: { id: item.product },
+              select: { variations: true }
+            })
+
+            if (!product) return
+
+            // Prepare update data
+            const updateData: any = {
+              countInStock: {
+                decrement: item.quantity
+              }
+            }
+
+            // If item has a selected variation, also decrement variation stock
+            const selectedVariation = (item as any).selectedVariation
+            if (selectedVariation && product.variations) {
+              let variations: any[] = []
+              try {
+                variations = typeof product.variations === 'string'
+                  ? JSON.parse(product.variations as string)
+                  : product.variations
+              } catch (e) {
+                variations = []
+              }
+
+              // Find and update the variation stock
+              const variationIndex = variations.findIndex(
+                (v: any) => v.name === selectedVariation
+              )
+
+              if (variationIndex !== -1 && variations[variationIndex].stock !== undefined) {
+                const currentStock = Number(variations[variationIndex].stock) || 0
+                const newStock = Math.max(0, currentStock - item.quantity)
+                variations[variationIndex].stock = newStock
+                updateData.variations = variations
+              }
+            }
+
+            // Update product with both countInStock and variations (if modified)
+            await tx.product.update({
+              where: { id: item.product },
+              data: updateData
+            })
+          })
+        )
+
         return createdOrder
       })
 
@@ -410,56 +461,6 @@ export async function updateOrderToPaid(orderId: string) {
           orderItems: true
         }
       })
-      
-      // Batch update all products in parallel within transaction
-      await Promise.all(
-        existingOrder.orderItems.map(async (item) => {
-          // Get current product data
-          const product = await tx.product.findUnique({
-            where: { id: item.productId },
-            select: { variations: true }
-          })
-
-          if (!product) return
-
-          // Prepare update data
-          const updateData: any = {
-            countInStock: {
-              decrement: item.quantity
-            }
-          }
-
-          // If item has a selected variation, also decrement variation stock
-          if (item.selectedVariation && product.variations) {
-            let variations: any[] = []
-            try {
-              variations = typeof product.variations === 'string'
-                ? JSON.parse(product.variations as string)
-                : product.variations
-            } catch (e) {
-              variations = []
-            }
-
-            // Find and update the variation stock
-            const variationIndex = variations.findIndex(
-              (v: any) => v.name === item.selectedVariation
-            )
-
-            if (variationIndex !== -1 && variations[variationIndex].stock !== undefined) {
-              const currentStock = Number(variations[variationIndex].stock) || 0
-              const newStock = Math.max(0, currentStock - item.quantity)
-              variations[variationIndex].stock = newStock
-              updateData.variations = variations
-            }
-          }
-
-          // Update product with both countInStock and variations (if modified)
-          await tx.product.update({
-            where: { id: item.productId },
-            data: updateData
-          })
-        })
-      )
       
       return updatedOrder
     })

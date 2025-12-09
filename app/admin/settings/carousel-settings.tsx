@@ -87,6 +87,11 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
         newSet.delete(index)
         return newSet
       })
+      // Reset file input value so onChange can fire again
+      const fileInput = document.getElementById(`videoUpload${index}`) as HTMLInputElement
+      if (fileInput) {
+        fileInput.value = ''
+      }
     }
   }
 
@@ -107,13 +112,14 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
     try {
       setUploadingImages(prev => new Set(prev).add(index))
       
-      const uploadResult = await startUpload([file])
+      const uploadResult = await startImageUpload([file])
       
       if (uploadResult && uploadResult[0]) {
         const imageUrl = uploadResult[0].url
         
         const newCarouselItems = [...carouselItems]
         newCarouselItems[index].image = imageUrl
+        newCarouselItems[index].video = undefined // Remove video if image is uploaded
         onCarouselItemsChange(newCarouselItems)
         
         toast({
@@ -137,6 +143,11 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
         newSet.delete(index)
         return newSet
       })
+      // Reset file input value so onChange can fire again
+      const fileInput = document.getElementById(`imageUpload${index}`) as HTMLInputElement
+      if (fileInput) {
+        fileInput.value = ''
+      }
     }
   }
 
@@ -310,6 +321,11 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
                           const newCarouselItems = [...carouselItems]
                           newCarouselItems[index].video = undefined
                           onCarouselItemsChange(newCarouselItems)
+                          // Reset file input value so user can upload again
+                          const fileInput = document.getElementById(`videoUpload${index}`) as HTMLInputElement
+                          if (fileInput) {
+                            fileInput.value = ''
+                          }
                         }}
                         className='text-red-500 hover:text-red-700'
                       >
@@ -324,6 +340,11 @@ export default function CarouselSettings({ carouselItems, onCarouselItemsChange 
                           const newCarouselItems = [...carouselItems]
                           newCarouselItems[index].image = undefined
                           onCarouselItemsChange(newCarouselItems)
+                          // Reset file input value so user can upload again
+                          const fileInput = document.getElementById(`imageUpload${index}`) as HTMLInputElement
+                          if (fileInput) {
+                            fileInput.value = ''
+                          }
                         }}
                         className='text-red-500 hover:text-red-700'
                       >
