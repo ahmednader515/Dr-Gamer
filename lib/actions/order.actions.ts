@@ -139,12 +139,16 @@ export const createOrderFromCart = async (
       type: target.productId ? 'product' : 'category',
       productId: target.productId || undefined,
       categoryId: target.categoryId || undefined,
-      categoryName: target.category?.name || undefined,
+      categoryName: target.category?.name 
+        ? String(target.category.name).trim().toLowerCase() 
+        : undefined,
       maxDiscountAmount: target.maxDiscountAmount
         ? Number(target.maxDiscountAmount)
         : null,
       variationNames: Array.isArray(target.variationNames)
-        ? target.variationNames
+        ? target.variationNames.map((name: any) =>
+            typeof name === 'string' ? name.trim().toLowerCase() : '',
+          )
         : [],
     }))
 
@@ -172,11 +176,13 @@ export const createOrderFromCart = async (
           return assignment.variationNames.includes(selectedVariation)
         }
         if (assignment.type === 'category') {
+          // Try categoryId first if both exist
           if (assignment.categoryId && categoryId) {
-            return assignment.categoryId === categoryId
+            if (assignment.categoryId === categoryId) return true
           }
+          // Fall back to categoryName comparison (both are now lowercased)
           if (assignment.categoryName && categoryName) {
-            return assignment.categoryName === categoryName
+            if (assignment.categoryName === categoryName) return true
           }
         }
         return false
@@ -201,7 +207,7 @@ export const createOrderFromCart = async (
       const meetsProductCount = minProductCount === null || eligibleProductCount >= minProductCount
       const meetsPurchaseAmount = minPurchaseAmount === null || eligibleCartValue >= minPurchaseAmount
 
-      if (!meetsProductCount && !meetsPurchaseAmount) {
+      if (!meetsProductCount || !meetsPurchaseAmount) {
         const requirements: string[] = []
         if (minProductCount !== null) {
           requirements.push(`${minProductCount} eligible product${minProductCount !== 1 ? 's' : ''}`)
@@ -209,7 +215,8 @@ export const createOrderFromCart = async (
         if (minPurchaseAmount !== null) {
           requirements.push(`${minPurchaseAmount.toFixed(2)} EGP in eligible items`)
         }
-        throw new Error(`This promo code requires either ${requirements.join(' OR ')}. You have ${eligibleProductCount} eligible product${eligibleProductCount !== 1 ? 's' : ''} worth ${eligibleCartValue.toFixed(2)} EGP.`)
+        const joinWord = requirements.length > 1 ? ' AND ' : ''
+        throw new Error(`This promo code requires ${requirements.join(joinWord)}. You have ${eligibleProductCount} eligible product${eligibleProductCount !== 1 ? 's' : ''} worth ${eligibleCartValue.toFixed(2)} EGP.`)
       }
     }
 

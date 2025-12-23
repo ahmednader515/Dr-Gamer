@@ -110,11 +110,13 @@ export async function POST(request: NextRequest) {
     
     // Build assignments for checking eligibility
     const assignmentsForCheck = assignmentsRaw.length > 0
-      ? assignmentsRaw.map((assignment) => ({
+      ? assignmentsRaw.map((assignment: any) => ({
           type: assignment.productId ? 'product' : 'category',
-          productId: assignment.productId || undefined,
-          categoryId: assignment.categoryId || undefined,
-          categoryName: assignment.category?.name || undefined,
+          productId: assignment.productId ? String(assignment.productId).trim() : undefined,
+          categoryId: assignment.categoryId ? String(assignment.categoryId).trim() : undefined,
+          categoryName: assignment.category?.name 
+            ? String(assignment.category.name).trim().toLowerCase() 
+            : undefined,
           variationNames: Array.isArray(assignment.variationNames)
             ? assignment.variationNames.map((name: any) =>
                 typeof name === 'string' ? name.trim().toLowerCase() : '',
@@ -136,23 +138,27 @@ export async function POST(request: NextRequest) {
       const categoryId = item?.categoryId ? String(item.categoryId).trim() : ''
       const categoryName = item?.categoryName
         ? String(item.categoryName).trim().toLowerCase()
+        : item?.category
+        ? String(item.category).trim().toLowerCase()
         : ''
       const selectedVariation = item?.selectedVariation
         ? String(item.selectedVariation).trim().toLowerCase()
         : ''
 
-      return assignmentsForCheck.some((assignment) => {
+      return assignmentsForCheck.some((assignment: any) => {
         if (assignment.type === 'product' && assignment.productId) {
           if (assignment.productId !== productId) return false
           if (assignment.variationNames.length === 0) return true
           return assignment.variationNames.includes(selectedVariation)
         }
         if (assignment.type === 'category') {
+          // Try categoryId first if both exist
           if (assignment.categoryId && categoryId) {
-            return assignment.categoryId === categoryId
+            if (assignment.categoryId === categoryId) return true
           }
+          // Fall back to categoryName comparison (both are now lowercased)
           if (assignment.categoryName && categoryName) {
-            return assignment.categoryName === categoryName
+            if (assignment.categoryName === categoryName) return true
           }
         }
         return false
@@ -185,7 +191,7 @@ export async function POST(request: NextRequest) {
       return sum + (price * quantity)
     }, 0)
 
-    // Check minimum requirements (OR condition: minProductCount OR minPurchaseAmount)
+    // Check minimum requirements (AND condition: minProductCount AND minPurchaseAmount)
     const minProductCount = promoCode.minProductCount ? Number(promoCode.minProductCount) : null
     const minPurchaseAmount = promoCode.minPurchaseAmount ? Number(promoCode.minPurchaseAmount) : null
 
@@ -193,7 +199,7 @@ export async function POST(request: NextRequest) {
       const meetsProductCount = minProductCount === null || eligibleProductCount >= minProductCount
       const meetsPurchaseAmount = minPurchaseAmount === null || eligibleCartValue >= minPurchaseAmount
 
-      if (!meetsProductCount && !meetsPurchaseAmount) {
+      if (!meetsProductCount || !meetsPurchaseAmount) {
         const requirements: string[] = []
         if (minProductCount !== null) {
           requirements.push(`${minProductCount} eligible product${minProductCount !== 1 ? 's' : ''}`)
@@ -202,10 +208,12 @@ export async function POST(request: NextRequest) {
           requirements.push(`${minPurchaseAmount.toFixed(2)} EGP in eligible items`)
         }
         
+        const joinWord = requirements.length > 1 ? ' AND ' : ''
+        
         return NextResponse.json(
           {
             success: false,
-            message: `This promo code requires either ${requirements.join(' OR ')}. You have ${eligibleProductCount} eligible product${eligibleProductCount !== 1 ? 's' : ''} worth ${eligibleCartValue.toFixed(2)} EGP.`,
+            message: `This promo code requires ${requirements.join(joinWord)}. You have ${eligibleProductCount} eligible product${eligibleProductCount !== 1 ? 's' : ''} worth ${eligibleCartValue.toFixed(2)} EGP.`,
           },
           { status: 400 }
         )
