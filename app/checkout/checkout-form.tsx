@@ -1063,6 +1063,20 @@ export default function CheckoutForm() {
                                   ) : (
                                     <UploadButton
                                       endpoint='imageUploader'
+                                      onBeforeUploadBegin={(files) => {
+                                        // Sanitize filenames to prevent double-encoding issues
+                                        console.log('Original files:', files.map(f => f.name))
+                                        const sanitized = files.map((file) => {
+                                          // Replace spaces and special characters with underscores
+                                          const sanitizedName = file.name
+                                            .replace(/\s+/g, '_')
+                                            .replace(/[^a-zA-Z0-9._-]/g, '_')
+                                          console.log(`Sanitizing: "${file.name}" -> "${sanitizedName}"`)
+                                          return new File([file], sanitizedName, { type: file.type })
+                                        })
+                                        console.log('Sanitized files:', sanitized.map(f => f.name))
+                                        return sanitized
+                                      }}
                                       onClientUploadComplete={(res) => {
                                         if (res && res[0]) {
                                           const url = res[0].url
@@ -1072,13 +1086,25 @@ export default function CheckoutForm() {
                                           toast({
                                             description: 'Image uploaded successfully',
                                           })
+                                        } else {
+                                          toast({
+                                            title: 'Upload Error',
+                                            description: 'Upload failed: No result returned',
+                                            variant: 'destructive',
+                                          })
                                         }
                                       }}
                                       onUploadError={(error: Error) => {
+                                        console.error('UploadThing error:', error)
+                                        const errorMessage = error?.message || 'Failed to upload image. Please try again or use a different image.'
                                         toast({
-                                          description: `Error uploading image: ${error.message}`,
+                                          title: 'Upload Error',
+                                          description: errorMessage,
                                           variant: 'destructive',
                                         })
+                                      }}
+                                      onUploadBegin={(name) => {
+                                        console.log('Upload begin:', name)
                                       }}
                                       appearance={{
                                         button: 'ut-ready:bg-purple-500 ut-ready:bg-opacity-20 ut-uploading:cursor-not-allowed ut-uploading:bg-gray-500 ut-uploading:bg-opacity-20 bg-gray-800 text-white border border-gray-700 cursor-pointer rounded-lg px-4 py-2 text-sm',
