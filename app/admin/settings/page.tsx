@@ -3,6 +3,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CategoryManagement from './category-management'
+import GlobalPricesSettings from './global-prices-settings'
 import SettingsTabsContent from './settings-tabs-content'
 import { getSetting } from '@/lib/actions/setting.actions'
 
@@ -28,7 +29,7 @@ export default async function SettingsPage() {
       
       <Tabs defaultValue="carousel" className="w-full" dir="ltr">
         <div className="mb-6">
-          <TabsList className="grid w-full grid-cols-2 gap-1 h-auto sm:grid-cols-3 lg:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-2 gap-1 h-auto sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
             <TabsTrigger value="carousel" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
               <span className="hidden sm:inline">Carousel</span>
               <span className="sm:hidden">Carousel</span>
@@ -52,6 +53,10 @@ export default async function SettingsPage() {
             <TabsTrigger value="categories" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
               <span className="hidden sm:inline">Manage Categories</span>
               <span className="sm:hidden">Categories</span>
+            </TabsTrigger>
+            <TabsTrigger value="globalPrices" className="flex items-center gap-1 text-xs sm:text-sm px-2 py-3 whitespace-nowrap">
+              <span className="hidden sm:inline">Global Prices</span>
+              <span className="sm:hidden">Prices</span>
             </TabsTrigger>
           </TabsList>
         </div>
@@ -78,6 +83,10 @@ export default async function SettingsPage() {
         
         <TabsContent value="categories" className="space-y-6">
           <CategoryManagement />
+        </TabsContent>
+
+        <TabsContent value="globalPrices" className="space-y-6">
+          <GlobalPricesSettings />
         </TabsContent>
       </Tabs>
     </div>

@@ -11,7 +11,8 @@
     "build": "prisma generate --no-engine && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "download-uploadthing": "npx tsx ./scripts/download-uploadthing-files.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -38,6 +39,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.0.0",
     "@uploadthing/react": "^7.3.3",
+    "axios": "^1.13.5",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
