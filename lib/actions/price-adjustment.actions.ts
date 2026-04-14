@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { z } from 'zod'
 import type { Prisma } from '@prisma/client'
 import { formatError } from '../utils'
@@ -355,6 +355,7 @@ export async function applyBulkPriceAdjustment(raw: z.infer<typeof ApplyInputSch
     revalidatePath('/admin/products')
     revalidatePath('/admin/settings')
     revalidatePath('/search')
+    revalidateTag('products')
 
     return {
       success: true as const,
